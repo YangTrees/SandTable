@@ -3,7 +3,16 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from .theory import CHAPTER_TITLES, RISK_DIMENSIONS, SIX_DIMENSIONS, THEORY_EVIDENCE, TRAINING_MODULES
+from .theory import (
+    CHAPTER_TITLES,
+    PROTECTIVE_CHAPTER_TITLE,
+    RISK_DIMENSIONS,
+    RISK_INSTRUMENTS,
+    SIX_DIMENSION_THEORIES,
+    SIX_DIMENSIONS,
+    THEORY_EVIDENCE,
+    TRAINING_MODULES,
+)
 
 SYSTEM_PROMPT = """你是一名学校心理评估咨询师与沙盘分析师。你的任务是生成《心理沙盘发展性评估报告》的结构化 JSON。
 必须遵守：
@@ -11,11 +20,14 @@ SYSTEM_PROMPT = """你是一名学校心理评估咨询师与沙盘分析师。�
 2. 报告是发展性心理评估参考，不是临床诊断，不得使用“确诊”“障碍”“病人”等医学诊断口吻。
 3. 沙盘意象分析必须写成探索性假设，明确“需访谈确认”。
 4. 不虚构成绩。成绩单不清晰或没有提供的科目，score/rate 写 null，并在 notes 说明“待核对”。
-5. 风险研判只作线索分级，不替代量表、访谈或转介；L3/L4 必须建议由专业人员进一步评估。
-6. 家长/学生端会由服务端强制删除第五章，你不能把风险内容复制到其他章节。
-7. 理论只作为解释透镜，不得编造“某作者提出某跨领域结论”的因果关系；不确定时宁可不写书名，也不要硬凑理论。
+5. 风险研判只作线索分级，不替代量表、访谈或转介；L3/L4 必须建议由专业人员进一步评估，并按风险维度使用对应量表，不得全篇套用同一组量表。
+6. 家长/学生端会由服务端强制删除第五章和 priority_banner，你不能把风险内容复制到其他章节。
+7. 理论只作为解释透镜，不得编造“某作者提出某跨领域结论”的因果关系；六维评估按服务端给定的理论映射填写，不再用箱庭理论推断学科能力。
 8. 沙盘投射量有限（沙具少于3件且无有效地形塑形）时，必须降低结论确定性；不得把“未见负向沙具”写成“无风险”或“心理支撑稳定”。
 9. 训练建议必须有优先级，只把1-2个与当前主要困扰最相关、置信度较高的模块设为优先启动；其余模块写“暂不启动，待信息补充”，不得把六套训练同时推给受测者。
+10. 缺少成绩单或访谈材料时，仍须依据沙盘空间结构、地形塑形、沙具意象、受测者自述和教师观察，对六个维度全部给出探索性学习推理；不得用“无足够线索”“无法判定”代替分析。此时置信度只能写“中”或“低”，并在每条结论末尾写“以上为基于沙盘与现有线索的探索性推断，需结合后续成绩与访谈核验”。
+11. 咨询师完整版除第六章访谈提问可使用第二人称引语外，其余章节的叙述、判断和建议必须用第三人称“受测者/该生”，不得写“你”“你们”“孩子”“你家孩子”。
+12. 制作过程数据（耗时、放入/删除、拖拽犹豫、推沙/挖水、掩埋人物、短时反复放删）只用于过程动力学探索：可讨论投入节奏、犹豫与修改、控制感和破坏—修复循环，但不得把单次动作直接等同于病理或稳定人格；若出现掩埋人物或反复放删，应提高风险核查优先级。
 """
 
 
@@ -23,6 +35,14 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
     items = payload.get("items") or []
     grid = payload.get("grid_distribution") or {}
     heightmap = payload.get("heightmap") or {}
+    terrain_metrics = payload.get("terrain_metrics") if isinstance(payload.get("terrain_metrics"), dict) else {}
+    heightmap_max_abs = max(
+        (abs(float(v)) for v in (heightmap.get("values") or []) if isinstance(v, (int, float))),
+        default=0.0,
+    )
+    terrain_edited = terrain_metrics.get("terrain_edited")
+    if terrain_edited is None:
+        terrain_edited = heightmap_max_abs > 0.5
     student = payload.get("student") or {}
 
     category_counts: dict[str, int] = {}
@@ -45,6 +65,10 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         "crisis": "崩解与丧失：灾害、破损、死亡、枯竭、失控与不可逆的丧失感",
         "shadow": "阴影与隐匿：被压抑、羞耻、退缩、隐藏及人格面具背后的部分",
         "transformation": "修复与转化：破裂后的修复、束缚解除、生命萌发、连接与方向重建",
+    }
+    theory_map = dict(SIX_DIMENSION_THEORIES)
+    risk_instrument_map = {
+        dict(RISK_DIMENSIONS)[key]: value for key, value in RISK_INSTRUMENTS.items()
     }
 
     schema = {
@@ -90,14 +114,14 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
             "dimensions": [{
                 "key": "string",
                 "name": "string：必须使用给定六维名称",
-                "confidence": "高|中|低",
-                "judgement": "string",
-                "assessment_theory": "string：给出真实且与维度匹配的理论；认知/学习维度优先使用认知负荷、元认知、自我决定等。若已有自述、成绩或教师观察，不得用箱庭空间分布直接推断学科能力；若没有这些材料，使用跨域理论类比时必须写明“理论假说·待核实”，不得写成结论",
-                "assessment_result": "string",
-                "evidence": ["string"],
+                "confidence": "高|中|低：未提供成绩单或尚未开展访谈时只能为中或低",
+                "judgement": "string：基于沙盘空间结构、地形、意象、自述与教师观察的探索性判断，不得写“无法判定/无足够线索”",
+                "assessment_theory": "string：必须使用 six_dimension_theory_map 中该维度的固定理论，不得改用箱庭理论推断学科能力",
+                "assessment_result": "string：写明支持该判断的沙盘线索与替代可能，不做能力定论",
+                "evidence": ["string：至少一条沙盘/自述/教师观察证据"],
                 "capabilities_to_improve": ["string"],
-                "training_module_directions": ["string：使用模块一至模块六名称"],
-                "conclusion": "string",
+                "training_module_directions": ["string：服务端最终回填，模型可给出初步方向"],
+                "conclusion": "string：缺少成绩或访谈时，末尾必须写“以上为基于沙盘与现有线索的探索性推断，需结合后续成绩与访谈核验”",
             }],
         },
         "chapter_4_academic": {
@@ -130,7 +154,7 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
                 "label": "L1 平稳|L2 轻度关注|L3 中度关注|L4 高度关注",
                 "judgement": "string",
                 "evidence": "string",
-                "norm_reference": "本次无量表数据，为观察性判断，建议补充对应心理量表（如 MHT/GAD-7/PHQ-9）核实",
+                "norm_reference": "string：按 risk_instrument_map 中该维度的对应量表填写，不得全篇统一 MHT/GAD-7/PHQ-9",
             }],
         },
         "chapter_6_interview": {
@@ -140,6 +164,7 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         "chapter_7_career": {
             "title": CHAPTER_TITLES["chapter_7_career"],
             "stage": "生涯探索",
+            "career_postponed": "boolean：L3/L4 时由服务端改为 true，并切换保护性因素标题",
             "summary": "string",
             "evidence_note": "string：说明优势为探索性假设，需结合访谈/教师家长观察核实",
             "strengths": ["string"],
@@ -214,7 +239,14 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         "sandplay_description": payload.get("sandplay_description"),
         "self_narrative": payload.get("self_narrative"),
         "teacher_observation": payload.get("teacher_observation"),
-        "cognitive_verification_available": bool(
+        "has_transcript": bool(
+            transcript_url or str(payload.get("transcript_text") or "").strip()
+        ),
+        "has_interview_evidence": bool(
+            len(str(payload.get("self_narrative") or "").strip()) >= 10
+            or len(str(payload.get("teacher_observation") or "").strip()) >= 10
+        ),
+        "exploration_only": not bool(
             transcript_url
             or str(payload.get("transcript_text") or "").strip()
             or len(str(payload.get("self_narrative") or "").strip()) >= 10
@@ -225,6 +257,9 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         "subcategory_counts": subcategory_counts,
         "theme_counts": theme_counts,
         "theme_definitions": theme_defs,
+        "six_dimension_theory_map": theory_map,
+        "risk_instrument_map": risk_instrument_map,
+        "protective_chapter_title": PROTECTIVE_CHAPTER_TITLE,
         "items": [
             {
                 "id": x.get("id"), "label": x.get("label") or x.get("name"),
@@ -240,9 +275,12 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         "notable_items": notable,
         "grid_summary": grid.get("summary", {}),
         "grid_cells": grid.get("cells", []),
+        "terrain_metrics": terrain_metrics,
+        "terrain_observation": str(terrain_metrics.get("terrain_summary") or ""),
+        "process_telemetry": payload.get("process_telemetry") or {},
         "heightmap_stats": heightmap.get("stats", {}),
-        "heightmap_max_abs": max((abs(float(v)) for v in (heightmap.get("values") or []) if isinstance(v, (int, float))), default=0.0),
-        "low_projection": len(items) < 3 and max((abs(float(v)) for v in (heightmap.get("values") or []) if isinstance(v, (int, float))), default=0.0) <= 0.001,
+        "heightmap_max_abs": heightmap_max_abs,
+        "low_projection": len(items) < 3 and not bool(terrain_edited),
         "heightmap_shape": {
             "width": heightmap.get("width"), "depth": heightmap.get("depth"),
             "cols": heightmap.get("cols"), "rows": heightmap.get("rows"),
@@ -271,8 +309,13 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
 - 成绩单：如果提供了图片，先逐科读取满分、得分、得分率和等级；只读清晰可辨的数字。没有把握的科目 score/rate 填 null，grade 填“待核对”。
 - chapter_2 每个主题必须给出两个竞争性假设：hypothesis 写支持性/资源性解释，alternative_hypothesis 写防御、阻抗或发展滞后解释，verification_question 写一句能区分两者的访谈提问。不得只做单向积极美化。
 - chapter_7 不得仅凭一件沙具推断稳定人格特质或能力水平；每条优势必须能回到沙盘或自述中的具体行为线索，并写明证据边界。
-- 理论依据必须与结论真正相关，不要求每段罗列三本书；不得编造“某作者提出某跨领域结论”。认知/学习维度优先使用认知负荷、元认知、自我决定等理论，不得把箱庭空间理论直接等同于学科诊断。
-- 认知维度必须遵守证据门控：`cognitive_verification_available=true` 时，`assessment_theory` 写“本维度不以箱庭空间分布直接推断学科能力，需结合自述、成绩与教师观察核实”；为 false 时，如使用“张日昇 2006 年箱庭空间分布与认知投注相关”一类跨域类比，必须在同一字段开头标注“理论假说·待核实”，并说明这是假设而非学科能力结论。不得只写理论名称或伪造因果关系。有核验材料时，也不得把沙盘分布写成“认知投注”，可写“注意与情感投入”作为观察线索，不上升到学科能力。
+- 理论依据必须与结论真正相关，不要求每段罗列三本书；不得编造“某作者提出某跨领域结论”。chapter_3 的 `assessment_theory` 必须原样使用 `six_dimension_theory_map` 中该维度的固定理论；箱庭与荣格分析心理学只用于意象解码、边界防御、安全容器与动力源分析，不用于学科能力推断。
+- chapter_3 六个维度必须全部生成，不得因缺少成绩单、访谈或量表而只写“无足够线索/无法判定/暂不判断”。必须从九宫格占据与留白、对称/分区/边界、地形塑形、主要沙具类别与主题、代表沙具、受测者自述和教师观察中组织证据：例如由压力/阴影主题推导认知负荷与专注带宽，由空间规整度与地形构建推导思维风格与学习策略，由家庭/支持意象推导学习动力来源。每条 `conclusion` 末尾必须写“以上为基于沙盘与现有线索的探索性推断，需结合后续成绩与访谈核验”。`has_transcript=false` 或 `has_interview_evidence=false` 时，置信度只能为“中”或“低”，不得为“高”。
+- 不得把“箱庭空间分布”直接写成学科能力或成绩结论；空间线索只能表述为注意与情感投入、任务组织、计划性或学习策略的探索性线索，并明确需成绩与访谈核验。
+- chapter_5 的 `norm_reference` 必须按 `risk_instrument_map` 逐维填写；不得全篇统一写 MHT/GAD-7/PHQ-9。
+- chapter_3 `training_module_directions` 只写初步方向，最终由服务端按第八章 Top 1-2 模块统一回填；不得在第三章自行宣称某模块已启动。
+- chapter_7 默认写职业发展优势；若服务端命中 L3/L4，会将标题切换为“内在心理资源与保护性因素（发展性视角）”并暂缓职业定位。模型无需自行生成 priority_banner。
+- chapter_9 及第一至第八章的叙述性文字必须使用第三人称“受测者/该生”；仅第六章访谈提问可以使用第二人称引语。不得出现“你”“你们”“孩子”“你家孩子”。
 - 若 item_count < 3 且 heightmap_max_abs <= 0.001，视为低投射量样本：六维 confidence 不得为“高”，风险 L1 只能写“当前沙盘未见显性线索，需结合访谈/量表核实”，不得写“无风险/心理支撑稳定”。
 - 训练建议必须做优先级门控：优先选择与当前主要困扰（如焦虑、学习压力、家庭支持）最相关且置信度较高的 1-2 个模块，不得把六套训练同时推给受测者。
 

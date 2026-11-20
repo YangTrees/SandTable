@@ -252,7 +252,7 @@
     }
     .section-aside {
       max-width: 58mm; color: var(--accent); font-size: 7.8pt; line-height: 1.5;
-      text-align: right; white-space: normal;
+      text-align: right; white-space: nowrap; word-break: keep-all;
     }
     .section-intro { margin: 0 0 4mm; color: var(--muted); font-size: 8.4pt; line-height: 1.7; }
     .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4mm; }
@@ -309,6 +309,13 @@
     .scene-quote ul, .plain-list { margin: 1.5mm 0 0; padding-left: 5mm; }
     .scene-quote li, .plain-list li { margin: 1mm 0; color: var(--ink-2); font-size: 9.2pt; line-height: 1.65; }
     .terrain-line { margin-top: 3mm; color: var(--muted); font-size: 8.3pt; }
+    .terrain-line b, .representative-line b, .process-line b { color: var(--accent-deep); font-weight: 600; margin-right: 1.5mm; }
+    .representative-line {
+      margin-top: 2.2mm; padding: 2.8mm 3.6mm; border: 1px solid var(--accent-soft);
+      border-left: 3px solid var(--accent); border-radius: 0 2mm 2mm 0;
+      background: linear-gradient(90deg, var(--accent-soft), #fff); color: var(--accent-deep); font-size: 8.5pt;
+    }
+    .process-line { margin-top: 3mm; padding: 3mm 3.6mm; border: 1px dashed #d7cbb8; border-radius: 2.5mm; background: #fcfaf5; color: var(--ink-2); font-size: 8.2pt; line-height: 1.65; }
     .raw-input {
       margin-top: 4mm; padding: 4mm 4.5mm; border: 1px solid #d8dfd9;
       border-radius: 3mm; background: #fbfdfb;
@@ -447,22 +454,31 @@
     .risk-card {
       min-height: 19mm; padding: 3.2mm 4mm; border: 1px solid var(--line);
       border-top: 3px solid var(--line); border-radius: 2.5mm; background: #fff;
+      break-inside: avoid; page-break-inside: avoid;
     }
-    .risk-card h4 { margin: 0 0 1.2mm; color: var(--ink); font-family: var(--serif); font-size: 9.4pt; }
+    .risk-card-head { display: flex; align-items: center; justify-content: space-between; gap: 3mm; }
+    .risk-card h4 { margin: 0; color: var(--ink); font-family: var(--serif); font-size: 9.4pt; line-height: 1.45; }
+    .risk-status {
+      flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+      min-width: 17mm; padding: 1mm 2.4mm; border: 1px solid var(--line);
+      border-radius: 999px; background: #f7f5ef; color: var(--muted);
+      font-size: 7.4pt; font-weight: 600; line-height: 1.35;
+      white-space: nowrap; word-break: keep-all;
+    }
     .risk-card p { margin: 0; font-size: 7.9pt; color: var(--muted); }
     .risk-card.l1 { border-color: #c8dbd1; border-top-color: #4f8a70; background: #f7fbf8; }
     .risk-card.l2 { border-color: #e4c9ab; border-top-color: #c69856; background: #fdf8ef; }
     .risk-card.l3 { border-color: #e2bda3; border-top-color: #c07a56; background: #fdf3ec; }
     .risk-card.l4 { border-color: #dcb1a9; border-top-color: #a8554e; background: #fdf0ef; }
-    .risk-level { color: var(--muted); font-weight: 600; }
-    .risk-level.l1 { color: #56816b; }
-    .risk-level.l2 { color: #a27538; }
-    .risk-level.l3 { color: #b05f3d; }
-    .risk-level.l4 { color: #a44e46; }
+    .risk-status.l1 { color: #56816b; border-color: #c8dbd1; background: #eff7f2; }
+    .risk-status.l2 { color: #a27538; border-color: #e4c9ab; background: #fbf4e9; }
+    .risk-status.l3 { color: #b05f3d; border-color: #e2bda3; background: #fdf0e8; }
+    .risk-status.l4 { color: #a44e46; border-color: #dcb1a9; background: #fbe9e7; }
     .risk-detail {
       margin-bottom: 3.2mm; padding: 4.2mm 5mm; border: 1px solid var(--line);
       border-left: 4px solid var(--accent); border-radius: 0 3mm 3mm 0;
       background: #fff; box-shadow: 0 3px 10px rgba(17,43,35,.035);
+      break-inside: avoid; page-break-inside: avoid;
     }
     .risk-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 4mm; margin-bottom: 2.4mm; }
     .risk-detail-head h3 { margin: 0; color: var(--ink); font-family: var(--serif); font-size: 9.6pt; }
@@ -484,7 +500,7 @@
     .action-card ul { margin: 0; padding-left: 4mm; }
     .action-card li { margin: 1.4mm 0; color: var(--ink-2); font-size: 8.2pt; line-height: 1.6; }
     .stage-line { display: flex; align-items: center; gap: 3mm; margin-bottom: 4mm; padding: 2.6mm 3.5mm; border-bottom: 1px solid var(--line-soft); font-size: 8.5pt; color: var(--muted); }
-    .stage-pill { padding: 1mm 2.5mm; border: 1px solid var(--accent-soft); border-radius: 999px; color: var(--accent-deep); background: var(--accent-soft); font-size: 8pt; }
+    .stage-pill { padding: 1mm 2.5mm; border: 1px solid var(--accent-soft); border-radius: 999px; color: var(--accent-deep); background: var(--accent-soft); font-size: 8pt; white-space: nowrap; word-break: keep-all; }
     .strength-list { margin: 1.5mm 0 0; padding-left: 4mm; }
     .strength-list li { margin: 1.2mm 0; color: var(--ink-2); font-size: 9.1pt; }
     .career-summary { margin-bottom: 4mm; color: var(--ink-2); font-size: 9.2pt; line-height: 1.7; }
@@ -531,6 +547,42 @@
       background: rgba(255,255,255,.08); font-weight: 700;
     }
     .callout-warn b { display: block; color: #f1dfc4; font-size: 9pt; margin-bottom: .8mm; }
+    .priority-banner {
+      margin: 0 0 6mm; padding: 5mm 6mm; border-radius: 3mm; color: #fff;
+      box-shadow: 0 8px 20px rgba(17,43,35,.14);
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    .priority-banner.l4 { background: linear-gradient(135deg, #7a1f1f, #a83232); border: 1px solid #d99; }
+    .priority-banner.l3 { background: linear-gradient(135deg, #7a4a12, #a87020); border: 1px solid #e0bd7c; }
+    .priority-banner .priority-kicker { margin: 0 0 1.5mm; color: #ffe4c0; font-size: 7.4pt; letter-spacing: .12em; }
+    .priority-banner h3 { margin: 0 0 2mm; font-size: 11pt; color: #fff; }
+    .priority-banner p { margin: 0 0 2mm; font-size: 8.8pt; line-height: 1.7; }
+    .priority-banner .pb-label { font-weight: 700; color: #ffe9c9; }
+    .priority-banner ul { margin: 1mm 0 3mm; padding-left: 5mm; }
+    .priority-banner li { margin: .8mm 0; font-size: 8.4pt; line-height: 1.6; }
+    .priority-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2mm; margin: 2mm 0 3mm; }
+    .priority-flow-step {
+      padding: 2.2mm 2.6mm; border: 1px solid rgba(255,255,255,.22); border-radius: 2mm;
+      background: rgba(255,255,255,.08); color: #fff; font-size: 7.8pt; line-height: 1.55;
+    }
+    .priority-flow-step b { display: block; margin-bottom: .8mm; color: #ffe4c0; font-size: 7.2pt; letter-spacing: .08em; }
+
+    .share-guard-page { padding: 18mm 8mm; }
+    .share-guard-card {
+      max-width: 138mm; margin: 0 auto; padding: 12mm 12mm 11mm; text-align: center;
+      border: 1px solid #d9dfd8; border-radius: 5mm;
+      background: linear-gradient(160deg, #fbfaf5, #f2f7f3);
+      box-shadow: 0 18px 50px rgba(17,43,35,.12);
+    }
+    .share-guard-mark {
+      width: 16mm; height: 16mm; margin: 0 auto 5mm; display: grid; place-items: center;
+      border: 1px solid #d9c6a5; border-radius: 50%; color: #8a6a3d;
+      background: #fbf4e7; font-family: var(--serif); font-size: 17pt;
+    }
+    .share-guard-card h1 { margin: 0; color: #173f34; font-family: var(--serif); font-size: 20pt; line-height: 1.4; }
+    .share-guard-card p { margin: 4mm 0 0; color: #5f6c64; font-size: 9.5pt; line-height: 1.8; text-align: left; }
+    .share-guard-note { margin-top: 5mm; padding-top: 4mm; border-top: 1px solid #dfe5dc; color: #7a817a; font-size: 8pt; }
+
 
     .qr-zone {
       display: flex; align-items: center; gap: 5mm; margin-top: 6mm; padding: 4.5mm;
@@ -591,6 +643,8 @@
       }
       .report-sheet::before, .report-sheet::after { display: none; }
       .report-hero { border-radius: 0; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .priority-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid; page-break-inside: avoid; }
+      .risk-card, .risk-detail { break-inside: avoid; page-break-inside: avoid; }
       .card, .dimension-card, .risk-detail, .module-card, .advice-card, .table-wrap, .callout-warn { box-shadow: none; }
       .section::before { display: none; }
       .qr-zone.no-share { display: none !important; }
@@ -639,7 +693,7 @@
       reportId: params.get("report_id") || null,
       shareToken: params.get("share_token") || null,
       counselorToken: params.get("counselor_token") || window.localStorage.getItem("sandplay_counselor_token") || "dev-counselor-token",
-      mode: params.get("mode") === "public" ? "public" : "counselor",
+      mode: params.get("share_token") ? "public" : (params.get("mode") === "public" ? "public" : "counselor"),
       lockedPublic: Boolean(params.get("share_token")),
       share: null,
       sourceLabel: ""
@@ -750,14 +804,22 @@
     }
     function sanitizePublic(report) {
       const data = deepClone(report || {});
+      const banner = data.priority_banner || {};
+      const guardLevel = String(banner.level || "").toUpperCase();
+      const l4Guard = guardLevel.indexOf("L4") >= 0;
+      delete data.priority_banner;
+      delete data.risk_banner;
       delete data.chapter_5_risk;
       delete data.counselor_only;
       delete data.risk_level;
       delete data.risk_summary;
+      delete data.raw_record_echo;
       if (data.meta) {
         delete data.meta.counselor_note;
         delete data.meta.review_note;
+        delete data.meta.client_inputs;
       }
+      if (data.chapter_1_overview) delete data.chapter_1_overview.process_observation;
       function scrub(value) {
         if (Array.isArray(value)) return value.map(scrub);
         if (value && typeof value === "object") {
@@ -774,13 +836,21 @@
         return value;
       }
       const result = scrub(data);
+      if (l4Guard) {
+        result.share_guard = {
+          blocked: true,
+          title: "由心理老师优先一对一沟通",
+          message: "这份沙盘作品需要心理老师先与家长和孩子进行一对一沟通。沟通完成后，老师会根据家庭与孩子的实际需要，提供更合适的支持建议。",
+          note: "报告内容暂不在本页展示。"
+        };
+      }
       result.share_visibility = "student_guardian";
-      result.redacted_chapters = ["chapter_5_risk"];
+      result.redacted_chapters = ["chapter_5_risk", "priority_banner"];
       return result;
     }
     function displayReport() {
       if (state.mode === "public") {
-        if (state.publicReport) return state.publicReport;
+        if (state.publicReport) return sanitizePublic(state.publicReport);
         return state.full ? sanitizePublic(state.full) : null;
       }
       return state.full;
@@ -815,7 +885,7 @@
         .filter((item) => sample.has_terrain !== false || !String(item).includes("地形"));
       const basis = basisItems.join(" · ") || "沙盘作品照片 1 张 · 画面分区 · 受测者自述";
       const modeText = state.mode === "counselor" ? "咨询师完整版" : "家长 / 学生端 · 脱敏";
-      const chapterCount = state.mode === "counselor" ? "09" : "08";
+      const chapterCount = "09";
       const reportNo = text(meta.report_no, "报告编号待生成");
       const sampleAlert = sample.low_projection
         ? `<div class="sample-alert"><b>低投射量提示</b><span>本次仅采集 ${esc(sample.item_count ?? 0)} 件沙具，且无有效地形塑形。报告结论应视为探索性假设，建议结合访谈、行为观察或量表核实，不宜单独作为判断依据。</span></div>`
@@ -855,20 +925,29 @@
       if (state.mode !== "counselor") return "";
       const inputs = state.full && state.full.meta && state.full.meta.client_inputs;
       if (!inputs) return "";
-      const description = text(inputs.sandplay_description, "");
-      const narrative = text(inputs.self_narrative, "");
-      if (!description && !narrative) return "";
+      const echo = (state.full && state.full.raw_record_echo) || {};
+      const chapter1 = (state.full && state.full.chapter_1_overview) || {};
+      const description = text(inputs.sandplay_description || echo.sandplay_description, "");
+      const narrative = text(inputs.self_narrative || echo.self_narrative, "");
+      const teacher = text(inputs.teacher_observation || echo.teacher_observation, "");
+      const representative = text(inputs.representative_item_name || chapter1.representative_item_name || "", "");
+      if (!description && !narrative && !teacher && !representative) return "";
       return `<div class="raw-input">
         <div class="raw-input-head"><span>受测者原始记录</span><small>咨询师核对用 · 保留原话</small></div>
+        ${representative ? `<div class="raw-quote"><b>代表沙具</b>${esc(representative)}</div>` : ""}
         <div class="raw-grid">
           ${description ? `<div class="raw-quote"><b>沙盘描述</b>${esc(description)}</div>` : ""}
           ${narrative ? `<div class="raw-quote"><b>自述文本</b>${esc(narrative)}</div>` : ""}
+          ${teacher ? `<div class="raw-quote"><b>教师观察记录</b>${esc(teacher)}</div>` : ""}
         </div>
         ${inputs.process_note ? `<div class="raw-process">制作过程：${esc(inputs.process_note)}</div>` : ""}
       </div>`;
     }
     function renderChapter1(c1, index) {
       const categories = list(c1.item_category_stats).filter(Boolean);
+      const inputs = (state.full && state.full.meta && state.full.meta.client_inputs) || {};
+      const representativeName = text(c1.representative_item_name || inputs.representative_item_name, "");
+      const processSummary = text(c1.process_observation || inputs.process_note, "");
       const grid = state.mode === "counselor" ? renderMiniGrid(c1.nine_grid_distribution) : `<p class="terrain-line">${esc(c1.blank_areas || "画面分区概况以整体聚集与留白描述呈现。")}</p>`;
       return `<section class="section avoid-break" data-chapter="1">
         ${sectionHead(index, c1.title || "整体结果与场景概览", "沙盘作品 1 张")}
@@ -888,7 +967,10 @@
         </div>
         <div class="scene-quote"><div class="soft-label">场景意象</div>${listMarkup(c1.scene_imagery, "plain-list")}</div>
         ${clientInputBlock()}
-        <div class="terrain-line">地形观察：${esc(text(c1.terrain_observation, "暂未采集地形信息"))}</div>
+        ${representativeName
+          ? `<div class="representative-line"><b>代表沙具</b>${esc(representativeName)}</div>` : ""}
+        <div class="terrain-line"><b>地形观察</b>${esc(text(c1.terrain_observation, "沙面基本平整，未进行明显地形塑形。"))}</div>
+        ${state.mode === "counselor" && processSummary ? `<div class="process-line"><b>制作过程</b>${esc(processSummary)}</div>` : ""}
       </section>`;
     }
     function renderChapter2(c2, index) {
@@ -976,7 +1058,7 @@
     }
     function riskBadge(dimension) {
       const cls = levelClass(dimension.level);
-      return `<span class="risk-level ${cls}">${esc(dimension.label || dimension.level || "待判")}</span>`;
+      return `<span class="risk-status ${cls}">${esc(dimension.label || dimension.level || "待判")}</span>`;
     }
     function renderChapter5(c5, index) {
       if (state.mode !== "counselor") return "";
@@ -986,7 +1068,7 @@
         <p class="risk-disclaimer">${esc(c5.disclaimer || "以下内容仅供咨询师在专业范围内审阅，不可直接呈现给受测者及其家属。")}</p>
         ${state.full && state.full.meta && state.full.meta.sample_quality && state.full.meta.sample_quality.low_projection ? `<div class="risk-low-note"><b>低投射量提醒：</b>本次沙具数量少，投射信息有限。以下“L1 平稳”仅表示当前沙盘未见显性线索，不等于无风险；建议结合访谈与相应心理量表核实。</div>` : ""}
         <div class="risk-grid">${dimensions.map((dimension) => `<div class="risk-card ${levelClass(dimension.level)}">
-          <h4>${esc(dimension.name || "—")}</h4><p class="risk-level ${levelClass(dimension.level)}">${esc(dimension.label || dimension.level || "—")}</p>
+          <div class="risk-card-head"><h4>${esc(dimension.name || "—")}</h4><span class="risk-status ${levelClass(dimension.level)}">${esc(dimension.label || dimension.level || "—")}</span></div>
         </div>`).join("")}</div>
         ${dimensions.map((dimension) => `<article class="risk-detail avoid-break">
           <div class="risk-detail-head"><h3>${esc(dimension.name || "—")}维度</h3>${riskBadge(dimension)}</div>
@@ -1011,17 +1093,60 @@
       </section>`;
     }
     function renderChapter7(c7, index) {
+      const protective = c7.career_postponed === true || String(c7.title || "").indexOf("保护性因素") >= 0;
+      const cardTitle = protective ? "心理韧性与保护性因素" : "职业发展优势";
       return `<section class="section" data-chapter="7">
-        ${sectionHead(index, c7.title || "职业发展优势", "优势视角")}
+        ${sectionHead(index, c7.title || (protective ? "内在心理资源与保护性因素（发展性视角）" : "职业发展优势"), protective ? "发展性视角" : "优势视角")}
         ${c7.evidence_note ? `<div class="warn-strip"><b>证据边界：</b><span>${esc(c7.evidence_note)}</span></div>` : ""}
         <div class="stage-line">${c7.stage ? `<span class="stage-pill">${esc(c7.stage)}</span>` : ""}<span>${esc(text(c7.summary, ""))}</span></div>
-        <div class="card"><div class="card-title">职业发展优势</div>${listMarkup(c7.strengths, "strength-list")}</div>
+        <div class="card"><div class="card-title">${cardTitle}</div>${listMarkup(c7.strengths, "strength-list")}</div>
         <div class="action-grid">
           ${actionCard("老师做什么", c7.teacher_actions)}
           ${actionCard("家长做什么", c7.parent_actions)}
           ${actionCard("学生做什么", c7.student_actions)}
         </div>
+        ${c7.career_resume_note ? `<div class="warn-strip"><b>后续安排：</b><span>${esc(c7.career_resume_note)}</span></div>` : ""}
       </section>`;
+    }
+    function renderPriorityBanner(banner) {
+      if (state.mode !== "counselor" || !banner || !banner.level) return "";
+      const level = String(banner.level || "").toUpperCase();
+      const red = level.indexOf("L4") >= 0;
+      const triggers = list(banner.triggers).filter(Boolean);
+      const actions = list(banner.recommended_actions).filter(Boolean);
+      const checklist = list(banner.checklist_24h).filter(Boolean);
+      const fallbackActions = [
+        "优先核查是否存在霸凌、家庭变故、亲人离世或近期重大应激事件。",
+        "24—48 小时内安排一次一对一访谈，避免在班级或集体场合追问。",
+        "与班主任、家长分别核实近期行为与情绪变化，记录时间线。"
+      ];
+      const fallbackChecklist = [
+        "确认当下安全状态，安排可信任的成年人陪伴，避免独处。",
+        "2 小时内联系班主任与家长，完成面对面信息交接。",
+        "24 小时内完成心理老师一对一访谈与风险复核。",
+        "必要时启动校内外转介，并建立每日跟进记录。"
+      ];
+      const actionItems = actions.length ? actions : (red ? [] : fallbackActions);
+      const flowItems = checklist.length ? checklist : (red ? fallbackChecklist : []);
+      return `<section class="priority-banner ${red ? "l4" : "l3"}" data-priority="${esc(banner.level)}">
+        <p class="priority-kicker">COUNSELOR ONLY · ${red ? "L4 危机预警" : "L3 优先关注"}</p>
+        <h3>${esc(banner.title || (red ? "L4 红色预警：建议立即启动危机处置" : "L3 橙色优先关注：建议优先核查与升级支持"))}</h3>
+        <p>${esc(banner.message || (red ? "本次沙盘出现需要优先核实的危机线索，请在 24 小时内完成安全确认与专业转介评估。" : "本次沙盘出现需要优先关注的线索，建议先核查霸凌、家庭变故或近期重大应激事件。"))}</p>
+        ${triggers.length ? `<p class="pb-label">触发证据</p>${listMarkup(triggers, "")}` : ""}
+        ${actionItems.length ? `<p class="pb-label">${red ? "优先处置" : "优先核查方向"}</p>${listMarkup(actionItems, "")}` : ""}
+        ${flowItems.length ? `<p class="pb-label">24 小时处置流程</p><div class="priority-flow">${flowItems.map((item, i) => `<div class="priority-flow-step"><b>STEP ${String(i + 1).padStart(2, "0")}</b>${esc(item)}</div>`).join("")}</div>` : ""}
+      </section>`;
+    }
+    function renderShareGuard(guard) {
+      const data = guard || {};
+      return `<div class="share-guard-page">
+        <section class="share-guard-card">
+          <div class="share-guard-mark">心</div>
+          <h1>${esc(data.title || "由心理老师优先一对一沟通")}</h1>
+          <p>${esc(data.message || "这份沙盘作品需要心理老师先与家长和孩子进行一对一沟通。沟通完成后，老师会根据家庭与孩子的实际需要，提供更合适的支持建议。")}</p>
+          <p class="share-guard-note">${esc(data.note || "报告内容暂不在本页展示。")}如已收到心理老师联系，请按约定时间沟通即可。</p>
+        </section>
+      </div>`;
     }
     function renderChapter8(c8, index) {
       const allModules = list(c8.modules).filter(Boolean);
@@ -1073,6 +1198,7 @@
       </div>`;
     }
     function render() {
+      if (state.lockedPublic) state.mode = "public";
       const report = displayReport();
       const publicLocked = Boolean(state.lockedPublic);
       el("modeSwitch").style.display = publicLocked ? "none" : "";
@@ -1088,25 +1214,34 @@
       }
       emptyState.classList.add("hide");
       sheet.classList.remove("hide");
+      const guard = state.mode === "public" && report.share_guard && report.share_guard.blocked ? report.share_guard : null;
+      if (guard) {
+        sheet.innerHTML = renderShareGuard(guard);
+        statusText.textContent = "由心理老师优先沟通";
+        el("modeSwitch").style.display = "none";
+        el("btnShare").style.display = "none";
+        btnPrint.disabled = true;
+        btnPdf.disabled = true;
+        btnShare.disabled = true;
+        return;
+      }
       const sections = [renderHeader(report)];
-      let chapterIndex = 0;
+      const priorityBanner = renderPriorityBanner(report.priority_banner);
+      if (priorityBanner) sections.push(priorityBanner);
       const chapterRenderers = [
-        [report.chapter_1_overview || {}, renderChapter1],
-        [report.chapter_2_imagery || {}, renderChapter2],
-        [report.chapter_3_six_dimensions || {}, renderChapter3],
-        [report.chapter_4_academic || {}, renderChapter4],
-        [report.chapter_5_risk || {}, renderChapter5],
-        [report.chapter_6_interview || {}, renderChapter6],
-        [report.chapter_7_career || {}, renderChapter7],
-        [report.chapter_8_training_modules || {}, renderChapter8],
-        [report.chapter_9_general_advice || {}, renderChapter9]
+        [1, report.chapter_1_overview || {}, renderChapter1],
+        [2, report.chapter_2_imagery || {}, renderChapter2],
+        [3, report.chapter_3_six_dimensions || {}, renderChapter3],
+        [4, report.chapter_4_academic || {}, renderChapter4],
+        [5, report.chapter_5_risk || {}, renderChapter5],
+        [6, report.chapter_6_interview || {}, renderChapter6],
+        [7, report.chapter_7_career || {}, renderChapter7],
+        [8, report.chapter_8_training_modules || {}, renderChapter8],
+        [9, report.chapter_9_general_advice || {}, renderChapter9]
       ];
-      chapterRenderers.forEach(([data, renderer]) => {
-        const html = renderer(data, chapterIndex);
-        if (html) {
-          sections.push(html);
-          chapterIndex += 1;
-        }
+      chapterRenderers.forEach(([chapterNo, data, renderer]) => {
+        const html = renderer(data, chapterNo - 1);
+        if (html) sections.push(html);
       });
       sections.push(renderQr(report));
       sheet.innerHTML = sections.join("");
@@ -1210,7 +1345,7 @@
         }));
         const report = displayReport();
         const reportNo = (report.meta && report.meta.report_no) || "sandplay-report";
-        const filename = `心理沙盘发展性评估报告_${reportNo}_${state.mode === "counselor" ? "咨询师版" : "家长学生版"}.pdf`;
+        const filename = `心理沙盘发展性评估报告_${reportNo}_${state.mode === "counselor" && !state.lockedPublic ? "咨询师版" : "家长学生版"}.pdf`;
         const opt = {
           margin: 0,
           filename,
@@ -1224,7 +1359,7 @@
             scrollY: 0
           },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["css", "legacy"], avoid: [".avoid-break", ".dimension-card", ".risk-detail", ".module-card", ".table-wrap", ".figure-block"] }
+          pagebreak: { mode: ["css", "legacy"], avoid: [".avoid-break", ".dimension-card", ".risk-card", ".risk-detail", ".priority-banner", ".module-card", ".table-wrap", ".figure-block"] }
         };
         sheet.classList.add("pdf-exporting");
         const worker = html2pdf().set(opt).from(sheet).toPdf();

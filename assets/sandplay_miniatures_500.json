@@ -9,7 +9,7 @@
     {
       "code": "person_role",
       "name": "人物与角色原型",
-      "count": 88
+      "count": 87
     },
     {
       "code": "building_home",
@@ -39,7 +39,7 @@
     {
       "code": "mystic_symbol",
       "name": "神秘与象征符号",
-      "count": 60
+      "count": 61
     },
     {
       "code": "food_abundance",
@@ -1928,9 +1928,11 @@
       "category": "建筑与居所",
       "psychology_meaning": "常与高处、逃离、开阔和危险边缘有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, soft clay and matte resin miniature figurine texture, warm studio lighting, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, cohesive healing sandplay therapy aesthetic, high detail, single centered object, no text, no watermark. Subject: rooftop terrace.",
-      "risk_tier": "none",
+      "risk_tier": "watch",
       "spatial_role": "symbol",
-      "themes": [],
+      "themes": [
+        "crisis"
+      ],
       "subcategory": "公共与文化",
       "asset_group": "building_home",
       "supportive_hypothesis": "常与高处、逃离、开阔和危险边缘有关",
@@ -3637,7 +3639,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3655,7 +3656,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3673,7 +3673,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3691,7 +3690,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3709,7 +3707,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3727,7 +3724,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3745,7 +3741,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3763,7 +3758,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3781,7 +3775,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3799,7 +3792,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3817,7 +3809,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3835,7 +3826,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -3853,7 +3843,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "神兽与神话动物",
@@ -5380,7 +5369,7 @@
       "category": "神秘与象征符号",
       "psychology_meaning": "常与丧失、纪念、终结和未完成的哀悼有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: tombstone.",
-      "risk_tier": "watch",
+      "risk_tier": "high_risk",
       "spatial_role": "symbol",
       "themes": [
         "crisis",
@@ -5469,7 +5458,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "魔法与愿望",
@@ -5625,7 +5613,6 @@
       "risk_tier": "none",
       "spatial_role": "container",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "魔法与愿望",
@@ -5661,7 +5648,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "魔法与愿望",
@@ -5679,7 +5665,6 @@
       "risk_tier": "none",
       "spatial_role": "symbol",
       "themes": [
-        "shadow",
         "transformation"
       ],
       "subcategory": "魔法与愿望",
@@ -6409,7 +6394,7 @@
       "id": "CONFLICT_004",
       "name": "匕首",
       "category": "神秘与象征符号",
-      "risk_tier": "watch",
+      "risk_tier": "high_risk",
       "spatial_role": "threat",
       "psychology_meaning": "可能象征隐秘攻击、切割与关系分离，也可能代表自我保护或难以表达的愤怒。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: dagger.",
@@ -6724,7 +6709,7 @@
       "id": "CONFINEMENT_001",
       "name": "铁牢笼",
       "category": "建筑与居所",
-      "risk_tier": "watch",
+      "risk_tier": "high_risk",
       "spatial_role": "container",
       "psychology_meaning": "在箱庭中，可能象征禁闭、限制与无力感，也可能反映被规则、关系或自我要求困住。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: iron cage.",
@@ -6909,7 +6894,7 @@
       "id": "CONFINEMENT_011",
       "name": "铁栅栏",
       "category": "建筑与居所",
-      "risk_tier": "none",
+      "risk_tier": "watch",
       "spatial_role": "barrier",
       "psychology_meaning": "在箱庭中，可能象征规则、隔离与防御，也可能提示对自由、隐私或身体边界的关注。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: iron fence.",
@@ -6927,7 +6912,7 @@
       "id": "CONFINEMENT_012",
       "name": "禁闭室",
       "category": "建筑与居所",
-      "risk_tier": "watch",
+      "risk_tier": "high_risk",
       "spatial_role": "container",
       "psychology_meaning": "在箱庭中，可能象征惩罚、孤立与情绪封闭，也可能代表需要独处却害怕被遗忘的矛盾。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: locked confinement room.",
@@ -6948,7 +6933,7 @@
       "risk_tier": "watch",
       "spatial_role": "barrier",
       "psychology_meaning": "可能象征被监视、暴露与不安，也可能反映只能看见外界却无法被看见的孤独。",
-      "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: one-way mirror.",
+      "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: framed semi-transparent one-way glass partition wall, architectural mirror glass panel.",
       "legacy_category": "禁闭与学业重压",
       "subcategory": "封闭与监控",
       "themes": [
@@ -7019,7 +7004,7 @@
       "id": "CONFINEMENT_017",
       "name": "沉重镣铐",
       "category": "神秘与象征符号",
-      "risk_tier": "watch",
+      "risk_tier": "high_risk",
       "spatial_role": "barrier",
       "psychology_meaning": "可能象征长期负担、罪疚与行动受限，也可能反映难以摆脱的责任或旧有角色。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: heavy shackles.",
@@ -7075,7 +7060,7 @@
       "id": "CONFINEMENT_020",
       "name": "高墙围栏",
       "category": "建筑与居所",
-      "risk_tier": "none",
+      "risk_tier": "watch",
       "spatial_role": "barrier",
       "psychology_meaning": "在箱庭中，可能象征防御、隔离与领地边界，也可能提示对外界侵入或关系靠近的警惕。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: high enclosing wall.",
@@ -7201,7 +7186,7 @@
       "id": "CRISIS_007",
       "name": "骷髅",
       "category": "人物与角色原型",
-      "risk_tier": "watch",
+      "risk_tier": "high_risk",
       "spatial_role": "symbol",
       "psychology_meaning": "在箱庭中，可能象征死亡、终结与阴影原型，也可能代表被压抑的记忆或对消亡的恐惧。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: human skull.",
@@ -7239,7 +7224,7 @@
       "id": "CRISIS_009",
       "name": "暴风雨乌云",
       "category": "自然山水与植物",
-      "risk_tier": "high_risk",
+      "risk_tier": "watch",
       "spatial_role": "threat",
       "psychology_meaning": "可能象征压顶的情绪、威胁与即将到来的冲突，也可能反映长期处于警戒状态。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: storm cloud.",
@@ -7311,7 +7296,7 @@
       "id": "CRISIS_013",
       "name": "烧焦的森林",
       "category": "自然山水与植物",
-      "risk_tier": "high_risk",
+      "risk_tier": "watch",
       "spatial_role": "barrier",
       "psychology_meaning": "可能象征大面积创伤、生命力灼伤与集体阴影，也可能提示恢复需要更长时间。",
       "prompt": "2.5D game asset icon, isometric 45-degree top-down perspective, matte resin and weathered miniature figurine texture, cool neutral studio lighting with subtle dramatic contrast, muted dark and desaturated color palette, soft ambient occlusion shadow directly underneath, isolated on a pure solid white background (#FFFFFF) for easy alpha matting, clean edges, symbolic psychological sandplay miniature aesthetic, non-gory, high detail, single centered object, no text, no watermark. Subject: charred forest.",
@@ -8107,7 +8092,7 @@
     {
       "id": "NEUTRAL_016",
       "name": "展开的双手",
-      "category": "人物与角色原型",
+      "category": "神秘与象征符号",
       "risk_tier": "none",
       "spatial_role": "symbol",
       "psychology_meaning": "在箱庭中，可能象征开放、接纳与求助，也可能反映愿意放下防御、允许关系靠近。",
@@ -8207,7 +8192,7 @@
   },
   "taxonomy_version": "2.1_500_item_coverage",
   "taxonomy_note": "器物形态为单选分类，共8类；subcategory 为器物子类；临床主题为主题标签，可多选。主题只在语义成立时标注，中性器物保留空数组，不替代作品整体、位置、组合与访谈解释。",
-  "theme_coverage": 236,
+  "theme_coverage": 237,
   "theme_tags": [
     {
       "code": "conflict",
@@ -8243,11 +8228,11 @@
   "theme_counts": {
     "conflict": 39,
     "pressure": 79,
-    "crisis": 39,
-    "shadow": 55,
+    "crisis": 40,
+    "shadow": 38,
     "transformation": 101
   },
-  "updated_at": "2026-11-20T18:05:36+08:00",
+  "updated_at": "2026-11-20T18:53:48+08:00",
   "field_schema": {
     "required": [
       "id",
@@ -8303,15 +8288,15 @@
       "count": 15
     },
     {
+      "name": "兵器与对抗",
+      "count": 14
+    },
+    {
       "name": "社会职业与公共服务",
       "count": 14
     },
     {
       "name": "神兽与神话动物",
-      "count": 14
-    },
-    {
-      "name": "兵器与对抗",
       "count": 14
     },
     {
@@ -8323,11 +8308,11 @@
       "count": 11
     },
     {
-      "name": "陆地交通",
+      "name": "通讯与电子",
       "count": 11
     },
     {
-      "name": "通讯与电子",
+      "name": "陆地交通",
       "count": 11
     },
     {
@@ -8339,11 +8324,11 @@
       "count": 9
     },
     {
-      "name": "居住与庇护",
+      "name": "主食与滋养",
       "count": 8
     },
     {
-      "name": "防御与边界",
+      "name": "书本与文具",
       "count": 8
     },
     {
@@ -8355,7 +8340,11 @@
       "count": 8
     },
     {
-      "name": "鸟类",
+      "name": "封闭与监控",
+      "count": 8
+    },
+    {
+      "name": "居住与庇护",
       "count": 8
     },
     {
@@ -8363,15 +8352,11 @@
       "count": 8
     },
     {
-      "name": "书本与文具",
+      "name": "防御与边界",
       "count": 8
     },
     {
-      "name": "主食与滋养",
-      "count": 8
-    },
-    {
-      "name": "封闭与监控",
+      "name": "鸟类",
       "count": 8
     },
     {
@@ -8379,23 +8364,7 @@
       "count": 7
     },
     {
-      "name": "水上交通",
-      "count": 6
-    },
-    {
-      "name": "航空与航天",
-      "count": 6
-    },
-    {
       "name": "学习家具与教室",
-      "count": 6
-    },
-    {
-      "name": "知识工具与实验",
-      "count": 6
-    },
-    {
-      "name": "运动与游乐",
       "count": 6
     },
     {
@@ -8407,8 +8376,20 @@
       "count": 6
     },
     {
-      "name": "自我与关系",
-      "count": 5
+      "name": "水上交通",
+      "count": 6
+    },
+    {
+      "name": "知识工具与实验",
+      "count": 6
+    },
+    {
+      "name": "航空与航天",
+      "count": 6
+    },
+    {
+      "name": "运动与游乐",
+      "count": 6
     },
     {
       "name": "学校与教育",
@@ -8419,11 +8400,7 @@
       "count": 5
     },
     {
-      "name": "益智与游戏",
-      "count": 5
-    },
-    {
-      "name": "餐桌与宴席",
+      "name": "灾害与废墟",
       "count": 5
     },
     {
@@ -8431,27 +8408,23 @@
       "count": 5
     },
     {
+      "name": "益智与游戏",
+      "count": 5
+    },
+    {
+      "name": "自我与关系",
+      "count": 5
+    },
+    {
       "name": "茶饮与器具",
       "count": 5
     },
     {
-      "name": "灾害与废墟",
+      "name": "餐桌与宴席",
       "count": 5
     },
     {
-      "name": "道路与信号",
-      "count": 4
-    },
-    {
       "name": "旗帜与身份",
-      "count": 4
-    },
-    {
-      "name": "魔法与愿望",
-      "count": 4
-    },
-    {
-      "name": "路径与选择",
       "count": 4
     },
     {
@@ -8459,7 +8432,27 @@
       "count": 4
     },
     {
-      "name": "生产与储备",
+      "name": "路径与选择",
+      "count": 4
+    },
+    {
+      "name": "道路与信号",
+      "count": 4
+    },
+    {
+      "name": "魔法与愿望",
+      "count": 4
+    },
+    {
+      "name": "受阻学习与私密",
+      "count": 3
+    },
+    {
+      "name": "救援与修复器物",
+      "count": 3
+    },
+    {
+      "name": "时间与奖励",
       "count": 3
     },
     {
@@ -8467,7 +8460,11 @@
       "count": 3
     },
     {
-      "name": "路径与过渡",
+      "name": "火与仪式",
+      "count": 3
+    },
+    {
+      "name": "生产与储备",
       "count": 3
     },
     {
@@ -8475,7 +8472,11 @@
       "count": 3
     },
     {
-      "name": "时间与奖励",
+      "name": "萌发与再生",
+      "count": 3
+    },
+    {
+      "name": "路径与过渡",
       "count": 3
     },
     {
@@ -8487,43 +8488,7 @@
       "count": 3
     },
     {
-      "name": "受阻学习与私密",
-      "count": 3
-    },
-    {
-      "name": "火与仪式",
-      "count": 3
-    },
-    {
-      "name": "萌发与再生",
-      "count": 3
-    },
-    {
-      "name": "救援与修复器物",
-      "count": 3
-    },
-    {
-      "name": "救援与公共服务",
-      "count": 2
-    },
-    {
-      "name": "工程与农用",
-      "count": 2
-    },
-    {
       "name": "军事与冲突",
-      "count": 2
-    },
-    {
-      "name": "神话与阴影人物",
-      "count": 2
-    },
-    {
-      "name": "学业与压力",
-      "count": 2
-    },
-    {
-      "name": "失事交通",
       "count": 2
     },
     {
@@ -8531,11 +8496,11 @@
       "count": 2
     },
     {
-      "name": "生活器物",
+      "name": "失事交通",
       "count": 2
     },
     {
-      "name": "测量与判断",
+      "name": "学业与压力",
       "count": 2
     },
     {
@@ -8543,15 +8508,27 @@
       "count": 2
     },
     {
-      "name": "科技与未来角色",
-      "count": 1
+      "name": "工程与农用",
+      "count": 2
     },
     {
-      "name": "钥匙与通行",
-      "count": 1
+      "name": "救援与公共服务",
+      "count": 2
     },
     {
-      "name": "死亡与纪念",
+      "name": "测量与判断",
+      "count": 2
+    },
+    {
+      "name": "生活器物",
+      "count": 2
+    },
+    {
+      "name": "神话与阴影人物",
+      "count": 2
+    },
+    {
+      "name": "体育与竞技",
       "count": 1
     },
     {
@@ -8559,11 +8536,7 @@
       "count": 1
     },
     {
-      "name": "体育与竞技",
-      "count": 1
-    },
-    {
-      "name": "缠绕与停滞",
+      "name": "死亡与纪念",
       "count": 1
     },
     {
@@ -8575,7 +8548,15 @@
       "count": 1
     },
     {
-      "name": "面具与人格",
+      "name": "科技与未来角色",
+      "count": 1
+    },
+    {
+      "name": "缠绕与停滞",
+      "count": 1
+    },
+    {
+      "name": "肢体与关系",
       "count": 1
     },
     {
@@ -8591,17 +8572,21 @@
       "count": 1
     },
     {
-      "name": "肢体与关系",
+      "name": "钥匙与通行",
+      "count": 1
+    },
+    {
+      "name": "面具与人格",
       "count": 1
     }
   ],
-  "neutral_theme_items": 264,
+  "neutral_theme_items": 263,
   "field_coverage": {
     "items": 500,
     "complete_required_items": 500,
     "subcategory_items": 500,
     "asset_group_items": 500,
-    "theme_tagged_items": 236,
-    "neutral_items": 264
+    "theme_tagged_items": 237,
+    "neutral_items": 263
   }
 }

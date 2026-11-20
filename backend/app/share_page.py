@@ -23,6 +23,30 @@ def _paragraphs(value: Any) -> str:
 
 def render_public_share(report: dict[str, Any], share_token: str) -> str:
     meta = report.get("meta") or {}
+    banner = report.get("priority_banner") or {}
+    guard = report.get("share_guard") or {}
+    if guard.get("blocked") or "L4" in str(banner.get("level") or "").upper():
+        title = _e(meta.get("student_name") or "学生")
+        return f"""<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>心理沙盘评估 · 沟通安排</title>
+<style>
+:root{{--ink:#24332d;--muted:#6f7a73;--line:#dfe4dc}}
+*{{box-sizing:border-box}}body{{margin:0;min-height:100vh;display:grid;place-items:center;padding:28px 18px;background:linear-gradient(160deg,#eef1e8,#f8f5ed 45%,#e4ece8);color:var(--ink);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.8}}
+.card{{width:min(560px,100%);padding:40px 34px 30px;text-align:center;background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 48px rgba(55,50,40,.09)}}
+.mark{{width:58px;height:58px;margin:0 auto 18px;display:grid;place-items:center;border:1px solid #d9c6a5;border-radius:50%;background:#fbf4e7;color:#8a6a3d;font-family:serif;font-size:24px}}
+h1{{margin:0;font-size:24px;font-weight:600;letter-spacing:.04em}}p{{margin:14px 0 0;color:#5f6c64;font-size:14px;text-align:left}}
+.note{{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;text-align:center}}
+</style></head>
+<body><div class="card">
+<div class="mark">心</div>
+<h1>{_e(guard.get('title') or '由心理老师优先一对一沟通')}</h1>
+<p>{_e(guard.get('message') or '这份沙盘作品需要心理老师先与家长和孩子进行一对一沟通。沟通完成后，老师会根据家庭与孩子的实际需要，提供更合适的支持建议。')}</p>
+<p class="note">{_e(guard.get('note') or '报告内容暂不在本页展示。')}如已收到心理老师联系，请按约定时间沟通即可。</p>
+</div></body></html>"""
+
     ch1 = report.get("chapter_1_overview") or {}
     ch2 = report.get("chapter_2_imagery") or {}
     ch3 = report.get("chapter_3_six_dimensions") or {}
@@ -79,6 +103,12 @@ def render_public_share(report: dict[str, Any], share_token: str) -> str:
         for row in (ch8.get("modules") or []) if isinstance(row, dict)
     )
 
+    career_title = ch7.get("title") or (
+        "内在心理资源与保护性因素"
+        if ch7.get("career_postponed") is True or "保护性因素" in str(ch7.get("title") or "")
+        else "职业发展优势"
+    )
+
     title = _e(meta.get("student_name") or "学生")
     return f"""<!doctype html>
 <html lang="zh-CN">
@@ -114,6 +144,7 @@ table{{width:100%;border-collapse:collapse;background:rgba(255,255,255,.8);borde
 <div>{f'<img class="shot" src="{_e(ch1.get("sandplay_image_url"))}" alt="沙盘作品">' if ch1.get('sandplay_image_url') else ''}</div>
 <div class="card"><p><b>沙具聚集区：</b>{_e(ch1.get('clusters'))}</p>
 <p><b>留白区域：</b>{_e(ch1.get('blank_areas'))}</p>
+{ f"<p><b>代表沙具：</b>{_e(ch1.get('representative_item_name'))}</p>" if ch1.get('representative_item_name') else '' }
 <p><b>地形观察：</b>{_e(ch1.get('terrain_observation'))}</p>
 <div class="chips">{category_html}</div>
 <p><b>场景意象：</b></p><ul>{_list(ch1.get('scene_imagery'))}</ul></div></div>
@@ -132,18 +163,18 @@ table{{width:100%;border-collapse:collapse;background:rgba(255,255,255,.8);borde
 <div class="two"><div><b>优势学科</b><p>{_e(ch4.get('strengths'))}</p></div><div><b>待提升学科</b><p>{_e(ch4.get('weaknesses'))}</p></div></div>
 <p><b>成绩趋势：</b>{_e(ch4.get('trend'))}</p></div>
 
-<h2>五、访谈建议</h2>
+<h2>六、访谈建议</h2>
 <table><thead><tr><th>访谈话题</th><th>建议提问</th><th>对象</th></tr></thead><tbody>{interview_rows}</tbody></table>
 
-<h2>六、职业发展优势</h2>
+<h2>七、{_e(career_title)}</h2>
 <div class="card"><p><b>生涯阶段：</b>{_e(ch7.get('stage'))}</p><p>{_e(ch7.get('summary'))}</p>
 <div class="two"><div><b>发展优势</b><ul>{_list(ch7.get('strengths'))}</ul></div><div><b>老师做什么</b><ul>{_list(ch7.get('teacher_actions'))}</ul><b>家长做什么</b><ul>{_list(ch7.get('parent_actions'))}</ul></div></div>
 <p><b>学生做什么：</b></p><ul>{_list(ch7.get('student_actions'))}</ul></div>
 
-<h2>七、学习能力训练模块方向建议</h2>
+<h2>八、学习能力训练模块方向建议</h2>
 {module_html}
 
-<h2>八、总体使用建议</h2>
+<h2>九、总体使用建议</h2>
 <div class="card"><h3>成长型思维：能力训练的底层动力</h3><ul>{_list(ch9.get('growth_mindset'))}</ul>
 <h3>优势能力迁移</h3><ul>{_list(ch9.get('strength_transfer'))}</ul>
 <h3>以能力发展替代特质判定</h3><ul>{_list(ch9.get('capability_not_label'))}</ul></div>

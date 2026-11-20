@@ -239,6 +239,11 @@ def build_demo_report(
         f"沙面高度范围为 {height_stats['min']}～{height_stats['max']}，起伏幅度 {height_stats['relief']}；"
         "堆高、挖低与水面区域共同构成空间张力"
     )
+    terrain_metrics = payload.get("terrain_metrics") if isinstance(payload.get("terrain_metrics"), dict) else {}
+    if str(terrain_metrics.get("terrain_summary") or "").strip():
+        terrain_text = str(terrain_metrics["terrain_summary"]).strip()
+    elif terrain_metrics.get("terrain_edited") is False:
+        terrain_text = "沙面基本平整，未进行明显地形塑形。"
 
     # 第二章：优先使用沙具主题标签形成竞争性假设；无标签时回退到器物类别。
     themes = []
@@ -503,7 +508,10 @@ def build_demo_report(
             "student_name": student.get("name") or "匿名受测者",
             "student_no": student.get("student_no") or "",
             "assessment_basis": [
-                "沙盘作品照片1张", "九宫格空间分布", "沙具使用数据", "沙盘地形高度图",
+                "沙盘作品照片1张", "九宫格空间分布", "沙具使用数据",
+            ] + ([
+                "沙盘地形高度图"
+            ] if terrain_metrics.get("terrain_edited") is True or payload.get("terrain_image_url") else []) + [
                 "代表沙具1件", "受测者沙盘描述1段",
             ] + (["受测者自述文本"] if narrative else []) + (["教师观察记录"] if teacher_observation else []) + (["学习成绩单1张"] if transcript_image_url else []),
             "disclaimer": "发展性心理评估参考·非临床诊断",
@@ -527,6 +535,7 @@ def build_demo_report(
             ],
             "nine_grid_distribution": grid,
             "terrain_observation": terrain_text,
+            "representative_item_name": rep_name,
             "scene_imagery": [
                 f"作品以{'、'.join(top_categories)}类意象为主，代表沙具为「{rep_name}」",
                 f"{cluster_text}",

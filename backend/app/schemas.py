@@ -40,6 +40,9 @@ class AssessmentPayload(BaseModel):
     items: list[dict[str, Any]] = Field(default_factory=list)
     grid_distribution: dict[str, Any] = Field(default_factory=dict)
     heightmap: HeightMap = Field(default_factory=HeightMap)
+    terrain_metrics: dict[str, Any] = Field(default_factory=dict)
+    process_telemetry: dict[str, Any] = Field(default_factory=dict)
+    interaction_summary: dict[str, Any] = Field(default_factory=dict)
     representative_item_id: str = Field(min_length=1)
     representative_item_name: str = ""
     sandplay_description: str = Field(min_length=1, max_length=4000)

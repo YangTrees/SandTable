@@ -18,9 +18,23 @@ table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.8);border
 .hero{display:grid;grid-template-columns:minmax(260px,420px) 1fr;gap:24px;align-items:start}.shot{width:100%;border-radius:14px;border:1px solid var(--line);display:block;background:#fff}
 .conclusion{background:#f7f2e8;border-left:3px solid var(--accent);padding:8px 12px;border-radius:0 8px 8px 0}.notice{margin-top:28px;border:1px solid #e8dcc8;background:#fffaf0;border-radius:14px;padding:16px;font-size:13px;color:#715b45}
 .module ul{margin:6px 0 10px 18px}li{margin:2px 0}ul{margin:4px 0 10px 18px}
+.guard{padding:10vh 0 12vh}.guard-card{width:min(560px,100%);margin:0 auto;padding:40px 34px 30px;text-align:center;background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 48px rgba(55,50,40,.09)}
+.guard-mark{width:58px;height:58px;margin:0 auto 18px;display:grid;place-items:center;border:1px solid #d9c6a5;border-radius:50%;background:#fbf4e7;color:#8a6a3d;font-family:serif;font-size:24px}
+.guard-card h1{margin:0;font-size:24px;font-weight:600;letter-spacing:.04em}.guard-card p{margin:14px 0 0;color:#5f6c64;font-size:14px;text-align:left}
+.guard-note{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;text-align:center}
+.stage-pill{display:inline-block;padding:2px 10px;border-radius:999px;background:#f5ede2;color:var(--accent);font-size:12px;white-space:nowrap;word-break:keep-all}
 @media(max-width:760px){.meta,.two,.hero{grid-template-columns:1fr}.top{display:block}h1{font-size:23px}table{display:block;overflow:auto}}
 </style></head>
-<body><div class="wrap">
+<body>
+<section id="shareGuard" class="guard" hidden>
+  <div class="guard-card">
+    <div class="guard-mark">心</div>
+    <h1>由心理老师优先一对一沟通</h1>
+    <p>这份沙盘作品需要心理老师先与家长和孩子进行一对一沟通。沟通完成后，老师会根据家庭与孩子的实际需要，提供更合适的支持建议。</p>
+    <p class="guard-note">报告内容暂不在本页展示。如已收到心理老师联系，请按约定时间沟通即可。</p>
+  </div>
+</section>
+<div class="wrap" id="shareMain">
 <header class="top"><div><h1>心理沙盘发展性评估报告</h1><div class="muted">发展性心理评估参考 · 非临床诊断</div>
 <div class="meta">
 <div>受测者：测试学生</div><div>年级段：初中</div><div>性别：男</div>
@@ -31,7 +45,8 @@ table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.8);border
 <div class="hero">
 <div><img class="shot" src="http://127.0.0.1:8000/media/76ad3dc9446711ec/sandplay.png" alt="沙盘作品"></div>
 <div class="card"><p><b>沙具聚集区：</b>沙具主要聚集于中心区域（1 件），中心区共 1 件</p>
-<p><b>留白区域：</b>九宫格中有 7 个区域未被占用，留白率约 80%；留白可作为距离感、回避或尚未表达之内容的探索线索</p>
+<p><b>留白区域：</b>画面分区中有 7 个区域未被占用，留白率约 80%；留白可作为距离感、回避或尚未表达之内容的探索线索</p>
+<p><b>代表沙具：</b>爷爷</p>
 <p><b>地形观察：</b>沙面高度范围为 0.0～3.0，起伏幅度 3.0；堆高、挖低与水面区域共同构成空间张力</p>
 <div class="chips"><div class="chip">人物与角色原型<b>1</b></div><div class="chip">动物与神兽<b>1</b></div></div>
 <p><b>场景意象：</b></p><ul><li>作品以人物与角色原型、动物与神兽类意象为主，代表沙具为「爷爷」</li><li>沙具主要聚集于中心区域（1 件），中心区共 1 件</li><li>沙面高度范围为 0.0～3.0，起伏幅度 3.0；堆高、挖低与水面区域共同构成空间张力</li></ul></div></div>
@@ -104,15 +119,15 @@ table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.8);border
 <div class="two"><div><b>优势学科</b><p>待成绩单补测后确认</p></div><div><b>待提升学科</b><p>待成绩单补测后确认</p></div></div>
 <p><b>成绩趋势：</b>本次为单次成绩，趋势需结合近 2-3 次考试对照。</p></div>
 
-<h2>五、访谈建议</h2>
+<h2>六、访谈建议</h2>
 <table><thead><tr><th>访谈话题</th><th>建议提问</th><th>对象</th></tr></thead><tbody><tr><td>代表沙具的选择理由</td><td>你为什么会选这个沙具代表自己？；它在沙盘里的位置对你意味着什么？</td><td>受测者</td></tr><tr><td>压力与家庭互动</td><td>最近哪些时刻让你觉得压力最大？；家里通常怎么回应你的学习状态？</td><td>家长</td></tr><tr><td>在校表现与人际</td><td>孩子近期在课堂和同伴互动中有什么变化？；是否有明确的冲突或回避场景？</td><td>教师</td></tr></tbody></table>
 
-<h2>六、职业发展优势</h2>
-<div class="card"><p><b>生涯阶段：</b>生涯探索</p><p>以「爷爷」和人物与角色原型类意象为兴趣入口，结合可读成绩探索优势方向；当前目标是建立学习与未来的连接感。</p>
+<h2>七、职业发展优势</h2>
+<div class="card"><p><b>生涯阶段：</b><span class="stage-pill">生涯探索</span></p><p>以「爷爷」和人物与角色原型类意象为兴趣入口，结合可读成绩探索优势方向；当前目标是建立学习与未来的连接感。</p>
 <div class="two"><div><b>发展优势</b><ul><li>人物与角色原型类意象投入明显，具备从兴趣进入任务的潜力</li><li>沙盘布局具备一定的空间组织感，可迁移到计划与分类</li><li>愿意通过沙盘表达，具备自我观察的起点</li></ul></div><div><b>老师做什么</b><ul><li>每两周用 10 分钟做一次兴趣—学科连接访谈</li><li>把一个长期任务拆成 2-3 个可见小目标</li></ul><b>家长做什么</b><ul><li>每月安排一次低评价的职业/社会场景体验</li><li>把“考多少分”改为“今天完成了哪一步”</li></ul></div></div>
 <p><b>学生做什么：</b></p><ul><li>每周记录一个感兴趣的职业及其能力要求</li><li>每周完成一次小目标复盘：做到/卡住/下一步</li></ul></div>
 
-<h2>七、学习能力训练模块方向建议</h2>
+<h2>八、学习能力训练模块方向建议</h2>
 <article class="card module">
           <div class="card-head"><h3>模块一：专注力与沉浸训练（心流模块）</h3></div>
           <p><b>训练目标：</b>持续专注与任务坚持、深度沉浸体验、主动延长任务的意愿</p>
@@ -169,10 +184,23 @@ table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.8);border
           <div><b>学生做什么</b><ul><li>每周主动向家长汇报 1 个进展和 1 个困难。</li></ul></div>
         </article>
 
-<h2>八、总体使用建议</h2>
+<h2>九、总体使用建议</h2>
 <div class="card"><h3>成长型思维：能力训练的底层动力</h3><ul><li>把成绩波动与社交困难理解为阶段性状态，而非能力不足的证明</li><li>用小步目标的完成积累胜任感，肯定每一次可复制的进步</li><li>把家庭压力与自身学习分开，建立自己的成长节奏</li></ul>
 <h3>优势能力迁移</h3><ul><li>以沙盘中的空间组织与兴趣投入为入口，迁移到学习计划</li><li>把代表沙具所承载的自我期待转化为一个可执行的小目标</li></ul>
-<h3>以能力发展替代特质判定</h3><ul><li>本报告为发展性评估参考，不用于障碍判定、分班或评优</li><li>所有意象与六维结论均为探索性假设，需访谈与表现数据校准</li><li>风险线索只用于咨询师决定是否升级支持，不向家长/学生端展示</li></ul></div>
+<h3>以能力发展替代特质判定</h3><ul><li>本报告为发展性评估参考，不用于障碍判定、分班或评优</li><li>所有意象与六维结论均为探索性假设，需访谈与表现数据校准</li><li>咨询师内部研判内容不向家长 / 学生端展示；如需进一步沟通，请联系心理老师</li></ul></div>
 <div class="notice"><b>免责声明：</b>本报告为发展性心理评估参考，非临床诊断；所有假设以访谈、量表与专业判断为准。<br>本页面为学生 / 家长查看版本，服务端已隐藏咨询师内部研判内容；所有结论均为发展性评估参考，不用于分班、评优或医学诊断。</div>
 <footer class="muted" style="margin-top:28px">分享标识 VWfsepSzdJ… · 长期有效，可联系咨询师申请撤回</footer>
-</div></body></html>
+</div>
+<script>
+(function () {
+  var guard = window.__SHARE_GUARD__ || null;
+  var params = new URLSearchParams(window.location.search);
+  var shouldGuard = (guard && guard.blocked) || params.get("guard") === "l4" || params.get("priority") === "L4_RED";
+  if (!shouldGuard) return;
+  document.getElementById("shareGuard").hidden = false;
+  document.getElementById("shareMain").style.display = "none";
+  document.title = "心理沙盘评估 · 沟通安排";
+  window.scrollTo(0, 0);
+})();
+</script>
+</body></html>

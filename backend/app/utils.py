@@ -62,14 +62,35 @@ def public_copy(report: dict[str, Any]) -> dict[str, Any]:
     import copy
 
     data = copy.deepcopy(report)
+    banner = data.get("priority_banner") or {}
+    level = str(banner.get("level") or "").upper()
+    l4_guard = "L4" in level
     data.pop("chapter_5_risk", None)
     data.pop("counselor_only", None)
     data.pop("risk_level", None)
     data.pop("risk_summary", None)
-    data.get("meta", {}).pop("counselor_note", None)
-    data.get("meta", {}).pop("review_note", None)
-    data.get("meta", {}).pop("client_inputs", None)
+    data.pop("priority_banner", None)
+    data.pop("risk_banner", None)
+    data.pop("raw_record_echo", None)
+    meta = data.get("meta")
+    if isinstance(meta, dict):
+        meta.pop("counselor_note", None)
+        meta.pop("review_note", None)
+        meta.pop("client_inputs", None)
+    chapter1 = data.get("chapter_1_overview")
+    if isinstance(chapter1, dict):
+        chapter1.pop("process_observation", None)
     data = _public_scrub(data)
+    if l4_guard:
+        data["share_guard"] = {
+            "blocked": True,
+            "title": "由心理老师优先一对一沟通",
+            "message": (
+                "这份沙盘作品需要心理老师先与家长和孩子进行一对一沟通。"
+                "沟通完成后，老师会根据家庭与孩子的实际需要，提供更合适的支持建议。"
+            ),
+            "note": "报告内容暂不在本页展示。",
+        }
     data["share_visibility"] = "student_guardian"
-    data["redacted_chapters"] = ["chapter_5_risk"]
+    data["redacted_chapters"] = ["chapter_5_risk", "priority_banner"]
     return data

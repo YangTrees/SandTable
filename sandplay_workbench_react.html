@@ -1336,6 +1336,61 @@
         }
       };
     }
+    function buildTerrainMetrics(terrain) {
+      const empty = {
+        terrain_edited: false,
+        water_area_pct: 0,
+        mound_area_pct: 0,
+        elevation_range: 0,
+        terrain_summary: "沙面基本平整，未进行明显地形塑形。"
+      };
+      if (!terrain || !terrain.heights || !terrain.heights.length) return empty;
+      const heights = terrain.heights;
+      const position = terrain.geometry && terrain.geometry.attributes ? terrain.geometry.attributes.position : null;
+      if (!position || position.count !== heights.length) return empty;
+
+      const waterLevel = -16;
+      const moundLevel = 2;
+      let waterCount = 0, moundCount = 0, centerWaterCount = 0, peripheralWaterCount = 0;
+      let min = Infinity, max = -Infinity;
+      for (let i = 0; i < heights.length; i += 1) {
+        const h = Number(heights[i]);
+        const x = position.getX(i);
+        const z = position.getZ(i);
+        min = Math.min(min, h);
+        max = Math.max(max, h);
+        if (h < waterLevel) {
+          waterCount += 1;
+          if (Math.abs(x) <= WORLD.width / 6 && Math.abs(z) <= WORLD.depth / 6) centerWaterCount += 1;
+          else peripheralWaterCount += 1;
+        }
+        if (h > moundLevel) moundCount += 1;
+      }
+      const total = heights.length || 1;
+      const waterPct = Number(((waterCount / total) * 100).toFixed(1));
+      const moundPct = Number(((moundCount / total) * 100).toFixed(1));
+      const centerWaterPct = Number(((centerWaterCount / total) * 100).toFixed(1));
+      const peripheralWaterPct = Number(((peripheralWaterCount / total) * 100).toFixed(1));
+      const elevationRange = Number((max - min).toFixed(2));
+      const edited = waterPct >= 2 || moundPct >= 2 || elevationRange >= 3;
+      let summary;
+      if (!edited) {
+        summary = "沙面基本平整，未进行明显地形塑形。";
+      } else if (waterPct >= 2) {
+        summary = `已进行明显地形塑形：挖出水域约占 ${waterPct}%（中心区 ${centerWaterPct}%、周边 ${peripheralWaterPct}%），局部隆起形成沙岛/沙丘约占 ${moundPct}%，高程差约 ${elevationRange}。`;
+      } else if (moundPct >= 2) {
+        summary = `已进行明显地形塑形：局部隆起形成沙丘/沙山约占 ${moundPct}%，高程差约 ${elevationRange}；未见明显水域。`;
+      } else {
+        summary = `已进行轻度地形塑形：高程差约 ${elevationRange}，未见明显水域或沙丘聚集。`;
+      }
+      return {
+        terrain_edited: edited,
+        water_area_pct: waterPct,
+        mound_area_pct: moundPct,
+        elevation_range: elevationRange,
+        terrain_summary: summary
+      };
+    }
     function buildHeightmap(heights, cols, rows, width, depth) {
       const values = [];
       let min = Infinity, max = -Infinity, sum = 0;
@@ -2251,6 +2306,17 @@
       const orbitTargetRef = useRef(null);
       const strokeRef = useRef(null);
       const toastTimerRef = useRef(null);
+      const telemetryRef = useRef({
+        startedAt: Date.now(),
+        itemAddedTotal: 0,
+        itemDeletedTotal: 0,
+        hesitationCount: 0,
+        terrainStrokeCount: 0,
+        buryActions: [],
+        destructiveLoops: 0,
+        addHistory: {},
+        undoCount: 0
+      });
 
       const [items, setItems] = useState([]);
       const [selectedId, setSelectedId] = useState(null);
@@ -2330,6 +2396,71 @@
         setToast(message);
         window.clearTimeout(toastTimerRef.current);
         toastTimerRef.current = window.setTimeout(() => setToast(""), 2200);
+      }, []);
+      const noteItemAdded = useCallback((item) => {
+        const t = telemetryRef.current;
+        t.itemAddedTotal += 1;
+        const key = item.source_id || item.label || item.id;
+        const now = Date.now();
+        t.addHistory[key] = [...(t.addHistory[key] || []), now].filter((stamp) => now - stamp <= 60000).slice(-8);
+        const isPerson = /人物|角色/.test(item.category || "") || /爷爷|奶奶|爸爸|妈妈|男孩|女孩|人物/.test(item.label || "");
+        if (!isPerson) return;
+        const buried = (itemsRef.current || []).find((other) => (
+          other.id !== item.id && Math.hypot((other.x || 0) - item.x, (other.z || 0) - item.z) < 34
+        ));
+        if (buried) {
+          t.buryActions.push({
+            source_id: item.source_id || "",
+            label: item.label || "",
+            buried_item_id: buried.id,
+            buried_label: buried.label || "",
+            at_sec: Math.round((now - t.startedAt) / 1000)
+          });
+          t.buryActions = t.buryActions.slice(-20);
+        }
+      }, []);
+      const noteItemDeleted = useCallback((item) => {
+        const t = telemetryRef.current;
+        t.itemDeletedTotal += 1;
+        if (!item) return;
+        const key = item.source_id || item.label || item.id;
+        const now = Date.now();
+        const recentAdds = (t.addHistory[key] || []).filter((stamp) => now - stamp <= 60000);
+        const isPerson = /人物|角色/.test(item.category || "") || /爷爷|奶奶|爸爸|妈妈|男孩|女孩|人物/.test(item.label || "");
+        if (isPerson && recentAdds.length >= 2) t.destructiveLoops += 1;
+      }, []);
+      const noteItemMoved = useCallback((item) => {
+        const t = telemetryRef.current;
+        t.hesitationCount += 1;
+        if (!item) return;
+        const isPerson = /人物|角色/.test(item.category || "") || /爷爷|奶奶|爸爸|妈妈|男孩|女孩|人物/.test(item.label || "");
+        if (!isPerson) return;
+        const buried = (itemsRef.current || []).find((other) => (
+          other.id !== item.id && Math.hypot((other.x || 0) - item.x, (other.z || 0) - item.z) < 30
+        ));
+        if (buried) {
+          t.buryActions.push({
+            source_id: item.source_id || "",
+            label: item.label || "",
+            buried_item_id: buried.id,
+            buried_label: buried.label || "",
+            at_sec: Math.round((Date.now() - t.startedAt) / 1000)
+          });
+          t.buryActions = t.buryActions.slice(-20);
+        }
+      }, []);
+      const buildProcessTelemetry = useCallback(() => {
+        const t = telemetryRef.current;
+        return {
+          total_duration_sec: Math.max(1, Math.round((Date.now() - t.startedAt) / 1000)),
+          item_added_total: t.itemAddedTotal,
+          item_deleted_total: t.itemDeletedTotal,
+          hesitation_count: t.hesitationCount,
+          terrain_stroke_count: t.terrainStrokeCount,
+          bury_actions: t.buryActions.slice(),
+          destructive_loops: t.destructiveLoops,
+          undo_count: t.undoCount
+        };
       }, []);
 
       const updateCamera = useCallback(() => {
@@ -2457,6 +2588,7 @@
           const next = [...stack];
           const snapshot = next.pop();
           restoreSnapshot(snapshot);
+          telemetryRef.current.undoCount += 1;
           showToast(`已撤销，剩余 ${next.length} 步`);
           return next;
         });
@@ -2899,6 +3031,9 @@
           return;
         }
         if (toolRef.current !== "select") {
+          if (["mound", "dig", "water"].includes(toolRef.current)) {
+            telemetryRef.current.terrainStrokeCount += 1;
+          }
           const point = intersectTerrain(event.clientX, event.clientY);
           updateBrushCursor(point);
           strokeRef.current = { active: true, snapshot: makeSnapshot(), lastPoint: point };
@@ -2979,10 +3114,14 @@
         }
         const drag = dragRef.current;
         if (drag) {
-          if (drag.moved) pushUndo(drag.snapshot);
+          if (drag.moved) {
+            const moved = itemsRef.current.find((item) => item.id === drag.id);
+            noteItemMoved(moved);
+            pushUndo(drag.snapshot);
+          }
           dragRef.current = null;
         }
-      }, [pushUndo, showToast]);
+      }, [pushUndo, showToast, noteItemMoved]);
       const onPointerLeave = useCallback((event) => {
         updateBrushCursor(null);
         event.currentTarget.style.cursor = "crosshair";
@@ -3010,16 +3149,18 @@
         const point = intersectTerrain(event.clientX, event.clientY);
         if (!point) { showToast("请拖入沙面区域"); return; }
         const item = makeItem(data.icon, data.label, point.x, point.z, data.image, data);
+        noteItemAdded(item);
         commitItems((current) => [...current, item], `已放入 ${data.label}`);
         setSelectedId(item.id);
-      }, [commitItems, intersectTerrain, showToast]);
+      }, [commitItems, intersectTerrain, showToast, noteItemAdded]);
       const addTestItem = useCallback((data) => {
         const slots = [[0, 20], [-220, -110], [220, -110], [-220, 120], [220, 120], [0, -180], [0, 190], [-110, 0], [110, 0]];
         const slot = slots[itemsRef.current.length % slots.length];
         const item = makeItem(data.icon, data.label, slot[0], slot[1], data.image, data);
+        noteItemAdded(item);
         commitItems((current) => [...current, item], `已放入 ${data.label}`);
         setSelectedId(item.id);
-      }, [commitItems]);
+      }, [commitItems, noteItemAdded]);
 
       const updateSelected = useCallback((updater, message) => {
         const selected = itemsRef.current.find((item) => item.id === selectedIdRef.current);
@@ -3031,11 +3172,13 @@
       const deleteSelected = useCallback(() => {
         const selected = itemsRef.current.find((item) => item.id === selectedIdRef.current);
         if (!selected) { showToast("请先选中一个沙具"); return; }
+        noteItemDeleted(selected);
         commitItems((current) => current.filter((item) => item.id !== selected.id), `已删除 ${selected.label}`);
         setSelectedId(null);
-      }, [commitItems, showToast]);
+      }, [commitItems, showToast, noteItemDeleted]);
       const clearAll = useCallback(() => {
         const snapshot = makeSnapshot();
+        telemetryRef.current.itemDeletedTotal += itemsRef.current.length;
         setItems([]);
         setSelectedId(null);
         const terrain = terrainRef.current;
@@ -3150,6 +3293,8 @@
           };
         });
         const heights = terrainRef.current && terrainRef.current.heights ? terrainRef.current.heights : new Float32Array(0);
+        const terrainMetrics = buildTerrainMetrics(terrainRef.current);
+        const processTelemetry = buildProcessTelemetry();
         return {
           schema_version: "1.0",
           exported_at: new Date().toISOString(),
@@ -3159,6 +3304,7 @@
           canvas_image_base64: renderExportImage(),
           grid_distribution: buildGridDistribution(currentItems),
           heightmap: buildHeightmap(heights, WORLD.segX + 1, WORLD.segZ + 1, WORLD.width, WORLD.depth),
+          terrain_metrics: terrainMetrics,
           items: currentItems,
           representative_item_id: completionData.representativeId || null,
           representative_item_name: completionData.representativeName || null,
@@ -3169,14 +3315,22 @@
           student: completionData.student || { name: "", student_no: "", grade_level: "初中", gender: "不透露" },
           consent: Boolean(completionData.consent),
           transcript_file_name: completionData.transcriptFile ? completionData.transcriptFile.name : null,
+          process_telemetry: processTelemetry,
           interaction_summary: {
             undo_steps_available: undoStack.length,
             brush_size: brushSizeRef.current,
             tool: toolRef.current,
-            camera_distance: Number(cameraStateRef.current.distance.toFixed(2))
+            camera_distance: Number(cameraStateRef.current.distance.toFixed(2)),
+            total_duration_sec: processTelemetry.total_duration_sec,
+            item_added_total: processTelemetry.item_added_total,
+            item_deleted_total: processTelemetry.item_deleted_total,
+            hesitation_count: processTelemetry.hesitation_count,
+            terrain_stroke_count: processTelemetry.terrain_stroke_count,
+            bury_actions: processTelemetry.bury_actions.length,
+            destructive_loops: processTelemetry.destructive_loops
           }
         };
-      }, [heightAt, renderExportImage, undoStack.length]);
+      }, [heightAt, renderExportImage, undoStack.length, buildProcessTelemetry]);
 
       const finishMaking = useCallback(() => {
         if (!itemsRef.current.length) { showToast("请先放入至少一件沙具，再结束制作"); return; }
@@ -3187,9 +3341,10 @@
       const submitCompletion = useCallback(async (completion) => {
         setSubmitting(true);
         setCompletionError("");
-        const basePayload = buildExportPayload(completion);
-        setExportPayload(basePayload);
+        let basePayload = null;
         try {
+          basePayload = buildExportPayload(completion);
+          setExportPayload(basePayload);
           const serverPayload = {
             ...basePayload,
             canvas_image_base64: undefined,
@@ -3226,8 +3381,9 @@
           showToast(server.report_engine === "demo" ? "报告已生成（示例版）" : "评估报告已生成");
         } catch (error) {
           const message = String(error && error.message ? error.message : error);
+          console.error("提交沙盘报告失败", error);
           setCompletionError("报告暂时没有生成，请稍后重试。本次沙盘作品已保留。");
-          setExportPayload({ ...basePayload, server_error: message, report_status: "failed" });
+          setExportPayload(basePayload ? { ...basePayload, server_error: message, report_status: "failed" } : { server_error: message, report_status: "failed" });
           showToast("报告暂未生成，已保留本次沙盘作品");
         } finally {
           setSubmitting(false);
