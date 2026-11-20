@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>心理沙盘发展性评估报告</title>
+  <script src="https://fastly.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <script src="https://fastly.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+  <style>
+    :root {
+      --ink: #142a24;
+      --ink-2: #35443d;
+      --muted: #6b7871;
+      --line: #d6ddd7;
+      --line-soft: #e7ece7;
+      --paper: #fffdf9;
+      --paper-2: #f7f3e9;
+      --forest: #133f35;
+      --forest-2: #1e5a49;
+      --teal: #3a7764;
+      --sage: #93b09f;
+      --sand: #f1e3cf;
+      --gold: #c69856;
+      --clay: #bd6b4d;
+      --rose: #a65a55;
+      --sky: #e6f0ec;
+      --accent: #2f6f5e;
+      --accent-soft: #e7f2ee;
+      --accent-deep: #143f35;
+      --shadow: 0 24px 70px rgba(17, 43, 35, .18);
+      --serif: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+      --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 10% 4%, rgba(198, 152, 86, .22), transparent 30%),
+        radial-gradient(circle at 92% 16%, rgba(58, 119, 100, .22), transparent 34%),
+        linear-gradient(150deg, #e9e1d3 0%, #dce5de 52%, #d1dbd5 100%);
+      background-attachment: fixed;
+      color: var(--ink-2);
+      font-family: var(--sans);
+      font-size: 10pt;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+
+    /* ===== 顶部工具栏 ===== */
+    .toolbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+      min-height: 68px; padding: 10px 24px;
+      color: #fff;
+      background: linear-gradient(120deg, rgba(13, 42, 34, .97), rgba(30, 90, 73, .92));
+      border-bottom: 1px solid rgba(198, 152, 86, .38);
+      box-shadow: 0 12px 32px rgba(11, 32, 26, .24);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 220px; }
+    .brand-mark {
+      width: 35px; height: 35px; display: grid; place-items: center;
+      border: 1px solid rgba(255,255,255,.3); border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #f1dcb8, #c69856);
+      color: var(--forest); font-family: var(--serif); font-size: 18px;
+      box-shadow: 0 0 0 4px rgba(198, 152, 86, .1);
+    }
+    .brand strong { display: block; font-size: 13px; letter-spacing: .05em; color: #fff; }
+    .brand small { display: block; margin-top: 1px; color: rgba(255,255,255,.62); font-size: 9px; letter-spacing: .05em; }
+    .toolbar-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+    .mode-switch {
+      display: flex; padding: 3px; border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px; background: rgba(255,255,255,.08);
+    }
+    .mode-switch button {
+      border: 0; border-radius: 999px; background: transparent; padding: 7px 12px;
+      color: rgba(255,255,255,.68); font-size: 9.5px; cursor: pointer;
+    }
+    .mode-switch button.active {
+      background: #f1e3cf; color: var(--forest);
+      box-shadow: 0 4px 12px rgba(0,0,0,.16);
+    }
+    .toolbar-btn {
+      border: 1px solid rgba(255,255,255,.24); border-radius: 999px; padding: 8px 13px;
+      background: rgba(255,255,255,.1); color: #fff; font-size: 10px; cursor: pointer;
+      transition: background .18s ease, transform .18s ease;
+    }
+    .toolbar-btn:hover { background: rgba(255,255,255,.18); transform: translateY(-1px); }
+    .toolbar-btn.primary {
+      background: linear-gradient(135deg, #e0bb7d, #c69856);
+      border-color: #c69856; color: #20352d;
+      box-shadow: 0 6px 18px rgba(0,0,0,.18);
+    }
+    .toolbar-btn.primary:hover { background: linear-gradient(135deg, #e8c98f, #d0a464); }
+    .toolbar-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px; max-width: 250px;
+      padding: 5px 9px; border: 1px solid rgba(255,255,255,.18); border-radius: 999px;
+      background: rgba(255,255,255,.1); color: rgba(255,255,255,.72); font-size: 8.5px;
+    }
+    .status-pill i { width: 5px; height: 5px; border-radius: 50%; background: #e0b978; }
+
+    /* ===== 纸张与页眉 ===== */
+    #viewport { position: relative; padding: 34px 18px 60px; }
+    .report-sheet {
+      position: relative; width: 210mm; min-height: 297mm; margin: 0 auto;
+      padding: 11mm 11mm 12mm; overflow: hidden;
+      border-radius: 3mm;
+      background: linear-gradient(180deg, #fffdf9 0%, #fffdf9 68%, #fbf8f0 100%);
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,.72);
+      color: var(--ink-2);
+    }
+    .report-sheet::before {
+      content: ""; position: absolute; inset: 0 0 auto; height: 3mm;
+      background: linear-gradient(90deg, var(--forest), var(--teal), var(--gold), var(--clay));
+    }
+    .report-sheet::after {
+      content: ""; position: absolute; right: -28mm; bottom: 28mm;
+      width: 64mm; height: 64mm; border-radius: 50%;
+      background: radial-gradient(circle, rgba(58,119,100,.09), transparent 70%);
+      pointer-events: none;
+    }
+    .report-head { margin-bottom: 7.5mm; }
+    .report-hero {
+      position: relative; overflow: hidden; padding: 11mm 11mm 10mm;
+      border-radius: 4mm; color: #fff;
+      background:
+        radial-gradient(circle at 88% 10%, rgba(198,152,86,.24), transparent 28%),
+        linear-gradient(135deg, #102f28 0%, #174b3e 52%, #2e6b58 100%);
+      box-shadow: 0 12px 32px rgba(16,47,40,.18);
+    }
+    .report-hero::before {
+      content: ""; position: absolute; right: -16mm; top: -23mm;
+      width: 78mm; height: 78mm; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 0 0 8mm rgba(255,255,255,.04), 0 0 0 16mm rgba(255,255,255,.03);
+    }
+    .report-hero::after {
+      content: ""; position: absolute; left: 0; bottom: 0;
+      width: 58%; height: 1px;
+      background: linear-gradient(90deg, rgba(198,152,86,.85), transparent);
+    }
+    .hero-copy { position: relative; z-index: 2; max-width: 132mm; }
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 2.5mm;
+      color: #e7cfa7; font-size: 7pt; letter-spacing: .16em; text-transform: uppercase;
+    }
+    .hero-eyebrow::before { content: ""; width: 7mm; height: 1px; background: var(--gold); }
+    h1 {
+      margin: 3.5mm 0 0; color: #fff; font-family: var(--serif);
+      font-size: 24pt; line-height: 1.18; letter-spacing: .02em; font-weight: 700;
+    }
+    h1 span {
+      display: block; margin-top: 1mm; color: #f1dfc4;
+      font-size: 16.5pt; letter-spacing: .1em; font-weight: 600;
+    }
+    .subtitle { margin: 3.2mm 0 0; color: rgba(255,255,255,.72); font-size: 8.6pt; line-height: 1.65; }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 2.5mm; margin-top: 5mm; }
+    .mode-tag {
+      display: inline-flex; align-items: center; padding: 1.4mm 3mm;
+      border-radius: 999px; white-space: nowrap; font-size: 7.8pt;
+      border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.1); color: #fff;
+    }
+    .mode-tag.counselor {
+      border-color: rgba(198,152,86,.55); background: rgba(198,152,86,.16); color: #f3dfc0;
+    }
+    .mode-tag.public {
+      border-color: rgba(180,220,205,.5); background: rgba(180,220,205,.12); color: #dff3e8;
+    }
+    .hero-report-no {
+      display: inline-flex; align-items: center; padding: 1.4mm 3mm;
+      border: 1px solid rgba(255,255,255,.18); border-radius: 999px;
+      color: rgba(255,255,255,.7); font-size: 7.4pt; letter-spacing: .05em;
+    }
+    .hero-emblem {
+      position: absolute; right: 10mm; bottom: 9mm; z-index: 2;
+      width: 31mm; height: 31mm; border: 1px solid rgba(255,255,255,.22);
+      border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: radial-gradient(circle, rgba(255,255,255,.08), transparent 70%);
+    }
+    .hero-emblem strong { color: #f1dfc4; font-family: var(--serif); font-size: 22pt; line-height: 1; }
+    .hero-emblem span { margin-top: 1.5mm; color: rgba(255,255,255,.5); font-size: 6pt; letter-spacing: .18em; }
+
+    .meta-card {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 3mm 6mm; margin-top: 5mm; padding: 5mm 5.5mm;
+      border: 1px solid var(--line); border-radius: 3mm;
+      background: linear-gradient(180deg, #fff, #f8f5ec);
+      box-shadow: 0 4px 14px rgba(17,43,35,.045);
+    }
+    .meta-item {
+      display: flex; align-items: baseline; gap: 2mm; min-width: 0;
+      padding-left: 2.5mm; border-left: 2px solid rgba(198,152,86,.5);
+    }
+    .meta-label { flex: 0 0 auto; color: var(--muted); font-size: 7.6pt; letter-spacing: .04em; }
+    .meta-value { color: var(--ink); font-size: 8.8pt; font-weight: 600; overflow-wrap: anywhere; }
+    .basis-card {
+      margin-top: 3.5mm; padding: 3.2mm 5mm;
+      border: 1px solid #e4d6bf; border-left: 4px solid var(--gold);
+      border-radius: 0 2mm 2mm 0;
+      background: linear-gradient(90deg, #fbf4e5, #fffdf9);
+      color: #5f5443; font-size: 8pt;
+    }
+    .basis-card b { color: #9a6f35; font-weight: 600; margin-right: 2mm; }
+    .sample-alert {
+      display: flex; align-items: flex-start; gap: 3mm; margin-top: 3mm; padding: 3mm 4.5mm;
+      border: 1px solid #e4c9ab; border-left: 4px solid var(--clay);
+      border-radius: 0 2.5mm 2.5mm 0;
+      background: linear-gradient(90deg, #fbf1e5, #fffdf9);
+      color: #6f5140; font-size: 8pt; line-height: 1.62;
+    }
+    .sample-alert b { flex: 0 0 auto; color: #9d5e42; font-weight: 700; }
+    .sample-alert span { min-width: 0; }
+
+    /* ===== 章节与卡片 ===== */
+    .section { position: relative; margin-top: 8mm; }
+    .section[data-chapter="1"] { --accent: #2f6f5e; --accent-soft: #e7f2ee; --accent-deep: #143f35; }
+    .section[data-chapter="2"] { --accent: #b7794b; --accent-soft: #fbf0e3; --accent-deep: #7d4d2c; }
+    .section[data-chapter="3"] { --accent: #3d6f7a; --accent-soft: #e8f1f3; --accent-deep: #284d56; }
+    .section[data-chapter="4"] { --accent: #8a6a3d; --accent-soft: #f6efe0; --accent-deep: #624a2b; }
+    .section[data-chapter="5"] { --accent: #a8554e; --accent-soft: #f8e9e7; --accent-deep: #743a35; }
+    .section[data-chapter="6"] { --accent: #4f6f8a; --accent-soft: #eaf0f6; --accent-deep: #354e64; }
+    .section[data-chapter="7"] { --accent: #6b5a8a; --accent-soft: #f0ecf6; --accent-deep: #493b61; }
+    .section[data-chapter="8"] { --accent: #3f7a6a; --accent-soft: #e8f4ef; --accent-deep: #285446; }
+    .section[data-chapter="9"] { --accent: #8a6a3d; --accent-soft: #f7f0e2; --accent-deep: #624a2b; }
+    .section::before {
+      content: ""; position: absolute; left: -4mm; top: 0; bottom: 0; width: 1.2mm;
+      border-radius: 2mm; background: linear-gradient(180deg, var(--accent), transparent 72%);
+      opacity: .24;
+    }
+    .section-head {
+      display: grid; grid-template-columns: 13mm 1fr auto; align-items: center; gap: 3mm;
+      position: relative; margin-bottom: 4.5mm; padding: 1mm 0 3mm;
+      border-bottom: 1px solid var(--line);
+    }
+    .section-head::after {
+      content: ""; position: absolute; left: 0; bottom: -1px; width: 26mm; height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    .section-numeral {
+      width: 12mm; height: 12mm; display: grid; place-items: center;
+      border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+      font-family: var(--serif); font-size: 15pt; font-weight: 700; line-height: 1;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.7);
+    }
+    .section-head h2 {
+      margin: 0; color: var(--ink); font-family: var(--serif);
+      font-size: 14pt; line-height: 1.35; letter-spacing: .02em; font-weight: 700;
+    }
+    .section-aside {
+      max-width: 58mm; color: var(--accent); font-size: 7.8pt; line-height: 1.5;
+      text-align: right; white-space: normal;
+    }
+    .section-intro { margin: 0 0 4mm; color: var(--muted); font-size: 8.4pt; line-height: 1.7; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4mm; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4mm; }
+    .card {
+      position: relative; border: 1px solid var(--line); border-top: 3px solid var(--accent);
+      border-radius: 3mm; padding: 4.5mm 5mm;
+      background: linear-gradient(180deg, #fff, #fbf9f3);
+      box-shadow: 0 4px 14px rgba(17,43,35,.045);
+    }
+    .card-title { margin-bottom: 2.5mm; color: var(--accent); font-size: 8.2pt; font-weight: 700; letter-spacing: .06em; }
+    .card p { margin: 0; color: var(--ink-2); font-size: 9.4pt; line-height: 1.75; }
+    .soft-label { color: var(--accent); font-size: 8.2pt; font-weight: 600; letter-spacing: .08em; }
+    .figure-block { width: 108mm; margin: 0 auto 5mm; }
+    .figure-frame {
+      position: relative; padding: 2.5mm; border-radius: 3.5mm;
+      background: linear-gradient(135deg, #efe3cf, #e5f0ea);
+      box-shadow: 0 10px 26px rgba(17,43,35,.12);
+    }
+    .figure-frame::before {
+      content: "SANDPLAY · 01"; position: absolute; top: 4.5mm; left: 4.5mm; z-index: 2;
+      padding: 1mm 2.2mm; border-radius: 999px;
+      background: rgba(20,63,53,.84); color: #f1dfc4; font-size: 6.2pt; letter-spacing: .12em;
+    }
+    .figure-frame img {
+      display: block; width: 100%; height: auto; max-height: 84mm;
+      object-fit: cover; border-radius: 2.5mm; background: #f7f4ed;
+    }
+    .figure-caption { margin-top: 2mm; color: var(--muted); font-size: 7.8pt; letter-spacing: .08em; text-align: center; }
+    .category-list { display: flex; flex-wrap: wrap; gap: 2mm; margin-top: 2mm; }
+    .category-chip {
+      padding: 1.2mm 2.6mm; border: 1px solid var(--accent-soft); border-radius: 999px;
+      color: var(--accent-deep); font-size: 8.2pt; background: var(--accent-soft);
+    }
+    .mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5mm; margin-top: 2mm; }
+    .mini-cell {
+      min-height: 14mm; padding: 1.5mm; border: 1px solid var(--line-soft); background: #fbfaf7;
+      border-radius: 1.2mm; display: flex; flex-direction: column; justify-content: center;
+      align-items: center; color: var(--muted); font-size: 7.4pt;
+    }
+    .mini-cell.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-deep); }
+    .mini-cell b { font-weight: 700; font-size: 8pt; }
+    .mini-cell span { margin-top: .5mm; font-family: var(--sans); }
+    .scene-quote {
+      position: relative; margin-top: 4mm; padding: 4.5mm 5mm 4.5mm 12mm;
+      border: 1px solid var(--line); border-left: 4px solid var(--accent);
+      border-radius: 0 3mm 3mm 0;
+      background: linear-gradient(135deg, #f7f3e8, #fff);
+    }
+    .scene-quote::before {
+      content: "“"; position: absolute; left: 4mm; top: 1.5mm;
+      color: var(--accent); font-family: var(--serif); font-size: 26pt; opacity: .35;
+    }
+    .scene-quote ul, .plain-list { margin: 1.5mm 0 0; padding-left: 5mm; }
+    .scene-quote li, .plain-list li { margin: 1mm 0; color: var(--ink-2); font-size: 9.2pt; line-height: 1.65; }
+    .terrain-line { margin-top: 3mm; color: var(--muted); font-size: 8.3pt; }
+    .raw-input {
+      margin-top: 4mm; padding: 4mm 4.5mm; border: 1px solid #d8dfd9;
+      border-radius: 3mm; background: #fbfdfb;
+    }
+    .raw-input-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 3mm;
+      margin-bottom: 2.5mm; color: var(--accent-deep); font-size: 8.4pt; font-weight: 700;
+    }
+    .raw-input-head small { color: var(--muted); font-size: 7.4pt; font-weight: 400; }
+    .raw-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3mm; }
+    .raw-quote {
+      padding: 3mm 3.5mm; border-left: 2px solid #b9cdc2; border-radius: 0 2mm 2mm 0;
+      background: #fff; color: var(--ink-2); font-size: 8.5pt; line-height: 1.7;
+    }
+    .raw-quote b { display: block; margin-bottom: 1.2mm; color: var(--muted); font-size: 7.5pt; font-weight: 500; }
+    .raw-process { margin-top: 2.5mm; color: var(--muted); font-size: 7.5pt; line-height: 1.55; }
+    .alt-hypothesis {
+      margin-top: 1.8mm; padding: 2mm 2.5mm; border-left: 2px solid #c69856;
+      background: #fbf5ea; color: #6f5a40; font-size: 8pt; line-height: 1.6;
+    }
+    .verify-question { margin-top: 1.2mm; color: #5d6f68; font-size: 7.8pt; line-height: 1.6; }
+    .warn-strip {
+      display: flex; align-items: baseline; gap: 3mm; margin-bottom: 4mm; padding: 2.8mm 4mm;
+      border: 1px solid #e4c9ab; border-radius: 2mm;
+      background: linear-gradient(90deg, #fdf4e8, #fff);
+      color: #7b5a38; font-size: 8.3pt; line-height: 1.6;
+    }
+    .warn-strip b { flex: 0 0 auto; color: #9a6a35; font-weight: 700; }
+
+    /* ===== 表格 ===== */
+    .table-wrap {
+      border: 1px solid var(--line); border-radius: 3mm; overflow: hidden;
+      background: #fff; box-shadow: 0 3px 12px rgba(17,43,35,.045);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 3mm 3.5mm; border-bottom: 1px solid var(--line-soft); vertical-align: top; text-align: left; }
+    th {
+      color: var(--accent-deep); font-size: 8.6pt; font-weight: 700;
+      background: linear-gradient(90deg, var(--accent-soft), #fff);
+    }
+    td { color: var(--ink-2); font-size: 8.7pt; line-height: 1.65; background: #fff; }
+    tbody tr:nth-child(even) td { background: #fbfaf5; }
+    tr:last-child td { border-bottom: 0; }
+    .table-note { margin: 2.4mm 0 0; color: var(--muted); font-size: 7.6pt; line-height: 1.55; }
+    .theory-note { margin-top: 1.2mm; color: var(--muted); font-size: 7.6pt; line-height: 1.55; }
+
+    /* ===== 六维 / 风险 / 训练 ===== */
+    .dimension-card {
+      margin-bottom: 4mm; border: 1px solid var(--line); border-left: 4px solid var(--accent);
+      border-radius: 3mm; background: #fff; overflow: hidden;
+      box-shadow: 0 4px 14px rgba(17,43,35,.045);
+    }
+    .dimension-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 5mm;
+      padding: 4mm 5mm; border-bottom: 1px solid var(--line-soft);
+      background: linear-gradient(90deg, var(--accent-soft), #fff);
+    }
+    .dimension-title { display: flex; align-items: center; gap: 4mm; min-width: 0; }
+    .dimension-index {
+      width: 9mm; height: 9mm; display: grid; place-items: center;
+      border-radius: 50%; background: var(--accent); color: #fff;
+      font-family: var(--serif); font-size: 10pt; line-height: 1; flex: 0 0 auto;
+    }
+    .dimension-title h3 { margin: 0; color: var(--ink); font-family: var(--serif); font-size: 11pt; font-weight: 700; line-height: 1.4; }
+    .confidence {
+      flex: 0 0 auto; padding: 1.2mm 3mm; border: 1px solid var(--line); border-radius: 999px;
+      color: var(--muted); font-size: 7.7pt; background: #fbfaf7;
+    }
+    .confidence.high { border-color: #bfd7cb; background: #f2f8f5; color: #4f7c68; }
+    .confidence.mid { border-color: #e4c9ab; background: #fbf4e9; color: #966936; }
+    .confidence.low { border-color: #dedbd2; background: #faf9f6; color: #8d8e86; }
+    .dimension-body { padding: 4.5mm 5mm 5mm; }
+    .judgement {
+      margin-bottom: 3.4mm; padding: 3mm 4mm 3mm 5mm;
+      border-left: 3px solid var(--accent); border-radius: 0 2mm 2mm 0;
+      background: linear-gradient(90deg, var(--accent-soft), #fff);
+    }
+    .judgement-label { color: var(--accent-deep); font-size: 8.1pt; font-weight: 700; letter-spacing: .06em; }
+    .judgement p { margin: 1.2mm 0 0; color: var(--ink); font-size: 9.3pt; line-height: 1.65; }
+    .theory-line { margin-bottom: 3mm; color: var(--ink-2); font-size: 8.2pt; line-height: 1.6; }
+    .theory-line b { color: var(--muted); font-weight: 500; }
+    .sub-label { display: flex; align-items: center; gap: 2mm; color: var(--accent-deep); font-size: 8.4pt; font-weight: 700; }
+    .sub-label i { width: 2mm; height: 2mm; border-radius: 50%; background: var(--accent); display: inline-block; }
+    .sub-label i.diamond { border-radius: 0; transform: rotate(45deg); background: var(--gold); width: 1.8mm; height: 1.8mm; }
+    .sub-block { margin-top: 2.4mm; }
+    .sub-block p { margin: 1.4mm 0 0; color: var(--ink-2); font-size: 9pt; line-height: 1.68; }
+    .sub-list { margin: 1.4mm 0 0; padding-left: 4mm; }
+    .sub-list li { margin: .8mm 0; color: var(--ink-2); font-size: 8.8pt; line-height: 1.6; }
+    .capability-list { margin: 1.2mm 0 0; padding-left: 3mm; }
+    .capability-list li { margin: .6mm 0; color: var(--ink-2); font-size: 8.8pt; line-height: 1.55; }
+    .capability-list li::marker { content: "→"; color: var(--accent); }
+    .module-pills { display: flex; flex-wrap: wrap; gap: 1.8mm; margin-top: 1.6mm; }
+    .module-pill {
+      padding: 1.2mm 2.4mm; border: 1px solid var(--accent-soft); border-radius: 1.2mm;
+      background: var(--accent-soft); color: var(--accent-deep); font-size: 7.6pt;
+    }
+    .conclusion { margin-top: 3mm; color: var(--accent-deep); font-size: 8.5pt; line-height: 1.65; }
+
+    .academic-hero {
+      margin-bottom: 4mm; padding: 4mm 5mm; border: 1px solid var(--line);
+      border-left: 4px solid var(--accent); border-radius: 0 3mm 3mm 0;
+      background: linear-gradient(90deg, var(--accent-soft), #fff);
+    }
+    .academic-hero .card-title { margin-bottom: 1.5mm; }
+    .academic-hero p { margin: 0; color: var(--ink-2); font-size: 9.3pt; line-height: 1.7; }
+    .total-line { display: flex; align-items: baseline; justify-content: space-between; gap: 5mm; padding: 3.2mm 4mm; border-bottom: 1px solid var(--line-soft); background: #fbfaf5; }
+    .total-line strong { color: var(--ink); font-family: var(--serif); font-size: 9.4pt; }
+    .total-line span { color: var(--muted); font-size: 8.1pt; }
+    .academic-table td:nth-child(2), .academic-table td:nth-child(3), .academic-table td:nth-child(4) { width: 17%; }
+    .academic-table td:nth-child(3) { color: var(--ink); font-weight: 600; }
+    .academic-table td:last-child { width: 20%; }
+    .grade-pill { display: inline-block; min-width: 12mm; padding: 1mm 2.4mm; border: 1px solid var(--line); border-radius: 999px; text-align: center; font-size: 7.8pt; }
+    .grade-pill.excellent { color: #4e7c67; border-color: #bdd7ca; background: #f3f8f5; }
+    .grade-pill.good { color: #8a6836; border-color: #e4c9ab; background: #fbf4e9; }
+    .grade-pill.pass { color: #9b7443; border-color: #e3c9a9; background: #fdf7ef; }
+    .grade-pill.fail { color: #9a5048; border-color: #e3bbb4; background: #fdf3f1; }
+    .empty-table { padding: 7mm 5mm; color: var(--muted); font-size: 9pt; text-align: center; background: #fcfbf8; }
+    .academic-empty {
+      display: flex; align-items: baseline; gap: 3mm; padding: 4mm 5mm;
+      border: 1px solid var(--line); border-left: 4px solid var(--accent);
+      border-radius: 0 3mm 3mm 0; background: linear-gradient(90deg, var(--accent-soft), #fff);
+      color: var(--ink-2); font-size: 8.8pt; line-height: 1.7;
+    }
+    .academic-empty b { flex: 0 0 auto; color: var(--accent-deep); font-size: 8.4pt; }
+    .transcript-block { margin-top: 4mm; }
+    .transcript-block img { display: block; max-width: 62mm; max-height: 108mm; margin-top: 2mm; border: 1px solid var(--line); border-radius: 2mm; object-fit: contain; background: #fbfaf7; }
+
+    .risk-disclaimer { margin-bottom: 3mm; color: #7e6b62; font-size: 8.1pt; line-height: 1.65; }
+    .risk-low-note {
+      margin-bottom: 3mm; padding: 3mm 4mm; border: 1px solid #e4c9ab;
+      border-left: 4px solid var(--accent); border-radius: 0 2.5mm 2.5mm 0;
+      background: #fdf4ea; color: #7b5142; font-size: 8pt; line-height: 1.65;
+    }
+    .risk-low-note b { color: var(--accent-deep); }
+    .risk-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3mm; margin-bottom: 4mm; }
+    .risk-card {
+      min-height: 19mm; padding: 3.2mm 4mm; border: 1px solid var(--line);
+      border-top: 3px solid var(--line); border-radius: 2.5mm; background: #fff;
+    }
+    .risk-card h4 { margin: 0 0 1.2mm; color: var(--ink); font-family: var(--serif); font-size: 9.4pt; }
+    .risk-card p { margin: 0; font-size: 7.9pt; color: var(--muted); }
+    .risk-card.l1 { border-color: #c8dbd1; border-top-color: #4f8a70; background: #f7fbf8; }
+    .risk-card.l2 { border-color: #e4c9ab; border-top-color: #c69856; background: #fdf8ef; }
+    .risk-card.l3 { border-color: #e2bda3; border-top-color: #c07a56; background: #fdf3ec; }
+    .risk-card.l4 { border-color: #dcb1a9; border-top-color: #a8554e; background: #fdf0ef; }
+    .risk-level { color: var(--muted); font-weight: 600; }
+    .risk-level.l1 { color: #56816b; }
+    .risk-level.l2 { color: #a27538; }
+    .risk-level.l3 { color: #b05f3d; }
+    .risk-level.l4 { color: #a44e46; }
+    .risk-detail {
+      margin-bottom: 3.2mm; padding: 4.2mm 5mm; border: 1px solid var(--line);
+      border-left: 4px solid var(--accent); border-radius: 0 3mm 3mm 0;
+      background: #fff; box-shadow: 0 3px 10px rgba(17,43,35,.035);
+    }
+    .risk-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 4mm; margin-bottom: 2.4mm; }
+    .risk-detail-head h3 { margin: 0; color: var(--ink); font-family: var(--serif); font-size: 9.6pt; }
+    .risk-field { margin-top: 2.2mm; }
+    .risk-field b { display: block; color: var(--muted); font-size: 7.9pt; font-weight: 500; }
+    .risk-field p { margin: .8mm 0 0; color: var(--ink-2); font-size: 8.7pt; line-height: 1.65; }
+    .risk-standard { margin: 3mm 0 6mm; padding: 3.2mm 4mm; border: 1px solid var(--line); border-radius: 2.5mm; background: #fcfbf8; }
+    .risk-standard strong { color: var(--ink); font-size: 8.6pt; }
+    .risk-standard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2mm; margin-top: 2mm; }
+    .risk-standard-grid div { padding: 2mm 2.4mm; border: 1px solid var(--line-soft); border-radius: 1.2mm; color: var(--muted); font-size: 7.5pt; background: #fff; }
+    .risk-standard-grid b { display: block; color: var(--ink); font-size: 7.8pt; }
+
+    .action-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3mm; margin-top: 4mm; }
+    .action-card {
+      padding: 3.6mm 4mm; border: 1px solid var(--line); border-top: 2px solid var(--accent);
+      border-radius: 2mm; background: linear-gradient(180deg, #fff, #fbfaf5);
+    }
+    .action-card h4 { margin: 0 0 2mm; color: var(--accent-deep); font-size: 8.8pt; }
+    .action-card ul { margin: 0; padding-left: 4mm; }
+    .action-card li { margin: 1.4mm 0; color: var(--ink-2); font-size: 8.2pt; line-height: 1.6; }
+    .stage-line { display: flex; align-items: center; gap: 3mm; margin-bottom: 4mm; padding: 2.6mm 3.5mm; border-bottom: 1px solid var(--line-soft); font-size: 8.5pt; color: var(--muted); }
+    .stage-pill { padding: 1mm 2.5mm; border: 1px solid var(--accent-soft); border-radius: 999px; color: var(--accent-deep); background: var(--accent-soft); font-size: 8pt; }
+    .strength-list { margin: 1.5mm 0 0; padding-left: 4mm; }
+    .strength-list li { margin: 1.2mm 0; color: var(--ink-2); font-size: 9.1pt; }
+    .career-summary { margin-bottom: 4mm; color: var(--ink-2); font-size: 9.2pt; line-height: 1.7; }
+    .module-card {
+      margin-bottom: 4mm; padding: 4.5mm 5mm; border: 1px solid var(--line);
+      border-top: 3px solid var(--accent); border-radius: 3mm;
+      background: #fff; box-shadow: 0 4px 14px rgba(17,43,35,.045);
+    }
+    .module-head { display: flex; align-items: center; gap: 3mm; margin-bottom: 3mm; }
+    .module-number {
+      width: 9mm; height: 9mm; display: grid; place-items: center; border-radius: 50%;
+      background: var(--accent); color: #fff; font-family: var(--serif); font-size: 9pt;
+    }
+    .module-head h3 { margin: 0; color: var(--ink); font-family: var(--serif); font-size: 10pt; line-height: 1.45; }
+    .module-meta { margin: 1.5mm 0 2.2mm; color: var(--ink-2); font-size: 8.4pt; }
+    .module-meta b { color: var(--muted); font-weight: 500; margin-right: 1.5mm; }
+    .module-goals { display: flex; flex-wrap: wrap; gap: 1.6mm; margin-top: 1.4mm; }
+    .module-goal { padding: 1mm 2.3mm; border: 1px solid var(--accent-soft); border-radius: 1.2mm; background: var(--accent-soft); color: var(--accent-deep); font-size: 7.6pt; }
+    .module-line { margin-top: 1.8mm; color: var(--ink-2); font-size: 8.5pt; line-height: 1.65; }
+    .module-line b { color: var(--muted); font-weight: 500; }
+    .deferred-modules {
+      margin-top: 2mm; padding: 3.2mm 4mm; border: 1px dashed #d4cabb;
+      border-radius: 2.5mm; background: #fbfaf7; color: var(--muted); font-size: 7.8pt; line-height: 1.65;
+    }
+    .deferred-modules b { color: var(--ink-2); font-weight: 600; }
+    .advice-card {
+      margin-bottom: 3mm; padding: 4mm 5mm; border: 1px solid var(--line);
+      border-left: 4px solid var(--accent); border-radius: 0 3mm 3mm 0;
+      background: linear-gradient(90deg, var(--accent-soft), #fff);
+    }
+    .advice-card h3 { margin: 0 0 2mm; color: var(--accent-deep); font-family: var(--serif); font-size: 9.8pt; }
+    .advice-card ul { margin: 0; padding-left: 4mm; }
+    .advice-card li { margin: 1.2mm 0; color: var(--ink-2); font-size: 8.8pt; line-height: 1.65; }
+    .callout-warn {
+      display: flex; gap: 3mm; margin-top: 4mm; padding: 4mm 5mm;
+      border: 0; border-radius: 3mm;
+      background: linear-gradient(135deg, #143f35, #235847);
+      color: #f7efe0; font-size: 8.1pt; line-height: 1.62;
+      box-shadow: 0 8px 20px rgba(17,43,35,.14);
+    }
+    .callout-warn .icon {
+      flex: 0 0 auto; width: 5mm; height: 5mm; display: grid; place-items: center;
+      border: 1px solid #d8b77b; border-radius: 50%; color: #f1dfc4;
+      background: rgba(255,255,255,.08); font-weight: 700;
+    }
+    .callout-warn b { display: block; color: #f1dfc4; font-size: 9pt; margin-bottom: .8mm; }
+
+    .qr-zone {
+      display: flex; align-items: center; gap: 5mm; margin-top: 6mm; padding: 4.5mm;
+      border: 1px dashed #d6c8b3; border-radius: 3mm;
+      background: linear-gradient(135deg, #f7f2e6, #fff);
+    }
+    .pdf-exporting .qr-zone.no-share { display: none !important; }
+    .qr-box {
+      width: 30mm; min-height: 30mm; display: grid; place-items: center; padding: 1mm;
+      border: 1px solid var(--line); border-radius: 2mm; background: #fff;
+      color: var(--muted); font-size: 7.4pt; text-align: center;
+    }
+    .qr-box img { width: 27mm; height: 27mm; object-fit: contain; }
+    .qr-copy { flex: 1; min-width: 0; }
+    .qr-copy strong { display: block; color: var(--ink); font-family: var(--serif); font-size: 9.2pt; }
+    .qr-copy small { display: block; margin-top: 1mm; color: var(--muted); font-size: 7.7pt; }
+    .qr-copy code { display: block; margin-top: 1mm; color: var(--accent-deep); font-family: var(--sans); font-size: 7.2pt; overflow-wrap: anywhere; }
+
+    .empty-state {
+      max-width: 680px; margin: 40px auto; padding: 34px; border: 1px solid rgba(255,255,255,.7); border-radius: 8px;
+      background: linear-gradient(135deg, rgba(255,253,249,.94), rgba(240,246,242,.9));
+      box-shadow: 0 18px 50px rgba(17,43,35,.16); text-align: center;
+    }
+    .empty-state h2 { margin: 0; color: var(--ink); font-family: var(--serif); font-size: 18px; }
+    .empty-state p { margin: 6px 0 18px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .drop-zone { padding: 22px; border: 1px dashed #cfc8ba; border-radius: 6px; color: var(--muted); font-size: 12px; background: rgba(255,255,255,.5); }
+    .drop-zone strong { display: block; margin-bottom: 4px; color: var(--ink); font-size: 13px; }
+    #toast {
+      position: fixed; left: 50%; bottom: 26px; z-index: 30; transform: translateX(-50%);
+      padding: 8px 15px; border: 1px solid rgba(255,255,255,.5); border-radius: 999px;
+      background: rgba(17,43,35,.92); color: #fff; font-size: 11px; opacity: 0; pointer-events: none; transition: opacity .2s ease;
+    }
+    #toast.show { opacity: 1; }
+    .hide { display: none !important; }
+    .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+
+    @media (max-width: 860px) {
+      .toolbar { align-items: flex-start; flex-direction: column; padding: 10px 12px; }
+      .toolbar-actions { width: 100%; justify-content: flex-start; }
+      .status-pill { max-width: none; }
+      #viewport { padding: 14px 6px 24px; overflow-x: auto; }
+      .report-sheet { width: 210mm; margin: 0; }
+      .report-hero { padding: 9mm; }
+      .hero-copy { max-width: 100%; }
+      .hero-emblem { display: none; }
+      h1 { font-size: 21pt; }
+      h1 span { font-size: 14.5pt; }
+      .section-head { grid-template-columns: 11mm 1fr; }
+      .section-aside { grid-column: 2; text-align: left; max-width: none; }
+    }
+    @media print {
+      body { background: #fff; }
+      .toolbar, #toast, .empty-state { display: none !important; }
+      #viewport { padding: 0; }
+      .report-sheet {
+        width: auto; min-height: 0; padding: 0; margin: 0;
+        border-radius: 0; box-shadow: none; background: #fff; overflow: visible;
+      }
+      .report-sheet::before, .report-sheet::after { display: none; }
+      .report-hero { border-radius: 0; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .card, .dimension-card, .risk-detail, .module-card, .advice-card, .table-wrap, .callout-warn { box-shadow: none; }
+      .section::before { display: none; }
+      .qr-zone.no-share { display: none !important; }
+      @page { size: A4 portrait; margin: 12mm 11mm; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="brand">
+      <div class="brand-mark">心</div>
+      <div>
+        <strong>发展性评估报告</strong>
+        <small>心理沙盘 · 咨询师版 / 家长学生版</small>
+      </div>
+    </div>
+    <div class="toolbar-actions">
+      <div class="mode-switch" id="modeSwitch">
+        <button type="button" data-mode="counselor" class="active" id="modeCounselor">咨询师完整版</button>
+        <button type="button" data-mode="public" id="modePublic">家长 / 学生版</button>
+      </div>
+      <span class="status-pill" id="status"><i></i><span id="statusText">等待报告</span></span>
+      <button type="button" class="toolbar-btn" id="btnShare" disabled>生成分享二维码</button>
+      <button type="button" class="toolbar-btn" id="btnPrint" disabled>打印</button>
+      <button type="button" class="toolbar-btn primary" id="btnPdf" disabled>导出 A4 PDF</button>
+    </div>
+  </div>
+
+  <main id="viewport">
+    <div id="emptyState" class="empty-state">
+      <h2>报告尚未加载</h2>
+      <p>请从沙盘工作台点击“查看完整报告”，或使用收到的分享链接 / 二维码打开。</p>
+    </div>
+    <article id="reportSheet" class="report-sheet hide"></article>
+  </main>
+  <div id="toast"></div>
+
+  <script>
+    const SAME_ORIGIN_API = ["8000", "80", "443", ""].includes(location.port);
+    const API_BASE = (window.localStorage.getItem("sandplay_report_api") || (location.protocol.indexOf("http") === 0 && SAME_ORIGIN_API ? `${location.origin}/api/v1` : "http://127.0.0.1:8000/api/v1")).replace(/\/$/, "");
+    const params = new URLSearchParams(window.location.search);
+    const numerals = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
+    const state = {
+      full: null,
+      publicReport: null,
+      reportId: params.get("report_id") || null,
+      shareToken: params.get("share_token") || null,
+      counselorToken: params.get("counselor_token") || window.localStorage.getItem("sandplay_counselor_token") || "dev-counselor-token",
+      mode: params.get("mode") === "public" ? "public" : "counselor",
+      lockedPublic: Boolean(params.get("share_token")),
+      share: null,
+      sourceLabel: ""
+    };
+
+    const el = (id) => document.getElementById(id);
+    const sheet = el("reportSheet");
+    const emptyState = el("emptyState");
+    const statusText = el("statusText");
+    const btnPrint = el("btnPrint");
+    const btnPdf = el("btnPdf");
+    const btnShare = el("btnShare");
+
+    function clientText(value) {
+      return String(value == null ? "" : value)
+        .replace(/九宫格空间分布/g, "画面分区空间分布")
+        .replace(/九宫格/g, "画面分区")
+        .replace(/成绩单复盘会/g, "成绩复盘会")
+        .replace(/待成绩单补测后确认/g, "待补充成绩后确认")
+        .replace(/成绩单待补/g, "成绩数据待补充")
+        .replace(/补充成绩单/g, "补充成绩数据")
+        .replace(/可读成绩单/g, "成绩数据")
+        .replace(/识别结果/g, "成绩数据")
+        .replace(/后续补测/g, "后续补充成绩")
+        .replace(/补测/g, "补充成绩");
+    }
+    function esc(value) {
+      return clientText(value)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+    function text(value, fallback) {
+      const v = String(value == null ? "" : value).trim();
+      return v || (fallback == null ? "—" : fallback);
+    }
+    function list(value) {
+      if (!value) return [];
+      if (Array.isArray(value)) return value;
+      return [value];
+    }
+    function deepClone(value) { return JSON.parse(JSON.stringify(value)); }
+    function num(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    }
+    function formatDateTime(value) {
+      if (!value) return "—";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+    function percent(value) {
+      if (value == null || value === "") return "—";
+      const n = Number(value);
+      if (!Number.isFinite(n)) return String(value);
+      return `${(n > 0 && n <= 1 ? n * 100 : n).toFixed(1)}%`;
+    }
+    function levelClass(level) {
+      const raw = String(level || "").toUpperCase();
+      if (raw.indexOf("L4") >= 0) return "l4";
+      if (raw.indexOf("L3") >= 0) return "l3";
+      if (raw.indexOf("L2") >= 0) return "l2";
+      return "l1";
+    }
+    function confidenceClass(value) {
+      const raw = String(value || "").toLowerCase();
+      if (raw.indexOf("高") >= 0 || raw.indexOf("high") >= 0) return "high";
+      if (raw.indexOf("中") >= 0 || raw.indexOf("mid") >= 0 || raw.indexOf("medium") >= 0) return "mid";
+      return "low";
+    }
+    function confidenceText(value) {
+      const raw = text(value, "待确认");
+      return `置信度·${raw}`;
+    }
+    function gradeClass(value) {
+      const raw = String(value || "");
+      if (raw.indexOf("优秀") >= 0) return "excellent";
+      if (raw.indexOf("良好") >= 0) return "good";
+      if (raw.indexOf("合格") >= 0) return "pass";
+      if (raw.indexOf("不合格") >= 0) return "fail";
+      return "";
+    }
+    function listMarkup(items, className) {
+      const rows = list(items).filter(Boolean);
+      if (!rows.length) return "";
+      return `<ul class="${className || "plain-list"}">${rows.map((item) => `<li>${esc(item)}</li>`).join("")}</ul>`;
+    }
+    function chips(items) {
+      return list(items).filter(Boolean).map((item) => `<span class="module-pill">${esc(item)}</span>`).join("");
+    }
+    function imgTag(url, alt, className) {
+      if (!url) return "";
+      return `<img src="${esc(url)}" alt="${esc(alt || "")}" crossorigin="anonymous" class="${className || ""}">`;
+    }
+    function actionCard(title, items) {
+      return `<div class="action-card"><h4>${esc(title)}</h4>${listMarkup(items, "") || '<p class="empty-table">暂无建议</p>'}</div>`;
+    }
+    function renderMiniGrid(grid) {
+      if (!grid || !Array.isArray(grid.cells) || !grid.cells.length) return `<p class="terrain-line">暂未采集画面分区数据。</p>`;
+      const max = Math.max(1, ...grid.cells.map((cell) => Number(cell.count) || 0));
+      return `<div class="mini-grid">${grid.cells.map((cell) => {
+        const count = Number(cell.count) || 0;
+        return `<div class="mini-cell${count ? " active" : ""}" title="${esc(cell.label || "")}">
+          <b>${esc(cell.label || "")}</b><span>${count} 件</span>
+        </div>`;
+      }).join("")}</div>`;
+    }
+    function sanitizePublic(report) {
+      const data = deepClone(report || {});
+      delete data.chapter_5_risk;
+      delete data.counselor_only;
+      delete data.risk_level;
+      delete data.risk_summary;
+      if (data.meta) {
+        delete data.meta.counselor_note;
+        delete data.meta.review_note;
+      }
+      function scrub(value) {
+        if (Array.isArray(value)) return value.map(scrub);
+        if (value && typeof value === "object") {
+          const out = {};
+          Object.keys(value).forEach((key) => {
+            const lower = key.toLowerCase();
+            if (["nine_grid_distribution", "grid_distribution", "heightmap"].indexOf(lower) >= 0) return;
+            if (lower.indexOf("counselor") === 0 || lower === "risk_level" || lower === "risk_summary") return;
+            out[key] = scrub(value[key]);
+          });
+          return out;
+        }
+        if (typeof value === "string") return value.replace(/九宫格/g, "画面分区").replace(/宫格/g, "区域");
+        return value;
+      }
+      const result = scrub(data);
+      result.share_visibility = "student_guardian";
+      result.redacted_chapters = ["chapter_5_risk"];
+      return result;
+    }
+    function displayReport() {
+      if (state.mode === "public") {
+        if (state.publicReport) return state.publicReport;
+        return state.full ? sanitizePublic(state.full) : null;
+      }
+      return state.full;
+    }
+    function extractReport(payload) {
+      if (!payload || typeof payload !== "object") return null;
+      const candidates = [payload, payload.data, payload.report, payload.data && payload.data.report, payload.result];
+      for (const candidate of candidates) {
+        if (candidate && typeof candidate === "object" && (candidate.chapter_1_overview || candidate.meta)) return candidate;
+      }
+      return null;
+    }
+    function setMode(mode) {
+      if (state.lockedPublic && mode === "counselor") {
+        toast("当前是分享链接，只能查看家长/学生脱敏版");
+        return;
+      }
+      state.mode = mode;
+      if (mode === "public" && state.full && !state.publicReport) state.sourceLabel = "本地脱敏预览";
+      el("modeCounselor").classList.toggle("active", mode === "counselor");
+      el("modePublic").classList.toggle("active", mode === "public");
+      el("modeCounselor").disabled = Boolean(state.lockedPublic);
+      render();
+    }
+    function renderHeader(report) {
+      const meta = report.meta || {};
+      const academic = report.chapter_4_academic || {};
+      const sample = meta.sample_quality || {};
+      const hasScores = Array.isArray(academic.subjects) && academic.subjects.some((subject) => subject && (subject.score != null || subject.rate != null || (subject.grade && subject.grade !== "待核对")));
+      const basisItems = list(meta.assessment_basis).filter(Boolean)
+        .filter((item) => hasScores || !String(item).includes("成绩单"))
+        .filter((item) => sample.has_terrain !== false || !String(item).includes("地形"));
+      const basis = basisItems.join(" · ") || "沙盘作品照片 1 张 · 画面分区 · 受测者自述";
+      const modeText = state.mode === "counselor" ? "咨询师完整版" : "家长 / 学生端 · 脱敏";
+      const chapterCount = state.mode === "counselor" ? "09" : "08";
+      const reportNo = text(meta.report_no, "报告编号待生成");
+      const sampleAlert = sample.low_projection
+        ? `<div class="sample-alert"><b>低投射量提示</b><span>本次仅采集 ${esc(sample.item_count ?? 0)} 件沙具，且无有效地形塑形。报告结论应视为探索性假设，建议结合访谈、行为观察或量表核实，不宜单独作为判断依据。</span></div>`
+        : "";
+      return `<header class="report-head">
+        <div class="report-hero">
+          <div class="hero-copy">
+            <div class="hero-eyebrow">SANDPLAY ASSESSMENT · 发展性心理评估</div>
+            <h1>心理沙盘<span>发展性评估报告</span></h1>
+            <p class="subtitle">${esc(meta.disclaimer || "发展性心理评估参考·非临床诊断")}</p>
+            <div class="hero-badges">
+              <span class="mode-tag ${state.mode === "counselor" ? "counselor" : "public"}">${esc(modeText)}</span>
+              <span class="hero-report-no">报告编号 · ${esc(reportNo)}</span>
+            </div>
+          </div>
+          <div class="hero-emblem" aria-hidden="true"><strong>${chapterCount}</strong><span>CHAPTERS</span></div>
+        </div>
+        <div class="meta-card">
+          ${metaItem("受测编号", meta.student_no || meta.student_id || "未填写")}
+          ${metaItem("评估来源", meta.assessment_source || "沙盘作品评估")}
+          ${metaItem("生成时间", formatDateTime(meta.generated_at))}
+          ${metaItem("年级段", meta.grade_level || "未填写")}
+          ${metaItem("性别", meta.gender || "未填写")}
+          ${metaItem("施测日期", formatDateTime(meta.test_date || meta.generated_at).slice(0, 10))}
+        </div>
+        <div class="basis-card"><b>评估依据</b>${esc(basis)}</div>
+        ${sampleAlert}
+      </header>`;
+    }
+    function metaItem(label, value) {
+      return `<div class="meta-item"><span class="meta-label">${esc(label)}</span><span class="meta-value">${esc(value)}</span></div>`;
+    }
+    function sectionHead(index, title, aside) {
+      return `<div class="section-head"><span class="section-numeral">${numerals[index]}</span><h2>${esc(title)}</h2>${aside ? `<span class="section-aside">${esc(aside)}</span>` : ""}</div>`;
+    }
+    function clientInputBlock() {
+      if (state.mode !== "counselor") return "";
+      const inputs = state.full && state.full.meta && state.full.meta.client_inputs;
+      if (!inputs) return "";
+      const description = text(inputs.sandplay_description, "");
+      const narrative = text(inputs.self_narrative, "");
+      if (!description && !narrative) return "";
+      return `<div class="raw-input">
+        <div class="raw-input-head"><span>受测者原始记录</span><small>咨询师核对用 · 保留原话</small></div>
+        <div class="raw-grid">
+          ${description ? `<div class="raw-quote"><b>沙盘描述</b>${esc(description)}</div>` : ""}
+          ${narrative ? `<div class="raw-quote"><b>自述文本</b>${esc(narrative)}</div>` : ""}
+        </div>
+        ${inputs.process_note ? `<div class="raw-process">制作过程：${esc(inputs.process_note)}</div>` : ""}
+      </div>`;
+    }
+    function renderChapter1(c1, index) {
+      const categories = list(c1.item_category_stats).filter(Boolean);
+      const grid = state.mode === "counselor" ? renderMiniGrid(c1.nine_grid_distribution) : `<p class="terrain-line">${esc(c1.blank_areas || "画面分区概况以整体聚集与留白描述呈现。")}</p>`;
+      return `<section class="section avoid-break" data-chapter="1">
+        ${sectionHead(index, c1.title || "整体结果与场景概览", "沙盘作品 1 张")}
+        <div class="figure-block">
+          <div class="figure-frame">${imgTag(c1.sandplay_image_url, "沙盘作品实拍")}</div>
+          <div class="figure-caption">图1　沙盘作品实拍</div>
+        </div>
+        <div class="grid-2">
+          <div class="card"><div class="card-title">沙具聚集区</div><p>${esc(text(c1.clusters, "暂无聚集区描述"))}</p></div>
+          <div class="card"><div class="card-title">留白区域</div><p>${esc(text(c1.blank_areas, "暂无留白区域描述"))}</p></div>
+        </div>
+        <div class="grid-2" style="margin-top:4mm">
+          <div class="card"><div class="card-title">沙具类目统计</div>
+            ${categories.length ? `<div class="category-list">${categories.map((item) => `<span class="category-chip">${esc(item.category || "未分类")} · ${esc(item.count || 0)}</span>`).join("")}</div>` : `<p class="terrain-line">暂无沙具类目分布。</p>`}
+          </div>
+          <div class="card"><div class="card-title">${state.mode === "counselor" ? "画面分区分布" : "画面分区概况"}</div>${grid}</div>
+        </div>
+        <div class="scene-quote"><div class="soft-label">场景意象</div>${listMarkup(c1.scene_imagery, "plain-list")}</div>
+        ${clientInputBlock()}
+        <div class="terrain-line">地形观察：${esc(text(c1.terrain_observation, "暂未采集地形信息"))}</div>
+      </section>`;
+    }
+    function renderChapter2(c2, index) {
+      const themes = list(c2.themes).filter(Boolean);
+      return `<section class="section avoid-break" data-chapter="2">
+        ${sectionHead(index, c2.title || "沙盘作品意象分析", "")}
+        <div class="warn-strip"><b>需访谈确认：</b><span>${esc(c2.disclaimer || "以下为探索性假设，需访谈确认，非临床诊断")}</span></div>
+        ${themes.length ? `<div class="table-wrap"><table>
+          <thead><tr><th style="width:22%">意象主题</th><th style="width:19%">象征沙具</th><th>分析假设</th></tr></thead>
+          <tbody>${themes.map((theme) => `<tr>
+            <td>${esc(theme.theme || "—")}</td>
+            <td>${esc(list(theme.symbols).filter(Boolean).join("、") || "—")}</td>
+            <td>${esc(theme.hypothesis || "—")}${theme.theory_basis ? `<div class="theory-note">${esc(theme.theory_basis)}</div>` : ""}${theme.alternative_hypothesis ? `<div class="alt-hypothesis"><b>竞争假设：</b>${esc(theme.alternative_hypothesis)}</div>` : ""}${theme.verification_question ? `<div class="verify-question"><b>验证提问：</b>${esc(theme.verification_question)}</div>` : ""}</td>
+          </tr>`).join("")}</tbody>
+        </table></div>` : `<div class="empty-table">暂无意象分析条目。</div>`}
+      </section>`;
+    }
+    function renderChapter3(c3, index) {
+      const dimensions = list(c3.dimensions).filter(Boolean);
+      return `<section class="section" data-chapter="3">
+        ${sectionHead(index, c3.title || "六维方向判定与训练模块指向", c3.intro || "")}
+        ${dimensions.map((dimension, i) => `<article class="dimension-card avoid-break">
+          <div class="dimension-head">
+            <div class="dimension-title"><span class="dimension-index">${i + 1}</span><h3>${esc(dimension.name || "未命名维度")}</h3></div>
+            <span class="confidence ${confidenceClass(dimension.confidence)}">${esc(confidenceText(dimension.confidence))}</span>
+          </div>
+          <div class="dimension-body">
+            <div class="judgement"><div class="judgement-label">判定建议结果</div><p>${esc(text(dimension.judgement))}</p></div>
+            ${dimension.assessment_theory ? `<div class="theory-line"><b>评估理论：</b>${esc(dimension.assessment_theory)}</div>` : ""}
+            <div class="sub-block"><div class="sub-label"><i></i>评估结果</div><p>${esc(text(dimension.assessment_result))}</p></div>
+            <div class="sub-block"><div class="sub-label"><i></i>佐证要点</div>${listMarkup(dimension.evidence, "sub-list")}</div>
+            <div class="sub-block"><div class="sub-label"><i class="diamond"></i>① 通过沙盘可见的待提升能力</div><ul class="capability-list">${list(dimension.capabilities_to_improve).filter(Boolean).map((item) => `<li>${esc(item)}</li>`).join("")}</ul></div>
+            <div class="sub-block"><div class="sub-label"><i></i>② 对应学习能力训练模块方向</div><div class="module-pills">${confidenceClass(dimension.confidence) === "low" ? '<span class="module-pill">暂不启动，待信息补充</span>' : (chips(dimension.training_module_directions) || '<span class="module-pill">暂不启动，待信息补充</span>')}</div></div>
+            <div class="conclusion">${esc(text(dimension.conclusion, ""))}</div>
+          </div>
+        </article>`).join("")}
+      </section>`;
+    }
+    function renderChapter4(c4, index) {
+      const subjects = list(c4.subjects).filter(Boolean);
+      const total = c4.total || {};
+      const totalText = `${total.score == null ? "—" : total.score} / ${total.full_score == null ? "—" : total.full_score}`;
+      const totalRate = total.rate == null ? "—" : percent(total.rate);
+      const friendlyAcademicText = (value) => String(value || "")
+        .replace(/未提供可读成绩单或识别结果/g, "暂未包含成绩数据")
+        .replace(/暂未获取可读成绩单数据/g, "暂未获取成绩数据")
+        .replace(/未获得可读成绩单数据/g, "暂未获得成绩数据")
+        .replace(/待成绩单补测后确认/g, "待补充成绩后确认")
+        .replace(/可读成绩单/g, "成绩数据")
+        .replace(/识别结果/g, "成绩数据");
+      const academicNote = subjects.some((subject) => subject && (subject.score != null || subject.rate != null || (subject.grade && subject.grade !== "待核对"))) ? "依据已提供成绩" : "本次暂未包含成绩数据";
+      const hasScoreData = academicNote === "依据已提供成绩";
+      if (!hasScoreData) {
+        const note = friendlyAcademicText(text(c4.overall_interpretation, "本次暂未包含成绩数据，学业评价以沙盘、自述与后续补充为线索。"));
+        const notes = list(c4.notes).filter(Boolean).map(friendlyAcademicText);
+        return `<section class="section" data-chapter="4">
+          ${sectionHead(index, c4.title || "学业成绩与学业评价", academicNote)}
+          <div class="academic-empty"><b>学业数据说明</b><span>${esc(note || "本次暂未包含成绩数据，后续补充成绩后再完善学业评价。")} 未采集的科目不再逐项列出。</span></div>
+          ${notes.length ? `<div class="card" style="margin-top:4mm"><div class="card-title">补充观察</div>${listMarkup(notes, "plain-list")}</div>` : ""}
+        </section>`;
+      }
+      return `<section class="section" data-chapter="4">
+        ${sectionHead(index, c4.title || "学业成绩与学业评价", academicNote)}
+        <div class="academic-hero"><div class="card-title">学业整体解读</div><p>${esc(friendlyAcademicText(text(c4.overall_interpretation, "本次暂未获取成绩数据，建议后续补充后复核。"))) || "本次暂未获取成绩数据，建议后续补充后复核。"}</p></div>
+        <div class="table-wrap">
+          <div class="total-line"><strong>成绩汇总</strong><span>总分 ${esc(totalText)}${totalRate !== "—" ? `（得分率 ${esc(totalRate)}）` : ""}</span></div>
+          ${subjects.length ? `<table class="academic-table"><thead><tr><th style="width:26%">科目</th><th>满分</th><th>得分</th><th>得分率</th><th>等级</th></tr></thead>
+            <tbody>${subjects.map((subject) => `<tr>
+              <td>${esc(subject.subject || subject.name || "—")}</td>
+              <td>${esc(subject.full_score == null ? "—" : subject.full_score)}</td>
+              <td>${esc(subject.score == null ? "—" : subject.score)}</td>
+              <td>${esc(percent(subject.rate))}</td>
+              <td><span class="grade-pill ${gradeClass(subject.grade)}">${esc(subject.grade || "—")}</span></td>
+            </tr>`).join("")}</tbody></table>` : `<div class="empty-table">${esc(friendlyAcademicText(c4.notes && c4.notes.length ? list(c4.notes)[0] : "本次暂未包含成绩数据，学业评价以沙盘、自述与后续补充为线索。")) || "本次暂未包含成绩数据，后续补充成绩后再完善学业评价。"}</div>`}
+        </div>
+        <div class="table-note">等级标准（按卷面总分得分率）：${esc(c4.grade_standard || "优秀 ≥80% · 良好 70%-80%（含70%） · 合格 60%-70%（含60%） · 不合格 <60%")}</div>
+        <div class="grid-2" style="margin-top:4mm">
+          <div class="card"><div class="card-title">优势学科 / 学科倾向</div><p>${esc(friendlyAcademicText(text(c4.strengths, "待补充成绩后确认"))) || "待补充成绩后确认"}</p></div>
+          <div class="card"><div class="card-title">待提升学科 / 薄弱环节</div><p>${esc(friendlyAcademicText(text(c4.weaknesses, "待补充成绩后确认"))) || "待补充成绩后确认"}</p></div>
+        </div>
+        <div class="card" style="margin-top:4mm"><div class="card-title">成绩趋势</div><p>${esc(text(c4.trend, "单次成绩无法形成趋势，建议结合近 2-3 次考试对照。"))}</p></div>
+        ${list(c4.notes).filter(Boolean).length ? `<div class="card" style="margin-top:4mm"><div class="card-title">补充观察</div>${listMarkup(list(c4.notes).map(friendlyAcademicText), "plain-list")}</div>` : ""}
+        ${state.mode === "counselor" && c4.transcript_image_url ? `<div class="transcript-block"><div class="soft-label">成绩单原图（1 张，供咨询师核对）</div>${imgTag(c4.transcript_image_url, "成绩单原图")}</div>` : ""}
+      </section>`;
+    }
+    function riskBadge(dimension) {
+      const cls = levelClass(dimension.level);
+      return `<span class="risk-level ${cls}">${esc(dimension.label || dimension.level || "待判")}</span>`;
+    }
+    function renderChapter5(c5, index) {
+      if (state.mode !== "counselor") return "";
+      const dimensions = list(c5.dimensions).filter(Boolean);
+      return `<section class="section" data-chapter="5">
+        ${sectionHead(index, c5.title || "风险研判（九维度分级预警·仅咨询师可见）", "仅咨询师可见")}
+        <p class="risk-disclaimer">${esc(c5.disclaimer || "以下内容仅供咨询师在专业范围内审阅，不可直接呈现给受测者及其家属。")}</p>
+        ${state.full && state.full.meta && state.full.meta.sample_quality && state.full.meta.sample_quality.low_projection ? `<div class="risk-low-note"><b>低投射量提醒：</b>本次沙具数量少，投射信息有限。以下“L1 平稳”仅表示当前沙盘未见显性线索，不等于无风险；建议结合访谈与相应心理量表核实。</div>` : ""}
+        <div class="risk-grid">${dimensions.map((dimension) => `<div class="risk-card ${levelClass(dimension.level)}">
+          <h4>${esc(dimension.name || "—")}</h4><p class="risk-level ${levelClass(dimension.level)}">${esc(dimension.label || dimension.level || "—")}</p>
+        </div>`).join("")}</div>
+        ${dimensions.map((dimension) => `<article class="risk-detail avoid-break">
+          <div class="risk-detail-head"><h3>${esc(dimension.name || "—")}维度</h3>${riskBadge(dimension)}</div>
+          <div class="risk-field"><b>研判结论</b><p>${esc(text(dimension.judgement))}</p></div>
+          <div class="risk-field"><b>线索佐证</b><p>${esc(text(dimension.evidence))}</p></div>
+          <div class="risk-field"><b>常模对照</b><p>${esc(text(dimension.norm_reference, "本次无量表数据，为观察性判断，建议补测"))}</p></div>
+        </article>`).join("")}
+        <div class="risk-standard"><strong>四级预警判定标准</strong>
+          <div class="risk-standard-grid">
+            <div><b>L1 平稳</b>暂无明确线索</div><div><b>L2 轻度关注</b>建议访谈与观察</div>
+            <div><b>L3 中度关注</b>建议升级支持</div><div><b>L4 高度关注</b>建议尽快转介</div>
+          </div>
+        </div>
+      </section>`;
+    }
+    function renderChapter6(c6, index) {
+      const items = list(c6.items).filter(Boolean);
+      return `<section class="section avoid-break" data-chapter="6">
+        ${sectionHead(index, c6.title || "访谈建议", "")}
+        ${items.length ? `<div class="table-wrap"><table><thead><tr><th style="width:24%">访谈话题</th><th>建议提问</th><th style="width:18%">对象</th></tr></thead>
+          <tbody>${items.map((item) => `<tr><td>${esc(item.topic || "—")}</td><td>${list(item.questions).filter(Boolean).map((q) => esc(q)).join("<br>") || "—"}</td><td>${esc(item.target || "—")}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty-table">暂无访谈建议。</div>`}
+      </section>`;
+    }
+    function renderChapter7(c7, index) {
+      return `<section class="section" data-chapter="7">
+        ${sectionHead(index, c7.title || "职业发展优势", "优势视角")}
+        ${c7.evidence_note ? `<div class="warn-strip"><b>证据边界：</b><span>${esc(c7.evidence_note)}</span></div>` : ""}
+        <div class="stage-line">${c7.stage ? `<span class="stage-pill">${esc(c7.stage)}</span>` : ""}<span>${esc(text(c7.summary, ""))}</span></div>
+        <div class="card"><div class="card-title">职业发展优势</div>${listMarkup(c7.strengths, "strength-list")}</div>
+        <div class="action-grid">
+          ${actionCard("老师做什么", c7.teacher_actions)}
+          ${actionCard("家长做什么", c7.parent_actions)}
+          ${actionCard("学生做什么", c7.student_actions)}
+        </div>
+      </section>`;
+    }
+    function renderChapter8(c8, index) {
+      const allModules = list(c8.modules).filter(Boolean);
+      const hasActiveFlag = allModules.some((module) => typeof module.active === "boolean");
+      const modules = hasActiveFlag ? allModules.filter((module) => module.active !== false) : allModules;
+      const deferred = hasActiveFlag ? allModules.filter((module) => module.active === false) : [];
+      return `<section class="section" data-chapter="8">
+        ${sectionHead(index, c8.title || "学习能力训练模块方向建议", "")}
+        <p class="section-intro">${esc(c8.intro || "每个维度只指向 1-3 个模块，保证训练聚焦、不分散。")}</p>
+        ${modules.map((module) => `<article class="module-card avoid-break">
+          <div class="module-head"><span class="module-number">${allModules.indexOf(module) + 1}</span><h3>${esc(module.name || "未命名训练模块")}</h3></div>
+          <div class="module-meta"><b>训练目标能力</b></div><div class="module-goals">${list(module.goals).filter(Boolean).map((goal) => `<span class="module-goal">${esc(goal)}</span>`).join("")}</div>
+          <div class="module-meta"><b>对应维度</b>${esc(list(module.dimensions).filter(Boolean).join("、") || "—")}</div>
+          ${module.logic ? `<div class="module-line"><b>训练逻辑：</b>${esc(module.logic)}</div>` : ""}
+          ${module.format ? `<div class="module-line"><b>开展形式：</b>${esc(module.format)}</div>` : ""}
+          <div class="action-grid">
+            ${actionCard("老师做什么", module.teacher_actions)}
+            ${actionCard("家长做什么", module.parent_actions)}
+            ${actionCard("学生做什么", module.student_actions)}
+          </div>
+        </article>`).join("")}
+        ${deferred.length ? `<div class="deferred-modules"><b>暂不启动 ${deferred.length} 个模块：</b>${esc(deferred.map((module) => module.name || "未命名模块").join("、"))}。待访谈、量表或更充分的沙盘信息补充后再确定是否展开。</div>` : ""}
+      </section>`;
+    }
+    function renderAdviceCard(title, items) {
+      return `<div class="advice-card"><h3>${esc(title)}</h3>${listMarkup(items, "")}</div>`;
+    }
+    function renderChapter9(c9, index) {
+      return `<section class="section" data-chapter="9">
+        ${sectionHead(index, c9.title || "总体使用建议", "")}
+        ${renderAdviceCard("（一）成长型思维：能力训练的底层动力", c9.growth_mindset)}
+        ${renderAdviceCard("（二）优势能力迁移", c9.strength_transfer)}
+        ${renderAdviceCard("（三）以能力发展替代特质判定（避免标签化）", c9.capability_not_label)}
+        <div class="callout-warn"><span class="icon">!</span><div><b>本报告为发展性心理评估参考，非临床诊断</b>${esc(c9.disclaimer || "报告中的意象分析、六维评估均为探索性建议，仅用于制定个性化支持方案。")}</div></div>
+      </section>`;
+    }
+    function renderQr(report) {
+      const share = state.share;
+      const publicMode = state.mode === "public";
+      const hasShareQr = Boolean(share && share.qr_png_base64);
+      const qr = hasShareQr ? `<img src="${esc(share.qr_png_base64)}" alt="报告分享二维码">` : `<span>${publicMode ? "家长 / 学生端" : "审核页可生成二维码"}</span>`;
+      return `<div class="qr-zone${hasShareQr ? "" : " no-share"}">
+        <div class="qr-box">${qr}</div>
+        <div class="qr-copy">
+          <strong>报告扫码查看</strong>
+          <small>${publicMode ? "当前为家长 / 学生脱敏版 · 内部研判内容已隐藏" : "手机扫码查看 · 长期有效"}</small>
+          ${share && share.share_url ? `<small>分享二维码已生成，可直接让家长 / 学生扫码查看。</small>` : (state.full ? `<small>该报告尚未生成分享二维码，可在顶部点击“生成分享二维码”。</small>` : "")}
+        </div>
+      </div>`;
+    }
+    function render() {
+      const report = displayReport();
+      const publicLocked = Boolean(state.lockedPublic);
+      el("modeSwitch").style.display = publicLocked ? "none" : "";
+      el("btnShare").style.display = (publicLocked || state.mode === "public") ? "none" : "";
+      if (!report) {
+        sheet.classList.add("hide");
+        emptyState.classList.remove("hide");
+        statusText.textContent = state.lockedPublic ? "分享链接待加载" : "等待报告";
+        btnPrint.disabled = true;
+        btnPdf.disabled = true;
+        btnShare.disabled = true;
+        return;
+      }
+      emptyState.classList.add("hide");
+      sheet.classList.remove("hide");
+      const sections = [renderHeader(report)];
+      let chapterIndex = 0;
+      const chapterRenderers = [
+        [report.chapter_1_overview || {}, renderChapter1],
+        [report.chapter_2_imagery || {}, renderChapter2],
+        [report.chapter_3_six_dimensions || {}, renderChapter3],
+        [report.chapter_4_academic || {}, renderChapter4],
+        [report.chapter_5_risk || {}, renderChapter5],
+        [report.chapter_6_interview || {}, renderChapter6],
+        [report.chapter_7_career || {}, renderChapter7],
+        [report.chapter_8_training_modules || {}, renderChapter8],
+        [report.chapter_9_general_advice || {}, renderChapter9]
+      ];
+      chapterRenderers.forEach(([data, renderer]) => {
+        const html = renderer(data, chapterIndex);
+        if (html) {
+          sections.push(html);
+          chapterIndex += 1;
+        }
+      });
+      sections.push(renderQr(report));
+      sheet.innerHTML = sections.join("");
+      const sourceLabel = state.mode === "public" && state.full && !state.publicReport ? "本地脱敏预览" : (state.sourceLabel || "已加载");
+      statusText.textContent = `${state.mode === "counselor" ? "咨询师完整版" : "家长 / 学生脱敏版"} · ${sourceLabel}`;
+      btnPrint.disabled = false;
+      btnPdf.disabled = false;
+      btnShare.disabled = !(state.reportId && state.mode === "counselor");
+      el("modeCounselor").disabled = Boolean(state.lockedPublic);
+      el("modeCounselor").classList.toggle("active", state.mode === "counselor");
+      el("modePublic").classList.toggle("active", state.mode === "public");
+      const images = sheet.querySelectorAll("img");
+      images.forEach((image) => {
+        image.addEventListener("error", () => {
+          image.style.display = "none";
+          if (image.parentElement) image.parentElement.classList.add("img-failed");
+        });
+      });
+    }
+    async function loadReportFromApi() {
+      try {
+        if (state.shareToken) {
+          const response = await fetch(`${API_BASE}/share/${encodeURIComponent(state.shareToken)}`);
+          const body = await response.json();
+          if (!response.ok || body.code !== "OK") throw new Error(body.message || "分享报告加载失败");
+          const report = body.data && body.data.report;
+          if (!report) throw new Error("分享报告为空");
+          state.publicReport = report;
+          state.mode = "public";
+          state.lockedPublic = true;
+          state.sourceLabel = "扫码查看";
+          render();
+          return;
+        }
+        if (state.reportId) {
+          const response = await fetch(`${API_BASE}/reports/${encodeURIComponent(state.reportId)}`, {
+            headers: { "X-Counselor-Token": state.counselorToken }
+          });
+          const body = await response.json();
+          if (!response.ok || body.code !== "OK") throw new Error(body.message || "完整报告加载失败");
+          const report = body.data && body.data.report;
+          if (!report) throw new Error("完整报告为空");
+          state.full = report;
+          state.sourceLabel = "咨询师后台";
+          if (params.get("mode") === "public") state.mode = "public";
+          render();
+          return;
+        }
+        const cached = window.localStorage.getItem("sandplay_last_report");
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          const report = extractReport(parsed);
+          if (report) {
+            state.full = report;
+            state.reportId = parsed.report_id || parsed.assessment_id || null;
+            state.sourceLabel = "本地最近报告";
+            render();
+            return;
+          }
+        }
+        render();
+      } catch (error) {
+        toast(`加载失败：${error.message || error}`);
+        render();
+      }
+    }
+    async function generateShare() {
+      if (!state.reportId) { toast("当前报告尚未准备好，暂时无法生成分享二维码"); return; }
+      btnShare.disabled = true;
+      const old = btnShare.textContent;
+      btnShare.textContent = "生成中…";
+      try {
+        const response = await fetch(`${API_BASE}/reports/${encodeURIComponent(state.reportId)}/share`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Counselor-Token": state.counselorToken },
+          body: JSON.stringify({})
+        });
+        const body = await response.json();
+        if (!response.ok || body.code !== "OK") throw new Error(body.message || "生成分享二维码失败");
+        state.share = body.data;
+        render();
+        toast("分享二维码已生成，分享端已脱敏");
+      } catch (error) {
+        toast(`生成失败：${error.message || error}`);
+      } finally {
+        btnShare.textContent = old;
+        btnShare.disabled = !(state.reportId && state.mode === "counselor");
+      }
+    }
+    async function exportPdf() {
+      if (!displayReport()) { toast("请先加载报告"); return; }
+      if (!window.html2pdf) { toast("html2pdf 未加载，请检查网络后重试"); return; }
+      btnPdf.disabled = true;
+      const old = btnPdf.textContent;
+      btnPdf.textContent = "正在导出…";
+      try {
+        await document.fonts.ready;
+        await Promise.all(Array.from(sheet.querySelectorAll("img")).map((image) => {
+          if (image.complete) return Promise.resolve();
+          return new Promise((resolve) => { image.onload = resolve; image.onerror = resolve; });
+        }));
+        const report = displayReport();
+        const reportNo = (report.meta && report.meta.report_no) || "sandplay-report";
+        const filename = `心理沙盘发展性评估报告_${reportNo}_${state.mode === "counselor" ? "咨询师版" : "家长学生版"}.pdf`;
+        const opt = {
+          margin: 0,
+          filename,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: "#ffffff",
+            scrollX: 0,
+            scrollY: 0
+          },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["css", "legacy"], avoid: [".avoid-break", ".dimension-card", ".risk-detail", ".module-card", ".table-wrap", ".figure-block"] }
+        };
+        sheet.classList.add("pdf-exporting");
+        const worker = html2pdf().set(opt).from(sheet).toPdf();
+        const pdf = await worker.get("pdf");
+        pdf.save(filename);
+        toast("A4 PDF 已导出");
+      } catch (error) {
+        toast(`导出失败：${error.message || error}`);
+      } finally {
+        sheet.classList.remove("pdf-exporting");
+        btnPdf.textContent = old;
+        btnPdf.disabled = false;
+      }
+    }
+    let toastTimer = null;
+    function toast(message) {
+      const node = el("toast");
+      node.textContent = message;
+      node.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => node.classList.remove("show"), 2200);
+    }
+    el("modeCounselor").addEventListener("click", () => setMode("counselor"));
+    el("modePublic").addEventListener("click", () => setMode("public"));
+    el("btnPrint").addEventListener("click", () => window.print());
+    el("btnPdf").addEventListener("click", exportPdf);
+    el("btnShare").addEventListener("click", generateShare);
+    if (state.lockedPublic) {
+      el("modeCounselor").disabled = true;
+      el("modePublic").classList.add("active");
+      el("modeCounselor").classList.remove("active");
+    }
+    loadReportFromApi();
+  </script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+[
+  {
+    "id": "NATURE_076",
+    "name": "荷塘",
+    "category": "自然山水与植物",
+    "psychology_meaning": "常与清净、淤泥、超脱和循环有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: NATURE_076. Subject: one single lotus pond, directly on the white ground; no mound, no rocks, no mushrooms, no extra plants, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "NATURE_077",
+    "name": "泉水",
+    "category": "自然山水与植物",
+    "psychology_meaning": "常与源头、清新、持续和内在供给有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: NATURE_077. Subject: one single spring water, directly on the white ground; no mound, no rocks, no mushrooms, no extra plants, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "NATURE_078",
+    "name": "小水洼",
+    "category": "自然山水与植物",
+    "psychology_meaning": "常与残留、映照、微小和暂时积聚有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: NATURE_078. Subject: one single puddle, directly on the white ground; no mound, no rocks, no mushrooms, no extra plants, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "NATURE_079",
+    "name": "冰面",
+    "category": "自然山水与植物",
+    "psychology_meaning": "常与冻结、滑险、静止和表面坚固有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: NATURE_079. Subject: one single frozen surface, directly on the white ground; no mound, no rocks, no mushrooms, no extra plants, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "NATURE_080",
+    "name": "彩虹桥",
+    "category": "自然山水与植物",
+    "psychology_meaning": "常与连接、幻想、过渡和理想化通路有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: NATURE_080. Subject: one single rainbow arch, directly on the white ground; no mound, no rocks, no mushrooms, no extra plants, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_001",
+    "name": "猫",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与独立、亲密、边界和若即若离的关系有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_001. Subject: one single cat, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_002",
+    "name": "狗",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与忠诚、陪伴、保护和直接情感有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_002. Subject: one single dog, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_003",
+    "name": "兔子",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与温顺、警觉、繁殖和脆弱有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_003. Subject: one single rabbit, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_004",
+    "name": "仓鼠",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与囤积、小空间、忙碌和储藏安全有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_004. Subject: one single hamster, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_005",
+    "name": "豚鼠",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与温顺、依赖、陪伴和群体安定有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_005. Subject: one single guinea pig, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_006",
+    "name": "鹦鹉",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与模仿、表达、喧闹和被听见有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_006. Subject: one single parrot, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_007",
+    "name": "金鱼",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与被观赏、记忆短暂、脆弱和受限空间有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_007. Subject: one single goldfish, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_008",
+    "name": "乌龟",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与缓慢、防御、长寿和缩回壳内有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_008. Subject: one single tortoise, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_009",
+    "name": "鹿",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与敏感、优雅、警觉和易受惊有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_009. Subject: one single deer, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_010",
+    "name": "狐狸",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与机智、狡黠、生存策略和试探有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_010. Subject: one single fox, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_011",
+    "name": "熊",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与力量、保护、冬眠和情绪蓄积有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_011. Subject: one single bear, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_012",
+    "name": "松鼠",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与储备、忙碌、警觉和未来准备有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_012. Subject: one single squirrel, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_013",
+    "name": "刺猬",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与防御、退缩、柔软内在和边界有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_013. Subject: one single hedgehog, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_014",
+    "name": "熊猫",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与珍稀、温和、被保护和憨态有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_014. Subject: one single panda, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_015",
+    "name": "猴子",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与顽皮、聪明、冲动和模仿有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_015. Subject: one single monkey, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_016",
+    "name": "马",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与行动力、自由、耐力、奔跑和被驾驭有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_016. Subject: one single horse, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_017",
+    "name": "牛",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与供养、耐力、固执和土地劳作有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_017. Subject: one single cow, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_018",
+    "name": "羊",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与温顺、群体、依赖和牺牲有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_018. Subject: one single goat, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_019",
+    "name": "猪",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与丰足、欲望、被养育和慵懒有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_019. Subject: one single pig, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "ANIMAL_020",
+    "name": "鸡",
+    "category": "动物与神兽",
+    "psychology_meaning": "常与日常、警觉、繁衍和晨起节律有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: ANIMAL_020. Subject: one single chicken, directly on the white ground; no fence, no tree, no lantern, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  }
+]

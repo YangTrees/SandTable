@@ -1,0 +1,85 @@
+{
+  "library_items": 500,
+  "transparent_png": 500,
+  "transparent_webp": 500,
+  "canvas_sizes": [
+    "512x512"
+  ],
+  "library_js_bytes": 17287636,
+  "taxonomy_version": "2.0_dual_axis",
+  "categories": {
+    "人物与角色原型": {
+      "code": "person_role",
+      "count": 88
+    },
+    "建筑与居所": {
+      "code": "building_home",
+      "count": 75
+    },
+    "自然山水与植物": {
+      "code": "nature_plant",
+      "count": 74
+    },
+    "动物与神兽": {
+      "code": "animal_myth",
+      "count": 65
+    },
+    "交通工具与现代器物": {
+      "code": "vehicle_tool",
+      "count": 46
+    },
+    "学习与生活道具": {
+      "code": "study_life",
+      "count": 58
+    },
+    "神秘与象征符号": {
+      "code": "mystic_symbol",
+      "count": 60
+    },
+    "饮食与丰饶意象": {
+      "code": "food_abundance",
+      "count": 34
+    }
+  },
+  "theme_tags": [
+    {
+      "code": "conflict",
+      "name": "冲突",
+      "long_name": "冲突与对抗",
+      "description": "攻击、防御、争夺、战争与攻击性张力。"
+    },
+    {
+      "code": "pressure",
+      "name": "压力",
+      "long_name": "限制与压力",
+      "description": "封闭、束缚、监控、学业负担与难以呼吸的处境。"
+    },
+    {
+      "code": "crisis",
+      "name": "危机",
+      "long_name": "崩解与丧失",
+      "description": "灾害、破损、死亡、枯竭、失控与不可逆的丧失感。"
+    },
+    {
+      "code": "shadow",
+      "name": "阴影",
+      "long_name": "阴影与隐匿",
+      "description": "被压抑、羞耻、退缩、隐藏及人格面具背后的部分。"
+    },
+    {
+      "code": "transformation",
+      "name": "转化",
+      "long_name": "修复与转化",
+      "description": "破裂后的修复、束缚解除、生命萌发、连接与方向重建。"
+    }
+  ],
+  "theme_counts": {
+    "conflict": 24,
+    "shadow": 32,
+    "crisis": 33,
+    "pressure": 36,
+    "transformation": 21
+  },
+  "theme_tagged_items": 100,
+  "note": "器物形态为单选分类，共8类；临床主题为多选标签，当前覆盖新增100件。透明 PNG 为 512×512 RGBA；WebP 为同尺寸压缩版。"
+}

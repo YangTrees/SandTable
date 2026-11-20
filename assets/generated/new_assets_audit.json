@@ -1,0 +1,1973 @@
+{
+  "new_items": 100,
+  "taxonomy_version": "2.0_dual_axis",
+  "category_counts": {
+    "人物与角色原型": 88,
+    "建筑与居所": 75,
+    "自然山水与植物": 74,
+    "动物与神兽": 65,
+    "交通工具与现代器物": 46,
+    "学习与生活道具": 58,
+    "神秘与象征符号": 60,
+    "饮食与丰饶意象": 34
+  },
+  "theme_counts": {
+    "conflict": 24,
+    "shadow": 32,
+    "crisis": 33,
+    "pressure": 36,
+    "transformation": 21
+  },
+  "problems": [],
+  "white_bytes_total": 256098990,
+  "png_bytes_total": 20174034,
+  "webp_bytes_total": 3914756,
+  "items": [
+    {
+      "id": "CONFLICT_001",
+      "name": "长剑",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2319200,
+      "png_bytes": 135349,
+      "webp_bytes": 28814,
+      "alpha_bbox": [
+        31,
+        45,
+        480,
+        467
+      ]
+    },
+    {
+      "id": "CONFLICT_002",
+      "name": "盾牌",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2894077,
+      "png_bytes": 247706,
+      "webp_bytes": 47452,
+      "alpha_bbox": [
+        31,
+        66,
+        479,
+        438
+      ]
+    },
+    {
+      "id": "CONFLICT_003",
+      "name": "弓箭",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2589002,
+      "png_bytes": 207155,
+      "webp_bytes": 42050,
+      "alpha_bbox": [
+        31,
+        79,
+        481,
+        433
+      ]
+    },
+    {
+      "id": "CONFLICT_004",
+      "name": "匕首",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2199698,
+      "png_bytes": 111656,
+      "webp_bytes": 28232,
+      "alpha_bbox": [
+        31,
+        85,
+        481,
+        426
+      ]
+    },
+    {
+      "id": "CONFLICT_005",
+      "name": "战斧",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2174794,
+      "png_bytes": 112098,
+      "webp_bytes": 26088,
+      "alpha_bbox": [
+        31,
+        68,
+        481,
+        444
+      ]
+    },
+    {
+      "id": "CONFLICT_006",
+      "name": "长矛",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 1756378,
+      "png_bytes": 56032,
+      "webp_bytes": 17834,
+      "alpha_bbox": [
+        31,
+        112,
+        481,
+        400
+      ]
+    },
+    {
+      "id": "CONFLICT_007",
+      "name": "怪兽",
+      "category": "人物与角色原型",
+      "subcategory": "神话与阴影人物",
+      "themes": [
+        "conflict",
+        "shadow"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2481479,
+      "png_bytes": 259135,
+      "webp_bytes": 49684,
+      "alpha_bbox": [
+        31,
+        43,
+        481,
+        469
+      ]
+    },
+    {
+      "id": "CONFLICT_008",
+      "name": "恶魔",
+      "category": "人物与角色原型",
+      "subcategory": "神话与阴影人物",
+      "themes": [
+        "conflict",
+        "shadow"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2251886,
+      "png_bytes": 181890,
+      "webp_bytes": 40970,
+      "alpha_bbox": [
+        92,
+        31,
+        419,
+        481
+      ]
+    },
+    {
+      "id": "CONFLICT_009",
+      "name": "炸弹",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict",
+        "crisis"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2210248,
+      "png_bytes": 192413,
+      "webp_bytes": 36080,
+      "alpha_bbox": [
+        65,
+        31,
+        446,
+        481
+      ]
+    },
+    {
+      "id": "CONFLICT_010",
+      "name": "炮台",
+      "category": "建筑与居所",
+      "subcategory": "防御与障碍",
+      "themes": [
+        "conflict",
+        "crisis"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2269150,
+      "png_bytes": 145796,
+      "webp_bytes": 29004,
+      "alpha_bbox": [
+        31,
+        117,
+        481,
+        394
+      ]
+    },
+    {
+      "id": "CONFLICT_011",
+      "name": "铁丝网",
+      "category": "建筑与居所",
+      "subcategory": "防御与障碍",
+      "themes": [
+        "conflict",
+        "pressure"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2711081,
+      "png_bytes": 164571,
+      "webp_bytes": 43210,
+      "alpha_bbox": [
+        32,
+        77,
+        481,
+        435
+      ]
+    },
+    {
+      "id": "CONFLICT_012",
+      "name": "荆棘墙",
+      "category": "建筑与居所",
+      "subcategory": "防御与障碍",
+      "themes": [
+        "conflict",
+        "pressure"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2673988,
+      "png_bytes": 221720,
+      "webp_bytes": 49076,
+      "alpha_bbox": [
+        31,
+        66,
+        481,
+        446
+      ]
+    },
+    {
+      "id": "CONFLICT_013",
+      "name": "狼牙棒",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2213756,
+      "png_bytes": 123568,
+      "webp_bytes": 29474,
+      "alpha_bbox": [
+        31,
+        83,
+        481,
+        428
+      ]
+    },
+    {
+      "id": "CONFLICT_014",
+      "name": "捕兽夹",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict",
+        "pressure"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2713989,
+      "png_bytes": 214733,
+      "webp_bytes": 37938,
+      "alpha_bbox": [
+        31,
+        79,
+        481,
+        432
+      ]
+    },
+    {
+      "id": "CONFLICT_015",
+      "name": "燃烧瓶",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict",
+        "crisis"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 1867297,
+      "png_bytes": 110901,
+      "webp_bytes": 22338,
+      "alpha_bbox": [
+        90,
+        31,
+        421,
+        481
+      ]
+    },
+    {
+      "id": "CONFLICT_016",
+      "name": "手雷",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict",
+        "crisis"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2251664,
+      "png_bytes": 216406,
+      "webp_bytes": 40292,
+      "alpha_bbox": [
+        55,
+        31,
+        457,
+        481
+      ]
+    },
+    {
+      "id": "CONFLICT_017",
+      "name": "弩箭",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2339960,
+      "png_bytes": 214498,
+      "webp_bytes": 44004,
+      "alpha_bbox": [
+        31,
+        89,
+        481,
+        422
+      ]
+    },
+    {
+      "id": "CONFLICT_018",
+      "name": "盔甲",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2461627,
+      "png_bytes": 160583,
+      "webp_bytes": 36146,
+      "alpha_bbox": [
+        75,
+        31,
+        437,
+        481
+      ]
+    },
+    {
+      "id": "CONFLICT_019",
+      "name": "战旗",
+      "category": "神秘与象征符号",
+      "subcategory": "旗帜与身份",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2137133,
+      "png_bytes": 106523,
+      "webp_bytes": 25682,
+      "alpha_bbox": [
+        146,
+        31,
+        366,
+        480
+      ]
+    },
+    {
+      "id": "CONFLICT_020",
+      "name": "拳击手套",
+      "category": "学习与生活道具",
+      "subcategory": "体育与竞技",
+      "themes": [
+        "conflict"
+      ],
+      "asset_group": "conflict_combat",
+      "white_bytes": 2248122,
+      "png_bytes": 173541,
+      "webp_bytes": 32994,
+      "alpha_bbox": [
+        85,
+        31,
+        426,
+        481
+      ]
+    },
+    {
+      "id": "CONFINEMENT_001",
+      "name": "铁牢笼",
+      "category": "建筑与居所",
+      "subcategory": "封闭与监控",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2789895,
+      "png_bytes": 230654,
+      "webp_bytes": 44108,
+      "alpha_bbox": [
+        31,
+        56,
+        481,
+        455
+      ]
+    },
+    {
+      "id": "CONFINEMENT_002",
+      "name": "锁链",
+      "category": "神秘与象征符号",
+      "subcategory": "束缚与限制",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2345044,
+      "png_bytes": 151213,
+      "webp_bytes": 32336,
+      "alpha_bbox": [
+        35,
+        112,
+        481,
+        400
+      ]
+    },
+    {
+      "id": "CONFINEMENT_003",
+      "name": "蜘蛛网",
+      "category": "自然山水与植物",
+      "subcategory": "缠绕与停滞",
+      "themes": [
+        "pressure",
+        "shadow"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2813939,
+      "png_bytes": 254957,
+      "webp_bytes": 54114,
+      "alpha_bbox": [
+        50,
+        31,
+        461,
+        480
+      ]
+    },
+    {
+      "id": "CONFINEMENT_004",
+      "name": "深坑",
+      "category": "自然山水与植物",
+      "subcategory": "险峻地形与困局",
+      "themes": [
+        "pressure",
+        "crisis"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 3147123,
+      "png_bytes": 255792,
+      "webp_bytes": 42678,
+      "alpha_bbox": [
+        38,
+        71,
+        481,
+        441
+      ]
+    },
+    {
+      "id": "CONFINEMENT_005",
+      "name": "落石陷阱",
+      "category": "自然山水与植物",
+      "subcategory": "险峻地形与困局",
+      "themes": [
+        "pressure",
+        "crisis"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2884581,
+      "png_bytes": 266102,
+      "webp_bytes": 47642,
+      "alpha_bbox": [
+        31,
+        42,
+        480,
+        470
+      ]
+    },
+    {
+      "id": "CONFINEMENT_006",
+      "name": "倾斜书山",
+      "category": "学习与生活道具",
+      "subcategory": "学业与压力",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2887508,
+      "png_bytes": 241014,
+      "webp_bytes": 43690,
+      "alpha_bbox": [
+        31,
+        63,
+        480,
+        449
+      ]
+    },
+    {
+      "id": "CONFINEMENT_007",
+      "name": "考卷堆",
+      "category": "学习与生活道具",
+      "subcategory": "学业与压力",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2576328,
+      "png_bytes": 220340,
+      "webp_bytes": 39968,
+      "alpha_bbox": [
+        31,
+        75,
+        481,
+        436
+      ]
+    },
+    {
+      "id": "CONFINEMENT_008",
+      "name": "悬崖",
+      "category": "自然山水与植物",
+      "subcategory": "险峻地形与困局",
+      "themes": [
+        "pressure",
+        "crisis"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2653194,
+      "png_bytes": 187226,
+      "webp_bytes": 37220,
+      "alpha_bbox": [
+        31,
+        88,
+        481,
+        423
+      ]
+    },
+    {
+      "id": "CONFINEMENT_009",
+      "name": "死胡同",
+      "category": "建筑与居所",
+      "subcategory": "封闭与监控",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 3144642,
+      "png_bytes": 271668,
+      "webp_bytes": 46158,
+      "alpha_bbox": [
+        31,
+        47,
+        481,
+        464
+      ]
+    },
+    {
+      "id": "CONFINEMENT_010",
+      "name": "玻璃罩",
+      "category": "建筑与居所",
+      "subcategory": "封闭与监控",
+      "themes": [
+        "pressure",
+        "shadow"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2086253,
+      "png_bytes": 209739,
+      "webp_bytes": 34890,
+      "alpha_bbox": [
+        79,
+        31,
+        432,
+        481
+      ]
+    },
+    {
+      "id": "CONFINEMENT_011",
+      "name": "铁栅栏",
+      "category": "建筑与居所",
+      "subcategory": "封闭与监控",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2033387,
+      "png_bytes": 116583,
+      "webp_bytes": 42344,
+      "alpha_bbox": [
+        31,
+        123,
+        481,
+        388
+      ]
+    },
+    {
+      "id": "CONFINEMENT_012",
+      "name": "禁闭室",
+      "category": "建筑与居所",
+      "subcategory": "封闭与监控",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2762771,
+      "png_bytes": 228121,
+      "webp_bytes": 38902,
+      "alpha_bbox": [
+        31,
+        59,
+        481,
+        452
+      ]
+    },
+    {
+      "id": "CONFINEMENT_013",
+      "name": "单向玻璃",
+      "category": "建筑与居所",
+      "subcategory": "封闭与监控",
+      "themes": [
+        "pressure",
+        "shadow"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2471008,
+      "png_bytes": 191193,
+      "webp_bytes": 33132,
+      "alpha_bbox": [
+        81,
+        31,
+        431,
+        481
+      ]
+    },
+    {
+      "id": "CONFINEMENT_014",
+      "name": "捆绑绳索",
+      "category": "神秘与象征符号",
+      "subcategory": "束缚与限制",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2819290,
+      "png_bytes": 242169,
+      "webp_bytes": 40772,
+      "alpha_bbox": [
+        31,
+        65,
+        481,
+        446
+      ]
+    },
+    {
+      "id": "CONFINEMENT_015",
+      "name": "锁住的日记本",
+      "category": "学习与生活道具",
+      "subcategory": "受阻学习与私密",
+      "themes": [
+        "pressure",
+        "shadow"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2518417,
+      "png_bytes": 241649,
+      "webp_bytes": 39666,
+      "alpha_bbox": [
+        31,
+        62,
+        481,
+        449
+      ]
+    },
+    {
+      "id": "CONFINEMENT_016",
+      "name": "折断的钥匙",
+      "category": "学习与生活道具",
+      "subcategory": "受阻学习与私密",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2255926,
+      "png_bytes": 135649,
+      "webp_bytes": 30106,
+      "alpha_bbox": [
+        31,
+        69,
+        481,
+        443
+      ]
+    },
+    {
+      "id": "CONFINEMENT_017",
+      "name": "沉重镣铐",
+      "category": "神秘与象征符号",
+      "subcategory": "束缚与限制",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2477069,
+      "png_bytes": 230098,
+      "webp_bytes": 34870,
+      "alpha_bbox": [
+        31,
+        78,
+        481,
+        434
+      ]
+    },
+    {
+      "id": "CONFINEMENT_018",
+      "name": "狭小暗室",
+      "category": "建筑与居所",
+      "subcategory": "封闭与监控",
+      "themes": [
+        "pressure",
+        "shadow"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 3045791,
+      "png_bytes": 248923,
+      "webp_bytes": 40816,
+      "alpha_bbox": [
+        34,
+        48,
+        481,
+        464
+      ]
+    },
+    {
+      "id": "CONFINEMENT_019",
+      "name": "倒塌书架",
+      "category": "学习与生活道具",
+      "subcategory": "受阻学习与私密",
+      "themes": [
+        "pressure",
+        "crisis"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 3015689,
+      "png_bytes": 257518,
+      "webp_bytes": 46698,
+      "alpha_bbox": [
+        31,
+        43,
+        481,
+        469
+      ]
+    },
+    {
+      "id": "CONFINEMENT_020",
+      "name": "高墙围栏",
+      "category": "建筑与居所",
+      "subcategory": "封闭与监控",
+      "themes": [
+        "pressure"
+      ],
+      "asset_group": "confinement_pressure",
+      "white_bytes": 2725929,
+      "png_bytes": 232952,
+      "webp_bytes": 40468,
+      "alpha_bbox": [
+        31,
+        63,
+        481,
+        449
+      ]
+    },
+    {
+      "id": "CRISIS_001",
+      "name": "熊熊火焰",
+      "category": "神秘与象征符号",
+      "subcategory": "火与仪式",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2753075,
+      "png_bytes": 162862,
+      "webp_bytes": 33778,
+      "alpha_bbox": [
+        31,
+        58,
+        481,
+        454
+      ]
+    },
+    {
+      "id": "CRISIS_002",
+      "name": "着火的房子",
+      "category": "建筑与居所",
+      "subcategory": "灾害与废墟",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2845955,
+      "png_bytes": 205862,
+      "webp_bytes": 40594,
+      "alpha_bbox": [
+        31,
+        59,
+        481,
+        452
+      ]
+    },
+    {
+      "id": "CRISIS_003",
+      "name": "废墟",
+      "category": "建筑与居所",
+      "subcategory": "灾害与废墟",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2991390,
+      "png_bytes": 259596,
+      "webp_bytes": 50776,
+      "alpha_bbox": [
+        31,
+        54,
+        481,
+        458
+      ]
+    },
+    {
+      "id": "CRISIS_004",
+      "name": "断桥",
+      "category": "建筑与居所",
+      "subcategory": "灾害与废墟",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2846743,
+      "png_bytes": 209350,
+      "webp_bytes": 45196,
+      "alpha_bbox": [
+        31,
+        80,
+        481,
+        431
+      ]
+    },
+    {
+      "id": "CRISIS_005",
+      "name": "倾覆的小船",
+      "category": "交通工具与现代器物",
+      "subcategory": "失事交通",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2611740,
+      "png_bytes": 224413,
+      "webp_bytes": 40762,
+      "alpha_bbox": [
+        34,
+        83,
+        481,
+        428
+      ]
+    },
+    {
+      "id": "CRISIS_006",
+      "name": "枯井",
+      "category": "自然山水与植物",
+      "subcategory": "枯竭自然",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2663675,
+      "png_bytes": 253900,
+      "webp_bytes": 48764,
+      "alpha_bbox": [
+        38,
+        31,
+        473,
+        481
+      ]
+    },
+    {
+      "id": "CRISIS_007",
+      "name": "骷髅",
+      "category": "人物与角色原型",
+      "subcategory": "死亡与阴影人物",
+      "themes": [
+        "crisis",
+        "shadow"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2386959,
+      "png_bytes": 227093,
+      "webp_bytes": 38662,
+      "alpha_bbox": [
+        31,
+        48,
+        481,
+        464
+      ]
+    },
+    {
+      "id": "CRISIS_008",
+      "name": "碎裂的镜子",
+      "category": "学习与生活道具",
+      "subcategory": "反射与自我观照",
+      "themes": [
+        "crisis",
+        "shadow"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2759341,
+      "png_bytes": 243101,
+      "webp_bytes": 47686,
+      "alpha_bbox": [
+        37,
+        31,
+        475,
+        481
+      ]
+    },
+    {
+      "id": "CRISIS_009",
+      "name": "暴风雨乌云",
+      "category": "自然山水与植物",
+      "subcategory": "灾变天气",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2565833,
+      "png_bytes": 235951,
+      "webp_bytes": 39458,
+      "alpha_bbox": [
+        31,
+        45,
+        481,
+        466
+      ]
+    },
+    {
+      "id": "CRISIS_010",
+      "name": "倒塌的树",
+      "category": "自然山水与植物",
+      "subcategory": "枯竭自然",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2622017,
+      "png_bytes": 162428,
+      "webp_bytes": 36610,
+      "alpha_bbox": [
+        31,
+        116,
+        480,
+        395
+      ]
+    },
+    {
+      "id": "CRISIS_011",
+      "name": "干裂的土地",
+      "category": "自然山水与植物",
+      "subcategory": "枯竭自然",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2590779,
+      "png_bytes": 217856,
+      "webp_bytes": 40328,
+      "alpha_bbox": [
+        31,
+        93,
+        481,
+        419
+      ]
+    },
+    {
+      "id": "CRISIS_012",
+      "name": "破旧房屋",
+      "category": "建筑与居所",
+      "subcategory": "灾害与废墟",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2961077,
+      "png_bytes": 230107,
+      "webp_bytes": 43194,
+      "alpha_bbox": [
+        31,
+        72,
+        481,
+        440
+      ]
+    },
+    {
+      "id": "CRISIS_013",
+      "name": "烧焦的森林",
+      "category": "自然山水与植物",
+      "subcategory": "枯竭自然",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 3060040,
+      "png_bytes": 229907,
+      "webp_bytes": 53136,
+      "alpha_bbox": [
+        32,
+        49,
+        481,
+        462
+      ]
+    },
+    {
+      "id": "CRISIS_014",
+      "name": "折断的箭",
+      "category": "神秘与象征符号",
+      "subcategory": "兵器与对抗",
+      "themes": [
+        "crisis",
+        "conflict"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2611256,
+      "png_bytes": 219494,
+      "webp_bytes": 38516,
+      "alpha_bbox": [
+        31,
+        73,
+        481,
+        439
+      ]
+    },
+    {
+      "id": "CRISIS_015",
+      "name": "破碎的陶罐",
+      "category": "学习与生活道具",
+      "subcategory": "生活器物",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2720364,
+      "png_bytes": 185294,
+      "webp_bytes": 41218,
+      "alpha_bbox": [
+        36,
+        73,
+        481,
+        438
+      ]
+    },
+    {
+      "id": "CRISIS_016",
+      "name": "漏水的屋顶",
+      "category": "建筑与居所",
+      "subcategory": "灾害与废墟",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 3133750,
+      "png_bytes": 261482,
+      "webp_bytes": 48814,
+      "alpha_bbox": [
+        31,
+        57,
+        481,
+        455
+      ]
+    },
+    {
+      "id": "CRISIS_017",
+      "name": "沉船",
+      "category": "交通工具与现代器物",
+      "subcategory": "失事交通",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2716739,
+      "png_bytes": 214280,
+      "webp_bytes": 46094,
+      "alpha_bbox": [
+        31,
+        76,
+        481,
+        436
+      ]
+    },
+    {
+      "id": "CRISIS_018",
+      "name": "熄灭的篝火",
+      "category": "神秘与象征符号",
+      "subcategory": "火与仪式",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2716431,
+      "png_bytes": 179289,
+      "webp_bytes": 32682,
+      "alpha_bbox": [
+        31,
+        109,
+        480,
+        403
+      ]
+    },
+    {
+      "id": "CRISIS_019",
+      "name": "荒芜的田地",
+      "category": "自然山水与植物",
+      "subcategory": "枯竭自然",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2873954,
+      "png_bytes": 215212,
+      "webp_bytes": 42952,
+      "alpha_bbox": [
+        31,
+        76,
+        481,
+        436
+      ]
+    },
+    {
+      "id": "CRISIS_020",
+      "name": "枯萎的花",
+      "category": "自然山水与植物",
+      "subcategory": "枯竭自然",
+      "themes": [
+        "crisis"
+      ],
+      "asset_group": "crisis_decay",
+      "white_bytes": 2407974,
+      "png_bytes": 213702,
+      "webp_bytes": 49278,
+      "alpha_bbox": [
+        38,
+        31,
+        474,
+        481
+      ]
+    },
+    {
+      "id": "SHADOW_001",
+      "name": "蹲坐抱膝的少年",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "pressure"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2445099,
+      "png_bytes": 197064,
+      "webp_bytes": 37708,
+      "alpha_bbox": [
+        31,
+        70,
+        481,
+        441
+      ]
+    },
+    {
+      "id": "SHADOW_002",
+      "name": "背对人群的少女",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "pressure"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2777611,
+      "png_bytes": 222580,
+      "webp_bytes": 37462,
+      "alpha_bbox": [
+        31,
+        62,
+        481,
+        447
+      ]
+    },
+    {
+      "id": "SHADOW_003",
+      "name": "捂耳低头的学生",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "pressure"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2416018,
+      "png_bytes": 201920,
+      "webp_bytes": 36734,
+      "alpha_bbox": [
+        31,
+        44,
+        481,
+        467
+      ]
+    },
+    {
+      "id": "SHADOW_004",
+      "name": "黑色影子人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2082459,
+      "png_bytes": 142786,
+      "webp_bytes": 25562,
+      "alpha_bbox": [
+        91,
+        31,
+        421,
+        481
+      ]
+    },
+    {
+      "id": "SHADOW_005",
+      "name": "站在悬崖边的人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "crisis"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2988095,
+      "png_bytes": 232924,
+      "webp_bytes": 45848,
+      "alpha_bbox": [
+        31,
+        61,
+        481,
+        451
+      ]
+    },
+    {
+      "id": "SHADOW_006",
+      "name": "推巨石的人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "pressure"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2922266,
+      "png_bytes": 198288,
+      "webp_bytes": 37430,
+      "alpha_bbox": [
+        33,
+        79,
+        481,
+        432
+      ]
+    },
+    {
+      "id": "SHADOW_007",
+      "name": "哭泣的孩子",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2591571,
+      "png_bytes": 185964,
+      "webp_bytes": 33138,
+      "alpha_bbox": [
+        31,
+        57,
+        480,
+        452
+      ]
+    },
+    {
+      "id": "SHADOW_008",
+      "name": "蜷缩在角落的人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "pressure"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 3125836,
+      "png_bytes": 260338,
+      "webp_bytes": 45680,
+      "alpha_bbox": [
+        32,
+        53,
+        481,
+        459
+      ]
+    },
+    {
+      "id": "SHADOW_009",
+      "name": "抱头蹲下的成年人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "pressure"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2273833,
+      "png_bytes": 214187,
+      "webp_bytes": 34140,
+      "alpha_bbox": [
+        56,
+        31,
+        456,
+        481
+      ]
+    },
+    {
+      "id": "SHADOW_010",
+      "name": "背对镜子的女孩",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2752755,
+      "png_bytes": 194186,
+      "webp_bytes": 38048,
+      "alpha_bbox": [
+        31,
+        65,
+        481,
+        447
+      ]
+    },
+    {
+      "id": "SHADOW_011",
+      "name": "捂脸站立的人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2158673,
+      "png_bytes": 153708,
+      "webp_bytes": 30342,
+      "alpha_bbox": [
+        110,
+        31,
+        402,
+        481
+      ]
+    },
+    {
+      "id": "SHADOW_012",
+      "name": "低头独行的少年",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2056015,
+      "png_bytes": 162377,
+      "webp_bytes": 32784,
+      "alpha_bbox": [
+        64,
+        31,
+        447,
+        481
+      ]
+    },
+    {
+      "id": "SHADOW_013",
+      "name": "双臂交叉的少女",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "conflict"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2320151,
+      "png_bytes": 149712,
+      "webp_bytes": 29780,
+      "alpha_bbox": [
+        101,
+        31,
+        410,
+        481
+      ]
+    },
+    {
+      "id": "SHADOW_014",
+      "name": "躲在门后的人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "pressure"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2861130,
+      "png_bytes": 211580,
+      "webp_bytes": 37178,
+      "alpha_bbox": [
+        31,
+        59,
+        481,
+        452
+      ]
+    },
+    {
+      "id": "SHADOW_015",
+      "name": "抱膝坐地的老人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2020494,
+      "png_bytes": 215665,
+      "webp_bytes": 37770,
+      "alpha_bbox": [
+        31,
+        53,
+        480,
+        458
+      ]
+    },
+    {
+      "id": "SHADOW_016",
+      "name": "背负重物弯腰的人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "pressure"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2048251,
+      "png_bytes": 214554,
+      "webp_bytes": 39628,
+      "alpha_bbox": [
+        84,
+        31,
+        428,
+        481
+      ]
+    },
+    {
+      "id": "SHADOW_017",
+      "name": "伸手求助的人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "transformation"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2464942,
+      "png_bytes": 153214,
+      "webp_bytes": 32110,
+      "alpha_bbox": [
+        31,
+        100,
+        481,
+        411
+      ]
+    },
+    {
+      "id": "SHADOW_018",
+      "name": "背对光站立的人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2516478,
+      "png_bytes": 207402,
+      "webp_bytes": 35748,
+      "alpha_bbox": [
+        31,
+        52,
+        481,
+        460
+      ]
+    },
+    {
+      "id": "SHADOW_019",
+      "name": "蹲在阴影里的男孩",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow",
+        "pressure"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2191219,
+      "png_bytes": 238468,
+      "webp_bytes": 35724,
+      "alpha_bbox": [
+        40,
+        31,
+        472,
+        481
+      ]
+    },
+    {
+      "id": "SHADOW_020",
+      "name": "掩面而坐的人",
+      "category": "人物与角色原型",
+      "subcategory": "情绪与阴影人物",
+      "themes": [
+        "shadow"
+      ],
+      "asset_group": "shadow_figures",
+      "white_bytes": 2376053,
+      "png_bytes": 188961,
+      "webp_bytes": 34090,
+      "alpha_bbox": [
+        31,
+        56,
+        481,
+        456
+      ]
+    },
+    {
+      "id": "NEUTRAL_001",
+      "name": "独立面具",
+      "category": "神秘与象征符号",
+      "subcategory": "面具与人格",
+      "themes": [
+        "shadow",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2890749,
+      "png_bytes": 238074,
+      "webp_bytes": 41862,
+      "alpha_bbox": [
+        31,
+        46,
+        480,
+        466
+      ]
+    },
+    {
+      "id": "NEUTRAL_002",
+      "name": "完整镜子",
+      "category": "学习与生活道具",
+      "subcategory": "反射与自我观照",
+      "themes": [
+        "shadow",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2885881,
+      "png_bytes": 200697,
+      "webp_bytes": 39102,
+      "alpha_bbox": [
+        31,
+        77,
+        481,
+        434
+      ]
+    },
+    {
+      "id": "NEUTRAL_003",
+      "name": "天平",
+      "category": "学习与生活道具",
+      "subcategory": "测量与判断",
+      "themes": [
+        "pressure",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2400255,
+      "png_bytes": 179024,
+      "webp_bytes": 48514,
+      "alpha_bbox": [
+        63,
+        31,
+        449,
+        480
+      ]
+    },
+    {
+      "id": "NEUTRAL_004",
+      "name": "破茧的蚕茧",
+      "category": "动物与神兽",
+      "subcategory": "蜕变与生命阶段",
+      "themes": [
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2792083,
+      "png_bytes": 212869,
+      "webp_bytes": 42388,
+      "alpha_bbox": [
+        31,
+        92,
+        480,
+        420
+      ]
+    },
+    {
+      "id": "NEUTRAL_005",
+      "name": "发芽的枯木",
+      "category": "自然山水与植物",
+      "subcategory": "萌发与再生",
+      "themes": [
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2548350,
+      "png_bytes": 209886,
+      "webp_bytes": 56800,
+      "alpha_bbox": [
+        31,
+        36,
+        481,
+        476
+      ]
+    },
+    {
+      "id": "NEUTRAL_006",
+      "name": "裂缝中的小花",
+      "category": "自然山水与植物",
+      "subcategory": "萌发与再生",
+      "themes": [
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2633529,
+      "png_bytes": 168693,
+      "webp_bytes": 38810,
+      "alpha_bbox": [
+        31,
+        65,
+        481,
+        447
+      ]
+    },
+    {
+      "id": "NEUTRAL_007",
+      "name": "灭火器",
+      "category": "学习与生活道具",
+      "subcategory": "救援与修复器物",
+      "themes": [
+        "crisis",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 1883958,
+      "png_bytes": 138393,
+      "webp_bytes": 24912,
+      "alpha_bbox": [
+        126,
+        31,
+        386,
+        481
+      ]
+    },
+    {
+      "id": "NEUTRAL_008",
+      "name": "救生圈",
+      "category": "学习与生活道具",
+      "subcategory": "救援与修复器物",
+      "themes": [
+        "crisis",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2614198,
+      "png_bytes": 166300,
+      "webp_bytes": 29822,
+      "alpha_bbox": [
+        31,
+        99,
+        479,
+        413
+      ]
+    },
+    {
+      "id": "NEUTRAL_009",
+      "name": "急救箱",
+      "category": "学习与生活道具",
+      "subcategory": "救援与修复器物",
+      "themes": [
+        "crisis",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2762011,
+      "png_bytes": 203082,
+      "webp_bytes": 35988,
+      "alpha_bbox": [
+        32,
+        77,
+        481,
+        435
+      ]
+    },
+    {
+      "id": "NEUTRAL_010",
+      "name": "空鸟笼",
+      "category": "建筑与居所",
+      "subcategory": "封闭与开放空间",
+      "themes": [
+        "pressure",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2370051,
+      "png_bytes": 239138,
+      "webp_bytes": 48774,
+      "alpha_bbox": [
+        41,
+        31,
+        470,
+        481
+      ]
+    },
+    {
+      "id": "NEUTRAL_011",
+      "name": "打开的门锁",
+      "category": "学习与生活道具",
+      "subcategory": "解锁与通行",
+      "themes": [
+        "pressure",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2651839,
+      "png_bytes": 194971,
+      "webp_bytes": 41970,
+      "alpha_bbox": [
+        31,
+        72,
+        481,
+        440
+      ]
+    },
+    {
+      "id": "NEUTRAL_012",
+      "name": "连接两岸的石桥",
+      "category": "建筑与居所",
+      "subcategory": "连接与过渡",
+      "themes": [
+        "conflict",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 3202744,
+      "png_bytes": 236003,
+      "webp_bytes": 50300,
+      "alpha_bbox": [
+        31,
+        82,
+        481,
+        430
+      ]
+    },
+    {
+      "id": "NEUTRAL_013",
+      "name": "重新点燃的蜡烛",
+      "category": "神秘与象征符号",
+      "subcategory": "火与仪式",
+      "themes": [
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2172425,
+      "png_bytes": 181731,
+      "webp_bytes": 34454,
+      "alpha_bbox": [
+        31,
+        56,
+        481,
+        456
+      ]
+    },
+    {
+      "id": "NEUTRAL_014",
+      "name": "修补过的陶罐",
+      "category": "学习与生活道具",
+      "subcategory": "生活器物",
+      "themes": [
+        "crisis",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2601173,
+      "png_bytes": 257307,
+      "webp_bytes": 42732,
+      "alpha_bbox": [
+        31,
+        33,
+        481,
+        479
+      ]
+    },
+    {
+      "id": "NEUTRAL_015",
+      "name": "新生的嫩芽",
+      "category": "自然山水与植物",
+      "subcategory": "萌发与再生",
+      "themes": [
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2216569,
+      "png_bytes": 205494,
+      "webp_bytes": 44186,
+      "alpha_bbox": [
+        40,
+        31,
+        472,
+        481
+      ]
+    },
+    {
+      "id": "NEUTRAL_016",
+      "name": "展开的双手",
+      "category": "人物与角色原型",
+      "subcategory": "肢体与关系",
+      "themes": [
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2303496,
+      "png_bytes": 239898,
+      "webp_bytes": 41546,
+      "alpha_bbox": [
+        31,
+        37,
+        481,
+        475
+      ]
+    },
+    {
+      "id": "NEUTRAL_017",
+      "name": "解开的绳结",
+      "category": "神秘与象征符号",
+      "subcategory": "束缚与限制",
+      "themes": [
+        "pressure",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2805591,
+      "png_bytes": 208162,
+      "webp_bytes": 41220,
+      "alpha_bbox": [
+        31,
+        92,
+        481,
+        420
+      ]
+    },
+    {
+      "id": "NEUTRAL_018",
+      "name": "透光的窗",
+      "category": "建筑与居所",
+      "subcategory": "封闭与开放空间",
+      "themes": [
+        "shadow",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2950902,
+      "png_bytes": 236549,
+      "webp_bytes": 41864,
+      "alpha_bbox": [
+        35,
+        49,
+        481,
+        463
+      ]
+    },
+    {
+      "id": "NEUTRAL_019",
+      "name": "立在中线的白旗",
+      "category": "神秘与象征符号",
+      "subcategory": "旗帜与身份",
+      "themes": [
+        "conflict",
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2511107,
+      "png_bytes": 177250,
+      "webp_bytes": 38452,
+      "alpha_bbox": [
+        35,
+        31,
+        476,
+        481
+      ]
+    },
+    {
+      "id": "NEUTRAL_020",
+      "name": "指南针",
+      "category": "学习与生活道具",
+      "subcategory": "测量与判断",
+      "themes": [
+        "transformation"
+      ],
+      "asset_group": "neutral_transformation",
+      "white_bytes": 2455725,
+      "png_bytes": 213622,
+      "webp_bytes": 37718,
+      "alpha_bbox": [
+        31,
+        77,
+        481,
+        434
+      ]
+    }
+  ]
+}

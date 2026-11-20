@@ -1,0 +1,607 @@
+{
+  "deleted_count": 100,
+  "remaining_count": 400,
+  "deleted_at": "2026-11-20",
+  "items": [
+    {
+      "id": "PERSON_021",
+      "name": "图书管理员",
+      "category": "人物与角色原型",
+      "reason": "人物角色功能重复或投射价值较低"
+    },
+    {
+      "id": "PERSON_031",
+      "name": "士兵",
+      "category": "人物与角色原型",
+      "reason": "角色高度重叠，保留同类代表"
+    },
+    {
+      "id": "PERSON_032",
+      "name": "卫兵",
+      "category": "人物与角色原型",
+      "reason": "角色高度重叠，保留同类代表"
+    },
+    {
+      "id": "PERSON_039",
+      "name": "司机",
+      "category": "人物与角色原型",
+      "reason": "人物角色功能重复或投射价值较低"
+    },
+    {
+      "id": "PERSON_040",
+      "name": "工人",
+      "category": "人物与角色原型",
+      "reason": "人物角色功能重复或投射价值较低"
+    },
+    {
+      "id": "PERSON_042",
+      "name": "厨师",
+      "category": "人物与角色原型",
+      "reason": "人物角色功能重复或投射价值较低"
+    },
+    {
+      "id": "PERSON_048",
+      "name": "园丁",
+      "category": "人物与角色原型",
+      "reason": "人物角色功能重复或投射价值较低"
+    },
+    {
+      "id": "PERSON_054",
+      "name": "魔法师",
+      "category": "人物与角色原型",
+      "reason": "角色高度重叠，保留同类代表"
+    },
+    {
+      "id": "PERSON_063",
+      "name": "守门人",
+      "category": "人物与角色原型",
+      "reason": "人物角色功能重复或投射价值较低"
+    },
+    {
+      "id": "PERSON_066",
+      "name": "木偶人",
+      "category": "人物与角色原型",
+      "reason": "人物角色功能重复或投射价值较低"
+    },
+    {
+      "id": "PERSON_068",
+      "name": "外星人",
+      "category": "人物与角色原型",
+      "reason": "人物角色功能重复或投射价值较低"
+    },
+    {
+      "id": "PERSON_074",
+      "name": "观察者",
+      "category": "人物与角色原型",
+      "reason": "抽象关系或天气概念，难稳定具象为单一微缩手办"
+    },
+    {
+      "id": "PERSON_076",
+      "name": "跟随者",
+      "category": "人物与角色原型",
+      "reason": "抽象关系或天气概念，难稳定具象为单一微缩手办"
+    },
+    {
+      "id": "PERSON_078",
+      "name": "同伴",
+      "category": "人物与角色原型",
+      "reason": "角色高度重叠，保留同类代表"
+    },
+    {
+      "id": "PERSON_079",
+      "name": "对手",
+      "category": "人物与角色原型",
+      "reason": "抽象关系或天气概念，难稳定具象为单一微缩手办"
+    },
+    {
+      "id": "PERSON_080",
+      "name": "倾听者",
+      "category": "人物与角色原型",
+      "reason": "抽象关系或天气概念，难稳定具象为单一微缩手办"
+    },
+    {
+      "id": "BUILDING_013",
+      "name": "木桥",
+      "category": "建筑与居所",
+      "reason": "桥梁形态重叠，保留主桥"
+    },
+    {
+      "id": "BUILDING_014",
+      "name": "石桥",
+      "category": "建筑与居所",
+      "reason": "桥梁形态重叠，保留主桥"
+    },
+    {
+      "id": "BUILDING_022",
+      "name": "车站",
+      "category": "建筑与居所",
+      "reason": "交通站点重复，保留机场与码头"
+    },
+    {
+      "id": "BUILDING_030",
+      "name": "公园大门",
+      "category": "建筑与居所",
+      "reason": "门类重复，保留城门与拱门"
+    },
+    {
+      "id": "BUILDING_034",
+      "name": "塔楼",
+      "category": "建筑与居所",
+      "reason": "塔楼类重复，保留灯塔、高塔与瞭望塔"
+    },
+    {
+      "id": "BUILDING_035",
+      "name": "钟楼",
+      "category": "建筑与居所",
+      "reason": "塔楼类重复，保留灯塔、高塔与瞭望塔"
+    },
+    {
+      "id": "BUILDING_048",
+      "name": "大门",
+      "category": "建筑与居所",
+      "reason": "门类重复，保留城门与拱门"
+    },
+    {
+      "id": "BUILDING_050",
+      "name": "屋顶",
+      "category": "建筑与居所",
+      "reason": "抽象关系或天气概念，难稳定具象为单一微缩手办"
+    },
+    {
+      "id": "BUILDING_051",
+      "name": "烟囱",
+      "category": "建筑与居所",
+      "reason": "抽象关系或天气概念，难稳定具象为单一微缩手办"
+    },
+    {
+      "id": "BUILDING_057",
+      "name": "车站站台",
+      "category": "建筑与居所",
+      "reason": "交通站点重复，保留机场与码头"
+    },
+    {
+      "id": "BUILDING_059",
+      "name": "公交站",
+      "category": "建筑与居所",
+      "reason": "交通站点重复，保留机场与码头"
+    },
+    {
+      "id": "BUILDING_067",
+      "name": "阳台",
+      "category": "建筑与居所",
+      "reason": "抽象关系或天气概念，难稳定具象为单一微缩手办"
+    },
+    {
+      "id": "BUILDING_068",
+      "name": "楼梯间",
+      "category": "建筑与居所",
+      "reason": "抽象关系或天气概念，难稳定具象为单一微缩手办"
+    },
+    {
+      "id": "BUILDING_070",
+      "name": "小型灯塔小屋",
+      "category": "建筑与居所",
+      "reason": "塔楼类重复，保留灯塔、高塔与瞭望塔"
+    },
+    {
+      "id": "NATURE_003",
+      "name": "柏树",
+      "category": "自然山水与植物",
+      "reason": "树木形态高度重叠"
+    },
+    {
+      "id": "NATURE_005",
+      "name": "梧桐树",
+      "category": "自然山水与植物",
+      "reason": "树木形态高度重叠"
+    },
+    {
+      "id": "NATURE_006",
+      "name": "白杨树",
+      "category": "自然山水与植物",
+      "reason": "树木形态高度重叠"
+    },
+    {
+      "id": "NATURE_008",
+      "name": "银杏树",
+      "category": "自然山水与植物",
+      "reason": "树木形态高度重叠"
+    },
+    {
+      "id": "NATURE_010",
+      "name": "开花树",
+      "category": "自然山水与植物",
+      "reason": "树木形态高度重叠"
+    },
+    {
+      "id": "NATURE_012",
+      "name": "桃树",
+      "category": "自然山水与植物",
+      "reason": "树木形态高度重叠"
+    },
+    {
+      "id": "NATURE_013",
+      "name": "梨树",
+      "category": "自然山水与植物",
+      "reason": "树木形态高度重叠"
+    },
+    {
+      "id": "NATURE_015",
+      "name": "椰子树",
+      "category": "自然山水与植物",
+      "reason": "树木形态高度重叠"
+    },
+    {
+      "id": "NATURE_016",
+      "name": "棕榈树",
+      "category": "自然山水与植物",
+      "reason": "树木形态高度重叠"
+    },
+    {
+      "id": "NATURE_021",
+      "name": "郁金香",
+      "category": "自然山水与植物",
+      "reason": "花卉形态高度重叠"
+    },
+    {
+      "id": "NATURE_022",
+      "name": "百合花",
+      "category": "自然山水与植物",
+      "reason": "花卉形态高度重叠"
+    },
+    {
+      "id": "NATURE_027",
+      "name": "草丛",
+      "category": "自然山水与植物",
+      "reason": "地被植物重复"
+    },
+    {
+      "id": "NATURE_028",
+      "name": "灌木",
+      "category": "自然山水与植物",
+      "reason": "地被植物重复"
+    },
+    {
+      "id": "NATURE_037",
+      "name": "丘陵",
+      "category": "自然山水与植物",
+      "reason": "山石形态重复"
+    },
+    {
+      "id": "NATURE_038",
+      "name": "假山",
+      "category": "自然山水与植物",
+      "reason": "山石形态重复"
+    },
+    {
+      "id": "NATURE_046",
+      "name": "半岛",
+      "category": "自然山水与植物",
+      "reason": "半岛与岛屿或海岸重复"
+    },
+    {
+      "id": "NATURE_067",
+      "name": "风",
+      "category": "自然山水与植物",
+      "reason": "抽象关系或天气概念，难稳定具象为单一微缩手办"
+    },
+    {
+      "id": "NATURE_068",
+      "name": "雾",
+      "category": "自然山水与植物",
+      "reason": "抽象关系或天气概念，难稳定具象为单一微缩手办"
+    },
+    {
+      "id": "NATURE_074",
+      "name": "稻田",
+      "category": "自然山水与植物",
+      "reason": "完全重名，保留同名另一条"
+    },
+    {
+      "id": "NATURE_075",
+      "name": "麦田",
+      "category": "自然山水与植物",
+      "reason": "完全重名，保留同名另一条"
+    },
+    {
+      "id": "ANIMAL_004",
+      "name": "仓鼠",
+      "category": "动物与神兽",
+      "reason": "小型宠物重复"
+    },
+    {
+      "id": "ANIMAL_005",
+      "name": "豚鼠",
+      "category": "动物与神兽",
+      "reason": "小型宠物重复"
+    },
+    {
+      "id": "ANIMAL_021",
+      "name": "鸭",
+      "category": "动物与神兽",
+      "reason": "家禽重复"
+    },
+    {
+      "id": "ANIMAL_022",
+      "name": "鹅",
+      "category": "动物与神兽",
+      "reason": "家禽重复"
+    },
+    {
+      "id": "ANIMAL_030",
+      "name": "犀牛",
+      "category": "动物与神兽",
+      "reason": "大型草食动物重复"
+    },
+    {
+      "id": "ANIMAL_031",
+      "name": "河马",
+      "category": "动物与神兽",
+      "reason": "大型草食动物重复"
+    },
+    {
+      "id": "ANIMAL_035",
+      "name": "蜥蜴",
+      "category": "动物与神兽",
+      "reason": "爬行或两栖类重复"
+    },
+    {
+      "id": "ANIMAL_036",
+      "name": "青蛙",
+      "category": "动物与神兽",
+      "reason": "爬行或两栖类重复"
+    },
+    {
+      "id": "ANIMAL_041",
+      "name": "燕子",
+      "category": "动物与神兽",
+      "reason": "小型鸟类重复"
+    },
+    {
+      "id": "ANIMAL_042",
+      "name": "麻雀",
+      "category": "动物与神兽",
+      "reason": "小型鸟类重复"
+    },
+    {
+      "id": "ANIMAL_050",
+      "name": "海龟",
+      "category": "动物与神兽",
+      "reason": "龟类重复"
+    },
+    {
+      "id": "ANIMAL_054",
+      "name": "螃蟹",
+      "category": "动物与神兽",
+      "reason": "小型海洋生物重复"
+    },
+    {
+      "id": "ANIMAL_055",
+      "name": "虾",
+      "category": "动物与神兽",
+      "reason": "小型海洋生物重复"
+    },
+    {
+      "id": "ANIMAL_056",
+      "name": "海马",
+      "category": "动物与神兽",
+      "reason": "小型海洋生物重复"
+    },
+    {
+      "id": "ANIMAL_073",
+      "name": "白泽",
+      "category": "动物与神兽",
+      "reason": "神兽近义重复"
+    },
+    {
+      "id": "ANIMAL_074",
+      "name": "九尾狐",
+      "category": "动物与神兽",
+      "reason": "神兽近义重复"
+    },
+    {
+      "id": "VEHICLE_009",
+      "name": "电动车",
+      "category": "交通工具与现代器物",
+      "reason": "交通工具类型重复"
+    },
+    {
+      "id": "VEHICLE_011",
+      "name": "三轮车",
+      "category": "交通工具与现代器物",
+      "reason": "交通工具类型重复"
+    },
+    {
+      "id": "VEHICLE_013",
+      "name": "货车",
+      "category": "交通工具与现代器物",
+      "reason": "交通工具类型重复"
+    },
+    {
+      "id": "VEHICLE_028",
+      "name": "飞艇",
+      "category": "交通工具与现代器物",
+      "reason": "慢速飞行或缆索类重复"
+    },
+    {
+      "id": "VEHICLE_032",
+      "name": "缆车",
+      "category": "交通工具与现代器物",
+      "reason": "慢速飞行或缆索类重复"
+    },
+    {
+      "id": "VEHICLE_037",
+      "name": "加油站",
+      "category": "交通工具与现代器物",
+      "reason": "补给设施重复"
+    },
+    {
+      "id": "VEHICLE_038",
+      "name": "充电桩",
+      "category": "交通工具与现代器物",
+      "reason": "补给设施重复"
+    },
+    {
+      "id": "VEHICLE_050",
+      "name": "望远镜",
+      "category": "交通工具与现代器物",
+      "reason": "完全重名，保留同名另一条"
+    },
+    {
+      "id": "VEHICLE_051",
+      "name": "微波炉",
+      "category": "交通工具与现代器物",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "VEHICLE_052",
+      "name": "冰箱",
+      "category": "交通工具与现代器物",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "VEHICLE_053",
+      "name": "洗衣机",
+      "category": "交通工具与现代器物",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "VEHICLE_054",
+      "name": "电风扇",
+      "category": "交通工具与现代器物",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "VEHICLE_057",
+      "name": "电梯",
+      "category": "交通工具与现代器物",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "VEHICLE_058",
+      "name": "自动扶梯",
+      "category": "交通工具与现代器物",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "VEHICLE_059",
+      "name": "自动售货机",
+      "category": "交通工具与现代器物",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "VEHICLE_060",
+      "name": "音响",
+      "category": "交通工具与现代器物",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "STUDY_002",
+      "name": "课桌",
+      "category": "学习与生活道具",
+      "reason": "书桌重复"
+    },
+    {
+      "id": "STUDY_015",
+      "name": "文具盒",
+      "category": "学习与生活道具",
+      "reason": "文具收纳低投射价值"
+    },
+    {
+      "id": "STUDY_018",
+      "name": "奖状",
+      "category": "学习与生活道具",
+      "reason": "奖状、奖牌与奖杯重叠"
+    },
+    {
+      "id": "STUDY_019",
+      "name": "奖牌",
+      "category": "学习与生活道具",
+      "reason": "奖状、奖牌与奖杯重叠"
+    },
+    {
+      "id": "STUDY_022",
+      "name": "日历",
+      "category": "学习与生活道具",
+      "reason": "时间工具重复"
+    },
+    {
+      "id": "STUDY_027",
+      "name": "放大镜",
+      "category": "学习与生活道具",
+      "reason": "光学工具重复"
+    },
+    {
+      "id": "STUDY_030",
+      "name": "试管架",
+      "category": "学习与生活道具",
+      "reason": "实验器具重复"
+    },
+    {
+      "id": "STUDY_034",
+      "name": "围棋盘",
+      "category": "学习与生活道具",
+      "reason": "棋类重复"
+    },
+    {
+      "id": "MYSTIC_008",
+      "name": "红旗",
+      "category": "神秘与象征符号",
+      "reason": "旗帜类重复"
+    },
+    {
+      "id": "MYSTIC_009",
+      "name": "蓝旗",
+      "category": "神秘与象征符号",
+      "reason": "旗帜类重复"
+    },
+    {
+      "id": "MYSTIC_037",
+      "name": "水晶石",
+      "category": "神秘与象征符号",
+      "reason": "水晶或能量石重复"
+    },
+    {
+      "id": "MYSTIC_039",
+      "name": "能量石",
+      "category": "神秘与象征符号",
+      "reason": "水晶或能量石重复"
+    },
+    {
+      "id": "FOOD_003",
+      "name": "蛋糕",
+      "category": "饮食与丰饶意象",
+      "reason": "同类节庆食物重叠，保留生日蛋糕"
+    },
+    {
+      "id": "FOOD_014",
+      "name": "梨",
+      "category": "饮食与丰饶意象",
+      "reason": "水果近义精简"
+    },
+    {
+      "id": "FOOD_020",
+      "name": "面袋",
+      "category": "饮食与丰饶意象",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "FOOD_023",
+      "name": "胡萝卜",
+      "category": "饮食与丰饶意象",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "FOOD_024",
+      "name": "白菜",
+      "category": "饮食与丰饶意象",
+      "reason": "日常家电、主食蔬菜或低投射价值凑数项"
+    },
+    {
+      "id": "FOOD_032",
+      "name": "水井",
+      "category": "饮食与丰饶意象",
+      "reason": "完全重名，保留同名另一条"
+    }
+  ]
+}

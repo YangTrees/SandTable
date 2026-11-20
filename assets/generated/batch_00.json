@@ -1,0 +1,177 @@
+[
+  {
+    "id": "PERSON_001",
+    "name": "爷爷",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与代际传承、智慧、保护以及权威距离有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_001. Subject: one single grandfather, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_002",
+    "name": "奶奶",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与养育温暖、家庭记忆、照料与依附有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_002. Subject: one single grandmother, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_003",
+    "name": "外公",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与外祖父角色的支持、家族渊源和远方牵挂有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_003. Subject: one single maternal grandfather, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_004",
+    "name": "外婆",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与早期照料、情感滋养、家庭记忆和依恋有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_004. Subject: one single maternal grandmother, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_005",
+    "name": "父亲",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与规则、责任、保护、权威以及父性认同有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_005. Subject: one single father, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_006",
+    "name": "母亲",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与情感容纳、养育、依恋以及母性认同有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_006. Subject: one single mother, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_007",
+    "name": "婴儿",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与新生、脆弱、依赖和被照料的需要有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_007. Subject: one single baby, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_008",
+    "name": "小男孩",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与童年活力、好奇、依赖和性别认同探索有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_008. Subject: one single young boy, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_009",
+    "name": "小女孩",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与童真、敏感、被保护和女性认同探索有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_009. Subject: one single young girl, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_010",
+    "name": "青少年男孩",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与独立、冲动、同伴认同和身份探索有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_010. Subject: one single teenage boy, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_011",
+    "name": "青少年女孩",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与身份认同、关系敏感、身体自我和自主有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_011. Subject: one single teenage girl, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_012",
+    "name": "哥哥",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与保护、榜样、竞争和手足位置有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_012. Subject: one single older brother, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_013",
+    "name": "姐姐",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与照料、示范、竞争和女性角色认同有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_013. Subject: one single older sister, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_014",
+    "name": "弟弟",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与被照顾、依赖、竞争和幼小位置有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_014. Subject: one single younger brother, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_015",
+    "name": "妹妹",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与被保护、依赖、争宠和手足竞争有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_015. Subject: one single younger sister, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_016",
+    "name": "家庭合影人物",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与家庭联结、归属、角色位置和共同记忆有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_016. Subject: one single family group figure, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_017",
+    "name": "男老师",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与知识权威、评价、指导和规则有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_017. Subject: one single male teacher, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_018",
+    "name": "女老师",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与教养、支持、评价和情感示范有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_018. Subject: one single female teacher, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_019",
+    "name": "班主任",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与管理、规则、责任和学校压力有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_019. Subject: one single homeroom teacher, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_020",
+    "name": "心理老师",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与倾听、情绪支持、求助和改变意愿有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_020. Subject: one single school counselor, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_021",
+    "name": "图书管理员",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与秩序、安静、知识保管和规则感有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_021. Subject: one single librarian, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_022",
+    "name": "男学生",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与同伴关系、学习身份和校园归属有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_022. Subject: one single male student, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_023",
+    "name": "女学生",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与同伴关系、学业身份和校园归属有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_023. Subject: one single female student, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_024",
+    "name": "看书少年",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与专注、求知、内向和暂时逃避有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_024. Subject: one single reading boy, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_025",
+    "name": "写作业学生",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与任务压力、责任、坚持和被督促有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_025. Subject: one single student doing homework, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  }
+]

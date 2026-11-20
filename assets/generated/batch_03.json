@@ -1,0 +1,177 @@
+[
+  {
+    "id": "PERSON_076",
+    "name": "跟随者",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与服从、依赖、归属和自主让渡有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_076. Subject: one single follower, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_077",
+    "name": "朋友",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与陪伴、信任、支持和平等关系有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_077. Subject: one single friend, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_078",
+    "name": "同伴",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与归属、认同、平等和群体位置有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_078. Subject: one single companion, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_079",
+    "name": "对手",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与竞争、冲突、投射和外部压力有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_079. Subject: one single opponent, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "PERSON_080",
+    "name": "倾听者",
+    "category": "人物与角色原型",
+    "psychology_meaning": "常与接纳、共情、被理解和情绪容器有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: PERSON_080. Subject: one single listener, directly on the white ground; no chair, no bench, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_001",
+    "name": "温馨小屋",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与家庭温暖、庇护、归属和私密安全感有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_001. Subject: one single cozy cottage, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_002",
+    "name": "现代学校",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与制度、学习、评价和公共规则有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_002. Subject: one single modern school, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_003",
+    "name": "教学楼",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与知识体系、学业压力和组织秩序有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_003. Subject: one single classroom building, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_004",
+    "name": "图书馆",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与知识、安静、秩序和内在探索有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_004. Subject: one single library, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_005",
+    "name": "教室",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与学习、规则、同伴比较和被评价有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_005. Subject: one single classroom, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_006",
+    "name": "学生宿舍",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与同伴生活、独立、私密空间和集体适应有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_006. Subject: one single dormitory, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_007",
+    "name": "家庭住宅",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与家庭结构、归属、私人领域和稳定感有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_007. Subject: one single family house, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_008",
+    "name": "庭院",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与家庭边界、过渡、休憩和内外连接有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_008. Subject: one single courtyard, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_009",
+    "name": "城堡",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与防御、权力、幻想和被围困有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_009. Subject: one single castle, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_010",
+    "name": "高塔",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与孤立、监视、成就高度和脱离地面有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_010. Subject: one single tower, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_011",
+    "name": "灯塔",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与指引、希望、守望和孤独守护有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_011. Subject: one single lighthouse, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_012",
+    "name": "桥梁",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与连接、过渡、跨越障碍和关系搭建有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_012. Subject: one single bridge, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_013",
+    "name": "木桥",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与朴素连接、临时过渡和自然适应有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_013. Subject: one single wooden bridge, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_014",
+    "name": "石桥",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与稳固连接、耐久和沉重责任有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_014. Subject: one single stone bridge, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_015",
+    "name": "栅栏",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与边界、保护、限制和领地感有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_015. Subject: one single fence, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_016",
+    "name": "围墙",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与防御、隔离、封闭和拒绝进入有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_016. Subject: one single wall, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_017",
+    "name": "篱笆",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与柔性边界、家园范围和日常防护有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_017. Subject: one single hedge fence, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_018",
+    "name": "岗哨",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与警戒、监控、安全检查和紧张防范有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_018. Subject: one single guard post, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_019",
+    "name": "瞭望塔",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与远见、警觉、孤立和高处观察有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_019. Subject: one single watchtower, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "BUILDING_020",
+    "name": "医院",
+    "category": "建筑与居所",
+    "psychology_meaning": "常与修复、脆弱、求助和生命危机有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: BUILDING_020. Subject: one single hospital, directly on the white ground; no trees, no fence, no flowers, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  }
+]

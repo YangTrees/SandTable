@@ -1,0 +1,807 @@
+{
+  "generated_at": "2026-11-20T14:32:05+0800",
+  "matched": 100,
+  "missing": [],
+  "records": [
+    {
+      "id": "CONFLICT_001",
+      "name": "长剑",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_001_长剑.png",
+      "url": "https://aka.doubaocdn.com/s/UcMKNVxzB7",
+      "bytes": 2319200
+    },
+    {
+      "id": "CONFLICT_002",
+      "name": "盾牌",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_002_盾牌.png",
+      "url": "https://aka.doubaocdn.com/s/u1NUr0wVve",
+      "bytes": 2894077
+    },
+    {
+      "id": "CONFLICT_003",
+      "name": "弓箭",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_003_弓箭.png",
+      "url": "https://aka.doubaocdn.com/s/a1HM2fwY79",
+      "bytes": 2589002
+    },
+    {
+      "id": "CONFLICT_004",
+      "name": "匕首",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_004_匕首.png",
+      "url": "https://aka.doubaocdn.com/s/RnfdqvOSiT",
+      "bytes": 2199698
+    },
+    {
+      "id": "CONFLICT_005",
+      "name": "战斧",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_005_战斧.png",
+      "url": "https://aka.doubaocdn.com/s/92NAbnHQ5M",
+      "bytes": 2174794
+    },
+    {
+      "id": "CONFLICT_006",
+      "name": "长矛",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_006_长矛.png",
+      "url": "https://aka.doubaocdn.com/s/l1BK33aaQ3",
+      "bytes": 1756378
+    },
+    {
+      "id": "CONFLICT_007",
+      "name": "怪兽",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_007_怪兽.png",
+      "url": "https://aka.doubaocdn.com/s/tF0BiNVkFf",
+      "bytes": 2481479
+    },
+    {
+      "id": "CONFLICT_008",
+      "name": "恶魔",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_008_恶魔.png",
+      "url": "https://aka.doubaocdn.com/s/7OCl3i2lIo",
+      "bytes": 2251886
+    },
+    {
+      "id": "CONFLICT_009",
+      "name": "炸弹",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_009_炸弹.png",
+      "url": "https://aka.doubaocdn.com/s/92Dgnas2a8",
+      "bytes": 2210248
+    },
+    {
+      "id": "CONFLICT_010",
+      "name": "炮台",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_010_炮台.png",
+      "url": "https://aka.doubaocdn.com/s/vrCnCby9fT",
+      "bytes": 2269150
+    },
+    {
+      "id": "CONFLICT_011",
+      "name": "铁丝网",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_011_铁丝网.png",
+      "url": "https://aka.doubaocdn.com/s/KqvG3KNCDc",
+      "bytes": 2711081
+    },
+    {
+      "id": "CONFLICT_012",
+      "name": "荆棘墙",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_012_荆棘墙.png",
+      "url": "https://aka.doubaocdn.com/s/YQChrPUYo5",
+      "bytes": 2673988
+    },
+    {
+      "id": "CONFLICT_013",
+      "name": "狼牙棒",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_013_狼牙棒.png",
+      "url": "https://aka.doubaocdn.com/s/YIxulP7m9M",
+      "bytes": 2213756
+    },
+    {
+      "id": "CONFLICT_014",
+      "name": "捕兽夹",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_014_捕兽夹.png",
+      "url": "https://aka.doubaocdn.com/s/qa25IUISWJ",
+      "bytes": 2713989
+    },
+    {
+      "id": "CONFLICT_015",
+      "name": "燃烧瓶",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_015_燃烧瓶.png",
+      "url": "https://aka.doubaocdn.com/s/005uPnaZKx",
+      "bytes": 1867297
+    },
+    {
+      "id": "CONFLICT_016",
+      "name": "手雷",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_016_手雷.png",
+      "url": "https://aka.doubaocdn.com/s/FUsVDeTUYd",
+      "bytes": 2251664
+    },
+    {
+      "id": "CONFLICT_017",
+      "name": "弩箭",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_017_弩箭.png",
+      "url": "https://aka.doubaocdn.com/s/DKpQ25UTrt",
+      "bytes": 2339960
+    },
+    {
+      "id": "CONFLICT_018",
+      "name": "盔甲",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_018_盔甲.png",
+      "url": "https://aka.doubaocdn.com/s/VckTSgTQnV",
+      "bytes": 2461627
+    },
+    {
+      "id": "CONFLICT_019",
+      "name": "战旗",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_019_战旗.png",
+      "url": "https://aka.doubaocdn.com/s/mM95HRqVKw",
+      "bytes": 2137133
+    },
+    {
+      "id": "CONFLICT_020",
+      "name": "拳击手套",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\conflict_combat\\CONFLICT_020_拳击手套.png",
+      "url": "https://aka.doubaocdn.com/s/aj0vc38iIq",
+      "bytes": 2248122
+    },
+    {
+      "id": "CONFINEMENT_001",
+      "name": "铁牢笼",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_001_铁牢笼.png",
+      "url": "https://aka.doubaocdn.com/s/7u5AdqfchW",
+      "bytes": 2789895
+    },
+    {
+      "id": "CONFINEMENT_002",
+      "name": "锁链",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_002_锁链.png",
+      "url": "https://aka.doubaocdn.com/s/A3iyUXCUHI",
+      "bytes": 2345044
+    },
+    {
+      "id": "CONFINEMENT_003",
+      "name": "蜘蛛网",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_003_蜘蛛网.png",
+      "url": "https://aka.doubaocdn.com/s/UrMkl6iIvt",
+      "bytes": 2813939
+    },
+    {
+      "id": "CONFINEMENT_004",
+      "name": "深坑",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_004_深坑.png",
+      "url": "https://aka.doubaocdn.com/s/UTSE2IONDl",
+      "bytes": 3147123
+    },
+    {
+      "id": "CONFINEMENT_005",
+      "name": "落石陷阱",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_005_落石陷阱.png",
+      "url": "https://aka.doubaocdn.com/s/IUklwthLOB",
+      "bytes": 2884581
+    },
+    {
+      "id": "CONFINEMENT_006",
+      "name": "倾斜书山",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_006_倾斜书山.png",
+      "url": "https://aka.doubaocdn.com/s/QKLz7mNtY2",
+      "bytes": 2887508
+    },
+    {
+      "id": "CONFINEMENT_007",
+      "name": "考卷堆",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_007_考卷堆.png",
+      "url": "https://aka.doubaocdn.com/s/2MuH4Zu7oW",
+      "bytes": 2576328
+    },
+    {
+      "id": "CONFINEMENT_008",
+      "name": "悬崖",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_008_悬崖.png",
+      "url": "https://aka.doubaocdn.com/s/e7d9QTRJxw",
+      "bytes": 2653194
+    },
+    {
+      "id": "CONFINEMENT_009",
+      "name": "死胡同",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_009_死胡同.png",
+      "url": "https://aka.doubaocdn.com/s/sfVGG51Jk4",
+      "bytes": 3144642
+    },
+    {
+      "id": "CONFINEMENT_010",
+      "name": "玻璃罩",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_010_玻璃罩.png",
+      "url": "https://aka.doubaocdn.com/s/0kLVU7nm54",
+      "bytes": 2086253
+    },
+    {
+      "id": "CONFINEMENT_011",
+      "name": "铁栅栏",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_011_铁栅栏.png",
+      "url": "https://aka.doubaocdn.com/s/Cy5s6E1SqU",
+      "bytes": 2033387
+    },
+    {
+      "id": "CONFINEMENT_012",
+      "name": "禁闭室",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_012_禁闭室.png",
+      "url": "https://aka.doubaocdn.com/s/pbYjOCjAuA",
+      "bytes": 2762771
+    },
+    {
+      "id": "CONFINEMENT_013",
+      "name": "单向玻璃",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_013_单向玻璃.png",
+      "url": "https://aka.doubaocdn.com/s/AYQzxzAPFZ",
+      "bytes": 2471008
+    },
+    {
+      "id": "CONFINEMENT_014",
+      "name": "捆绑绳索",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_014_捆绑绳索.png",
+      "url": "https://aka.doubaocdn.com/s/ft7byPIFWr",
+      "bytes": 2819290
+    },
+    {
+      "id": "CONFINEMENT_015",
+      "name": "锁住的日记本",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_015_锁住的日记本.png",
+      "url": "https://aka.doubaocdn.com/s/0UDKa5NMqT",
+      "bytes": 2518417
+    },
+    {
+      "id": "CONFINEMENT_016",
+      "name": "折断的钥匙",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_016_折断的钥匙.png",
+      "url": "https://aka.doubaocdn.com/s/OOqq4AC1Hr",
+      "bytes": 2255926
+    },
+    {
+      "id": "CONFINEMENT_017",
+      "name": "沉重镣铐",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_017_沉重镣铐.png",
+      "url": "https://aka.doubaocdn.com/s/4BfUWJ7dN5",
+      "bytes": 2477069
+    },
+    {
+      "id": "CONFINEMENT_018",
+      "name": "狭小暗室",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_018_狭小暗室.png",
+      "url": "https://aka.doubaocdn.com/s/MQIUBUCoA8",
+      "bytes": 3045791
+    },
+    {
+      "id": "CONFINEMENT_019",
+      "name": "倒塌书架",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_019_倒塌书架.png",
+      "url": "https://aka.doubaocdn.com/s/fjZRVWJuRU",
+      "bytes": 3015689
+    },
+    {
+      "id": "CONFINEMENT_020",
+      "name": "高墙围栏",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\confinement_pressure\\CONFINEMENT_020_高墙围栏.png",
+      "url": "https://aka.doubaocdn.com/s/q1AMGuqrw4",
+      "bytes": 2725929
+    },
+    {
+      "id": "CRISIS_001",
+      "name": "熊熊火焰",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_001_熊熊火焰.png",
+      "url": "https://aka.doubaocdn.com/s/zmTGuwnpRY",
+      "bytes": 2753075
+    },
+    {
+      "id": "CRISIS_002",
+      "name": "着火的房子",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_002_着火的房子.png",
+      "url": "https://aka.doubaocdn.com/s/2I0fwGHrJn",
+      "bytes": 2845955
+    },
+    {
+      "id": "CRISIS_003",
+      "name": "废墟",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_003_废墟.png",
+      "url": "https://aka.doubaocdn.com/s/hnUzUfhQ4k",
+      "bytes": 2991390
+    },
+    {
+      "id": "CRISIS_004",
+      "name": "断桥",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_004_断桥.png",
+      "url": "https://aka.doubaocdn.com/s/MVUzLvElHT",
+      "bytes": 2846743
+    },
+    {
+      "id": "CRISIS_005",
+      "name": "倾覆的小船",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_005_倾覆的小船.png",
+      "url": "https://aka.doubaocdn.com/s/zFaVdj8nCN",
+      "bytes": 2611740
+    },
+    {
+      "id": "CRISIS_006",
+      "name": "枯井",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_006_枯井.png",
+      "url": "https://aka.doubaocdn.com/s/Xy8H72MjS4",
+      "bytes": 2663675
+    },
+    {
+      "id": "CRISIS_007",
+      "name": "骷髅",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_007_骷髅.png",
+      "url": "https://aka.doubaocdn.com/s/zKEWSUVA7R",
+      "bytes": 2386959
+    },
+    {
+      "id": "CRISIS_008",
+      "name": "碎裂的镜子",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_008_碎裂的镜子.png",
+      "url": "https://aka.doubaocdn.com/s/S8y1ekUwY1",
+      "bytes": 2759341
+    },
+    {
+      "id": "CRISIS_009",
+      "name": "暴风雨乌云",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_009_暴风雨乌云.png",
+      "url": "https://aka.doubaocdn.com/s/3YOqIXL5KI",
+      "bytes": 2565833
+    },
+    {
+      "id": "CRISIS_010",
+      "name": "倒塌的树",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_010_倒塌的树.png",
+      "url": "https://aka.doubaocdn.com/s/Vcnq9VCDEP",
+      "bytes": 2622017
+    },
+    {
+      "id": "CRISIS_011",
+      "name": "干裂的土地",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_011_干裂的土地.png",
+      "url": "https://aka.doubaocdn.com/s/VPn4WEqxdN",
+      "bytes": 2590779
+    },
+    {
+      "id": "CRISIS_012",
+      "name": "破旧房屋",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_012_破旧房屋.png",
+      "url": "https://aka.doubaocdn.com/s/Bbn3L0VSoD",
+      "bytes": 2961077
+    },
+    {
+      "id": "CRISIS_013",
+      "name": "烧焦的森林",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_013_烧焦的森林.png",
+      "url": "https://aka.doubaocdn.com/s/uUffVJaiOR",
+      "bytes": 3060040
+    },
+    {
+      "id": "CRISIS_014",
+      "name": "折断的箭",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_014_折断的箭.png",
+      "url": "https://aka.doubaocdn.com/s/Tbuc8VFQ4m",
+      "bytes": 2611256
+    },
+    {
+      "id": "CRISIS_015",
+      "name": "破碎的陶罐",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_015_破碎的陶罐.png",
+      "url": "https://aka.doubaocdn.com/s/LdAmhilxlU",
+      "bytes": 2720364
+    },
+    {
+      "id": "CRISIS_016",
+      "name": "漏水的屋顶",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_016_漏水的屋顶.png",
+      "url": "https://aka.doubaocdn.com/s/0KU5bhnyh4",
+      "bytes": 3133750
+    },
+    {
+      "id": "CRISIS_017",
+      "name": "沉船",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_017_沉船.png",
+      "url": "https://aka.doubaocdn.com/s/9LVCxTRmwa",
+      "bytes": 2716739
+    },
+    {
+      "id": "CRISIS_018",
+      "name": "熄灭的篝火",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_018_熄灭的篝火.png",
+      "url": "https://aka.doubaocdn.com/s/Urut9VUUJH",
+      "bytes": 2716431
+    },
+    {
+      "id": "CRISIS_019",
+      "name": "荒芜的田地",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_019_荒芜的田地.png",
+      "url": "https://aka.doubaocdn.com/s/KkDalsnoOk",
+      "bytes": 2873954
+    },
+    {
+      "id": "CRISIS_020",
+      "name": "枯萎的花",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\crisis_decay\\CRISIS_020_枯萎的花.png",
+      "url": "https://aka.doubaocdn.com/s/9v3nw9GEOB",
+      "bytes": 2407974
+    },
+    {
+      "id": "SHADOW_001",
+      "name": "蹲坐抱膝的少年",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_001_蹲坐抱膝的少年.png",
+      "url": "https://aka.doubaocdn.com/s/Uux3PK2bhd",
+      "bytes": 2445099
+    },
+    {
+      "id": "SHADOW_002",
+      "name": "背对人群的少女",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_002_背对人群的少女.png",
+      "url": "https://aka.doubaocdn.com/s/JS6Q5YNxBi",
+      "bytes": 2777611
+    },
+    {
+      "id": "SHADOW_003",
+      "name": "捂耳低头的学生",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_003_捂耳低头的学生.png",
+      "url": "https://aka.doubaocdn.com/s/UddUJ6UWSG",
+      "bytes": 2416018
+    },
+    {
+      "id": "SHADOW_004",
+      "name": "黑色影子人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_004_黑色影子人.png",
+      "url": "https://aka.doubaocdn.com/s/kvPnNxD5fU",
+      "bytes": 2082459
+    },
+    {
+      "id": "SHADOW_005",
+      "name": "站在悬崖边的人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_005_站在悬崖边的人.png",
+      "url": "https://aka.doubaocdn.com/s/LraYLRFaic",
+      "bytes": 2988095
+    },
+    {
+      "id": "SHADOW_006",
+      "name": "推巨石的人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_006_推巨石的人.png",
+      "url": "https://aka.doubaocdn.com/s/YDspWzes1Q",
+      "bytes": 2922266
+    },
+    {
+      "id": "SHADOW_007",
+      "name": "哭泣的孩子",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_007_哭泣的孩子.png",
+      "url": "https://aka.doubaocdn.com/s/Er7AIkbDXA",
+      "bytes": 2591571
+    },
+    {
+      "id": "SHADOW_008",
+      "name": "蜷缩在角落的人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_008_蜷缩在角落的人.png",
+      "url": "https://aka.doubaocdn.com/s/XXpURFYGip",
+      "bytes": 3125836
+    },
+    {
+      "id": "SHADOW_009",
+      "name": "抱头蹲下的成年人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_009_抱头蹲下的成年人.png",
+      "url": "https://aka.doubaocdn.com/s/Vh0PCsBNhU",
+      "bytes": 2273833
+    },
+    {
+      "id": "SHADOW_010",
+      "name": "背对镜子的女孩",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_010_背对镜子的女孩.png",
+      "url": "https://aka.doubaocdn.com/s/0oVbi6nVVH",
+      "bytes": 2752755
+    },
+    {
+      "id": "SHADOW_011",
+      "name": "捂脸站立的人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_011_捂脸站立的人.png",
+      "url": "https://aka.doubaocdn.com/s/f0AA3bc8KV",
+      "bytes": 2158673
+    },
+    {
+      "id": "SHADOW_012",
+      "name": "低头独行的少年",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_012_低头独行的少年.png",
+      "url": "https://aka.doubaocdn.com/s/3Piy93TyaQ",
+      "bytes": 2056015
+    },
+    {
+      "id": "SHADOW_013",
+      "name": "双臂交叉的少女",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_013_双臂交叉的少女.png",
+      "url": "https://aka.doubaocdn.com/s/TNYUjpsCji",
+      "bytes": 2320151
+    },
+    {
+      "id": "SHADOW_014",
+      "name": "躲在门后的人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_014_躲在门后的人.png",
+      "url": "https://aka.doubaocdn.com/s/gZZslhmbfF",
+      "bytes": 2861130
+    },
+    {
+      "id": "SHADOW_015",
+      "name": "抱膝坐地的老人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_015_抱膝坐地的老人.png",
+      "url": "https://aka.doubaocdn.com/s/wJPzIn0QSH",
+      "bytes": 2020494
+    },
+    {
+      "id": "SHADOW_016",
+      "name": "背负重物弯腰的人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_016_背负重物弯腰的人.png",
+      "url": "https://aka.doubaocdn.com/s/NFdzPTHyg2",
+      "bytes": 2048251
+    },
+    {
+      "id": "SHADOW_017",
+      "name": "伸手求助的人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_017_伸手求助的人.png",
+      "url": "https://aka.doubaocdn.com/s/fVqpSQOXTg",
+      "bytes": 2464942
+    },
+    {
+      "id": "SHADOW_018",
+      "name": "背对光站立的人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_018_背对光站立的人.png",
+      "url": "https://aka.doubaocdn.com/s/0iBxwmBeRT",
+      "bytes": 2516478
+    },
+    {
+      "id": "SHADOW_019",
+      "name": "蹲在阴影里的男孩",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_019_蹲在阴影里的男孩.png",
+      "url": "https://aka.doubaocdn.com/s/VOVuoRuO2X",
+      "bytes": 2191219
+    },
+    {
+      "id": "SHADOW_020",
+      "name": "掩面而坐的人",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\shadow_figures\\SHADOW_020_掩面而坐的人.png",
+      "url": "https://aka.doubaocdn.com/s/to4z5EW0Ql",
+      "bytes": 2376053
+    },
+    {
+      "id": "NEUTRAL_001",
+      "name": "独立面具",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_001_独立面具.png",
+      "url": "https://aka.doubaocdn.com/s/On76Yu56pS",
+      "bytes": 2890749
+    },
+    {
+      "id": "NEUTRAL_002",
+      "name": "完整镜子",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_002_完整镜子.png",
+      "url": "https://aka.doubaocdn.com/s/9yFrep3jZt",
+      "bytes": 2885881
+    },
+    {
+      "id": "NEUTRAL_003",
+      "name": "天平",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_003_天平.png",
+      "url": "https://aka.doubaocdn.com/s/HOHpQmFR5S",
+      "bytes": 2400255
+    },
+    {
+      "id": "NEUTRAL_004",
+      "name": "破茧的蚕茧",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_004_破茧的蚕茧.png",
+      "url": "https://aka.doubaocdn.com/s/5qllW3vM9s",
+      "bytes": 2792083
+    },
+    {
+      "id": "NEUTRAL_005",
+      "name": "发芽的枯木",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_005_发芽的枯木.png",
+      "url": "https://aka.doubaocdn.com/s/2EFLxL4k3U",
+      "bytes": 2548350
+    },
+    {
+      "id": "NEUTRAL_006",
+      "name": "裂缝中的小花",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_006_裂缝中的小花.png",
+      "url": "https://aka.doubaocdn.com/s/Ap45tJgos6",
+      "bytes": 2633529
+    },
+    {
+      "id": "NEUTRAL_007",
+      "name": "灭火器",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_007_灭火器.png",
+      "url": "https://aka.doubaocdn.com/s/Z1F3Zm8DNV",
+      "bytes": 1883958
+    },
+    {
+      "id": "NEUTRAL_008",
+      "name": "救生圈",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_008_救生圈.png",
+      "url": "https://aka.doubaocdn.com/s/uVmiJarW7f",
+      "bytes": 2614198
+    },
+    {
+      "id": "NEUTRAL_009",
+      "name": "急救箱",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_009_急救箱.png",
+      "url": "https://aka.doubaocdn.com/s/U7zQVLbDbO",
+      "bytes": 2762011
+    },
+    {
+      "id": "NEUTRAL_010",
+      "name": "空鸟笼",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_010_空鸟笼.png",
+      "url": "https://aka.doubaocdn.com/s/Znws3U55Xi",
+      "bytes": 2370051
+    },
+    {
+      "id": "NEUTRAL_011",
+      "name": "打开的门锁",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_011_打开的门锁.png",
+      "url": "https://aka.doubaocdn.com/s/JYvm7tB659",
+      "bytes": 2651839
+    },
+    {
+      "id": "NEUTRAL_012",
+      "name": "连接两岸的石桥",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_012_连接两岸的石桥.png",
+      "url": "https://aka.doubaocdn.com/s/rogywNVCZN",
+      "bytes": 3202744
+    },
+    {
+      "id": "NEUTRAL_013",
+      "name": "重新点燃的蜡烛",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_013_重新点燃的蜡烛.png",
+      "url": "https://aka.doubaocdn.com/s/d3B8FzdwoW",
+      "bytes": 2172425
+    },
+    {
+      "id": "NEUTRAL_014",
+      "name": "修补过的陶罐",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_014_修补过的陶罐.png",
+      "url": "https://aka.doubaocdn.com/s/8FdVuFvpcc",
+      "bytes": 2601173
+    },
+    {
+      "id": "NEUTRAL_015",
+      "name": "新生的嫩芽",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_015_新生的嫩芽.png",
+      "url": "https://aka.doubaocdn.com/s/2Sg76YDVFP",
+      "bytes": 2216569
+    },
+    {
+      "id": "NEUTRAL_016",
+      "name": "展开的双手",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_016_展开的双手.png",
+      "url": "https://aka.doubaocdn.com/s/o34rfiSU7d",
+      "bytes": 2303496
+    },
+    {
+      "id": "NEUTRAL_017",
+      "name": "解开的绳结",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_017_解开的绳结.png",
+      "url": "https://aka.doubaocdn.com/s/tTkmJq8jkp",
+      "bytes": 2805591
+    },
+    {
+      "id": "NEUTRAL_018",
+      "name": "透光的窗",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_018_透光的窗.png",
+      "url": "https://aka.doubaocdn.com/s/wORMzrC8UR",
+      "bytes": 2950902
+    },
+    {
+      "id": "NEUTRAL_019",
+      "name": "立在中线的白旗",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_019_立在中线的白旗.png",
+      "url": "https://aka.doubaocdn.com/s/PK9RFPVxEN",
+      "bytes": 2511107
+    },
+    {
+      "id": "NEUTRAL_020",
+      "name": "指南针",
+      "status": "success",
+      "path": "D:\\AI\\AI_SandBox\\assets\\generated\\white\\neutral_transformation\\NEUTRAL_020_指南针.png",
+      "url": "https://aka.doubaocdn.com/s/WA7pjCGv98",
+      "bytes": 2455725
+    }
+  ]
+}

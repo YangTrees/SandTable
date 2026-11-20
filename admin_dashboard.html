@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心理沙盘 · 管理后台</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap">
+<script src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.1/echarts.min.js'"></script>
+<style>
+  :root {
+    --paper: #efe9dd;
+    --paper-deep: #e5dccb;
+    --ink: #1c2722;
+    --ink-soft: #415047;
+    --muted: #738076;
+    --line: rgba(35, 52, 42, .13);
+    --line-strong: rgba(35, 52, 42, .24);
+    --sage: #617d69;
+    --sage-deep: #2a4135;
+    --sage-dark: #1d3228;
+    --sage-soft: #dfe8de;
+    --gold: #bf8c58;
+    --gold-soft: #f0dfc9;
+    --red: #a8584d;
+    --red-soft: #f0d9d3;
+    --blue: #617d8a;
+    --panel: rgba(255, 252, 246, .78);
+    --panel-solid: #fffdf8;
+    --shadow: 0 20px 55px rgba(39, 51, 43, .10);
+    --shadow-soft: 0 8px 28px rgba(39, 51, 43, .07);
+    --radius-xl: 28px;
+    --radius-lg: 22px;
+    --radius-md: 16px;
+    --sans: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    --serif: "Noto Serif SC", "Songti SC", "STSong", serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    background:
+      radial-gradient(circle at 8% 10%, rgba(113, 139, 114, .22), transparent 30%),
+      radial-gradient(circle at 96% 2%, rgba(193, 151, 98, .19), transparent 28%),
+      radial-gradient(circle at 70% 96%, rgba(118, 140, 133, .13), transparent 32%),
+      linear-gradient(180deg, #f5f0e7 0%, #ebe3d4 100%);
+    overflow: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: .34;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, .055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
+    background-size: 38px 38px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, .55), transparent 80%);
+  }
+  button, input, select, textarea { font: inherit; }
+  button { cursor: pointer; }
+  button:disabled { cursor: not-allowed; opacity: .45; }
+  a { color: inherit; }
+  ::selection { background: rgba(97, 125, 105, .22); }
+
+  .shell {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 224px minmax(0, 1fr);
+    grid-template-rows: 74px minmax(0, 1fr);
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .topbar {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 0 22px 0 18px;
+    border: 1px solid rgba(255, 255, 255, .72);
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(255, 253, 248, .88), rgba(249, 245, 237, .66));
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(20px);
+  }
+  .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+  .brand-mark {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: var(--sage-dark);
+    border: 1px solid rgba(44, 68, 54, .22);
+    background: radial-gradient(circle at 35% 28%, #fffdf7, #e7e0d1);
+    font-family: var(--serif); font-size: 20px; font-weight: 600;
+    box-shadow: inset 0 0 0 4px rgba(255, 255, 255, .46);
+    flex: none;
+  }
+  .brand h1 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+  .brand p { margin: 2px 0 0; font-size: 11px; color: var(--muted); letter-spacing: .07em; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; flex: none; }
+  .sync-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    height: 30px; padding: 0 12px; border-radius: 999px;
+    border: 1px solid var(--line); background: rgba(255, 255, 255, .48);
+    color: var(--muted); font-size: 11px; white-space: nowrap;
+  }
+  .sync-pill i {
+    width: 6px; height: 6px; border-radius: 50%; background: #7d9a7e;
+    box-shadow: 0 0 0 3px rgba(125, 154, 126, .15);
+  }
+  .sync-pill.err i { background: var(--red); box-shadow: 0 0 0 3px rgba(168, 88, 77, .13); }
+  .top-divider { width: 1px; height: 30px; background: var(--line); }
+  .operator { display: flex; align-items: center; gap: 9px; }
+  .operator small { display: block; color: var(--muted); font-size: 10px; margin-top: 1px; }
+  .operator b { display: block; font-size: 12px; font-weight: 600; }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: #f7f1e4; font-family: var(--serif); font-size: 14px;
+    background: linear-gradient(145deg, #587363, #2d493b);
+    box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .16);
+    flex: none;
+  }
+
+  .rail {
+    grid-column: 1;
+    grid-row: 2;
+    min-height: 0;
+    display: flex; flex-direction: column;
+    padding: 18px 13px 13px;
+    color: #f4efe3;
+    border-radius: 26px;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(164, 186, 160, .24), transparent 32%),
+      linear-gradient(165deg, rgba(43, 64, 51, .98), rgba(26, 43, 34, .97));
+    box-shadow: 0 22px 60px rgba(28, 42, 33, .20);
+    overflow: hidden;
+  }
+  .rail-label { padding: 4px 12px 10px; font-size: 9px; letter-spacing: .18em; color: rgba(244, 239, 227, .48); }
+  .rail nav { display: grid; gap: 4px; }
+  .nav-item {
+    position: relative;
+    display: flex; align-items: center; gap: 11px;
+    width: 100%; min-height: 48px; padding: 0 12px;
+    border: 1px solid transparent; border-radius: 14px;
+    color: rgba(246, 242, 233, .72); background: transparent;
+    text-align: left; transition: .18s ease;
+  }
+  .nav-item:hover { color: #fffaf0; background: rgba(255, 255, 255, .055); }
+  .nav-item.active {
+    color: #20352a;
+    background: linear-gradient(135deg, #f7f1e4, #e8dfcf);
+    border-color: rgba(255, 255, 255, .55);
+    box-shadow: 0 8px 18px rgba(10, 24, 16, .15);
+  }
+  .nav-item svg { width: 18px; height: 18px; stroke-width: 1.5; flex: none; opacity: .82; }
+  .nav-item span { font-size: 12.5px; letter-spacing: .02em; }
+  .nav-badge {
+    margin-left: auto; min-width: 21px; height: 21px; padding: 0 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 999px; background: rgba(255, 255, 255, .11);
+    color: rgba(255, 250, 240, .78); font-size: 9.5px;
+  }
+  .nav-item.active .nav-badge { background: var(--sage-dark); color: #f6efdf; }
+  .rail-spacer { flex: 1; min-height: 20px; }
+  .rail-note {
+    margin: 8px 4px 12px; padding: 13px 14px;
+    border: 1px solid rgba(255, 255, 255, .10); border-radius: 16px;
+    background: rgba(255, 255, 255, .045);
+    color: rgba(244, 239, 227, .58); font-size: 10px; line-height: 1.7;
+  }
+  .rail-note b { display: block; margin-bottom: 3px; color: rgba(255, 250, 240, .88); font-size: 11px; font-weight: 500; }
+  .rail-link {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 12px 14px; border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 14px; background: rgba(255, 255, 255, .04);
+    color: rgba(245, 240, 230, .78); text-decoration: none; font-size: 11px;
+  }
+  .rail-link:hover { background: rgba(255, 255, 255, .08); color: #fffaf0; }
+  .rail-link svg { width: 15px; height: 15px; }
+
+  .workspace { grid-column: 2; grid-row: 2; min-width: 0; min-height: 0; overflow: hidden; }
+  .view { height: 100%; overflow: auto; padding: 2px 5px 28px 2px; scrollbar-width: thin; scrollbar-color: rgba(65, 80, 71, .24) transparent; }
+  .view.hide { display: none; }
+  .view::-webkit-scrollbar { width: 6px; height: 6px; }
+  .view::-webkit-scrollbar-thumb { background: rgba(65, 80, 71, .22); border-radius: 99px; }
+
+  .view-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; margin: 5px 4px 16px; }
+  .eyebrow { display: flex; align-items: center; gap: 8px; color: var(--sage); font-size: 9px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
+  .eyebrow::before { content: ""; width: 18px; height: 1px; background: currentColor; opacity: .7; }
+  .view-title { margin: 7px 0 0; font-family: var(--serif); font-size: clamp(24px, 2.35vw, 34px); font-weight: 600; letter-spacing: -.035em; line-height: 1.2; }
+  .view-desc { margin: 7px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.65; max-width: 680px; }
+  .head-actions { display: flex; align-items: center; gap: 8px; flex: none; padding-bottom: 2px; }
+
+  .btn {
+    height: 36px; padding: 0 14px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    border: 1px solid var(--line-strong); border-radius: 999px;
+    background: rgba(255, 253, 248, .62); color: var(--ink-soft);
+    font-size: 11.5px; white-space: nowrap; transition: .17s ease;
+  }
+  .btn:hover { background: rgba(255, 253, 248, .9); border-color: rgba(42, 65, 53, .35); color: var(--ink); transform: translateY(-1px); }
+  .btn svg { width: 15px; height: 15px; stroke-width: 1.6; }
+  .btn.primary { color: #f7f1e4; border-color: var(--sage-deep); background: linear-gradient(145deg, #496656, #2a4135); box-shadow: 0 7px 16px rgba(35, 57, 44, .16); }
+  .btn.primary:hover { color: #fff; background: linear-gradient(145deg, #547565, #304b3c); }
+  .btn.soft { color: var(--sage-deep); border-color: rgba(64, 93, 76, .18); background: rgba(223, 232, 222, .55); }
+  .btn.soft:hover { background: rgba(218, 229, 216, .88); }
+  .btn.danger { color: #8b463f; border-color: rgba(168, 88, 77, .24); background: rgba(244, 226, 220, .55); }
+  .btn.small { height: 30px; padding: 0 11px; font-size: 10.5px; }
+  .icon-btn {
+    width: 32px; height: 32px; display: grid; place-items: center;
+    border: 1px solid var(--line); border-radius: 50%; background: rgba(255, 253, 248, .52);
+    color: var(--ink-soft);
+  }
+  .icon-btn:hover { background: rgba(255, 253, 248, .9); border-color: var(--line-strong); }
+  .icon-btn svg { width: 15px; height: 15px; }
+
+  .surface {
+    border: 1px solid rgba(255, 255, 255, .7);
+    background: linear-gradient(145deg, rgba(255, 253, 247, .95), rgba(249, 245, 237, .82));
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+  .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .card-title { margin: 0; font-family: var(--serif); font-size: 16px; font-weight: 600; letter-spacing: -.02em; }
+  .card-sub { margin: 5px 0 0; color: var(--muted); font-size: 10.5px; line-height: 1.6; }
+  .card-link { color: var(--sage); font-size: 10.5px; border: 0; background: transparent; padding: 3px 0; }
+  .card-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  .hero {
+    position: relative; overflow: hidden;
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 26px;
+    padding: 28px 30px 25px;
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, .18);
+    background:
+      radial-gradient(circle at 88% 10%, rgba(181, 151, 101, .25), transparent 28%),
+      radial-gradient(circle at 2% 100%, rgba(143, 171, 145, .18), transparent 32%),
+      linear-gradient(135deg, #2a4135, #1d3228 72%);
+    color: #f7f1e4;
+    box-shadow: 0 22px 55px rgba(28, 42, 33, .18);
+  }
+  .hero::after {
+    content: "";
+    position: absolute; right: -38px; top: -58px;
+    width: 220px; height: 220px; border-radius: 50%;
+    border: 1px solid rgba(230, 211, 177, .22);
+    box-shadow: 0 0 0 22px rgba(230, 211, 177, .035), 0 0 0 48px rgba(230, 211, 177, .022);
+    pointer-events: none;
+  }
+  .hero-copy { position: relative; z-index: 1; max-width: 720px; }
+  .hero-kicker { color: rgba(247, 241, 228, .55); font-size: 9px; letter-spacing: .18em; }
+  .hero h2 { margin: 11px 0 0; font-family: var(--serif); font-size: clamp(27px, 3vw, 40px); font-weight: 500; line-height: 1.25; letter-spacing: -.03em; }
+  .hero p { margin: 10px 0 0; color: rgba(247, 241, 228, .65); font-size: 11.5px; line-height: 1.7; max-width: 560px; }
+  .hero-side { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; }
+  .hero-date { text-align: right; color: rgba(247, 241, 228, .6); font-size: 10px; line-height: 1.6; }
+  .hero-date b { display: block; font-family: var(--serif); font-size: 18px; color: rgba(247, 241, 228, .92); font-weight: 500; }
+  .hero-btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    height: 40px; padding: 0 16px; border-radius: 999px;
+    border: 1px solid rgba(247, 241, 228, .25);
+    color: #f7f1e4; background: rgba(247, 241, 228, .1);
+    font-size: 11.5px; backdrop-filter: blur(8px);
+  }
+  .hero-btn:hover { background: rgba(247, 241, 228, .18); }
+  .hero-btn svg { width: 16px; height: 16px; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+  .kpi { position: relative; padding: 18px 18px 16px; overflow: hidden; }
+  .kpi::after { content: ""; position: absolute; right: -12px; bottom: -22px; width: 86px; height: 86px; border-radius: 50%; background: var(--sage-soft); opacity: .45; }
+  .kpi.gold::after { background: var(--gold-soft); }
+  .kpi.red::after { background: var(--red-soft); }
+  .kpi.blue::after { background: #dbe5e7; }
+  .kpi-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; position: relative; z-index: 1; }
+  .kpi-icon { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--sage); background: rgba(255, 255, 255, .4); }
+  .kpi-icon svg { width: 17px; height: 17px; }
+  .kpi-label { color: var(--muted); font-size: 10px; }
+  .kpi-value { position: relative; z-index: 1; margin: 12px 0 0; font-family: var(--serif); font-size: 30px; font-weight: 600; line-height: 1; letter-spacing: -.04em; }
+  .kpi-foot { position: relative; z-index: 1; margin: 8px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+  .kpi-foot b { color: var(--ink-soft); font-weight: 500; }
+
+  .overview-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .85fr); gap: 14px; margin-top: 14px; }
+  .queue-card, .risk-card { padding: 20px 20px 16px; min-height: 328px; }
+  .queue-list { display: grid; gap: 5px; margin-top: 15px; }
+  .queue-row {
+    display: grid; grid-template-columns: 4px minmax(0, 1fr) auto;
+    gap: 12px; align-items: center;
+    padding: 10px 10px 10px 0; border-top: 1px solid var(--line);
+    background: transparent; border-right: 0; border-bottom: 0; border-left: 0; text-align: left;
+    color: var(--ink); width: 100%;
+  }
+  .queue-row:hover { background: rgba(255, 253, 248, .42); }
+  .queue-bar { align-self: stretch; border-radius: 99px; background: var(--sage); }
+  .queue-bar.L2, .level-bar.L2 { background: var(--gold); }
+  .queue-bar.L3, .level-bar.L3 { background: #c57957; }
+  .queue-bar.L4, .level-bar.L4 { background: var(--red); }
+  .queue-main { min-width: 0; }
+  .queue-main b { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .queue-main small { display: block; margin-top: 4px; color: var(--muted); font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .queue-right { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 9.5px; white-space: nowrap; }
+  .queue-right svg { width: 14px; height: 14px; opacity: .55; }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px;
+    border-radius: 999px; font-size: 9.5px; white-space: nowrap;
+  }
+  .status-pill::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .75; }
+  .status-pill.pending { color: #8a6b3d; background: #f3e7d3; }
+  .status-pill.changes { color: #914d45; background: #f2ded8; }
+  .status-pill.approved { color: #42634e; background: #deeadf; }
+  .level-pill {
+    display: inline-flex; align-items: center; justify-content: center; height: 23px; padding: 0 9px;
+    border-radius: 999px; font-size: 9px; letter-spacing: .03em; white-space: nowrap;
+  }
+  .level-pill.L1 { color: #4c6657; background: #e0eae0; }
+  .level-pill.L2 { color: #85602f; background: #f3e5cf; }
+  .level-pill.L3 { color: #934f36; background: #f3ded4; }
+  .level-pill.L4 { color: #7c3e38; background: #efd4d0; }
+
+  .risk-body { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 18px; align-items: center; margin-top: 17px; }
+  .risk-donut { position: relative; width: 148px; height: 148px; }
+  .risk-donut svg { width: 100%; height: 100%; display: block; }
+  .risk-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 2; }
+  .risk-center b { font-family: var(--serif); font-size: 27px; line-height: 1; }
+  .risk-center small { margin-top: 5px; color: var(--muted); font-size: 9px; }
+  .risk-legend { display: grid; gap: 9px; }
+  .risk-legend-row { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: 10px; }
+  .risk-legend-row i { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); }
+  .risk-legend-row i.L2 { background: var(--gold); }
+  .risk-legend-row i.L3 { background: #c57957; }
+  .risk-legend-row i.L4 { background: var(--red); }
+  .risk-legend-row span { color: var(--muted); }
+  .risk-legend-row b { font-weight: 500; }
+  .high-risk-head { display: flex; align-items: center; justify-content: space-between; margin-top: 19px; padding-top: 15px; border-top: 1px solid var(--line); }
+  .high-risk-head strong { font-size: 11px; font-weight: 500; }
+  .high-risk-head span { color: var(--red); font-size: 9.5px; }
+  .high-risk-list { display: grid; gap: 3px; margin-top: 7px; }
+  .high-risk-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 10px; }
+  .high-risk-row b { font-weight: 500; }
+  .high-risk-row small { color: var(--muted); margin-left: 6px; }
+
+  .review-view { display: flex; flex-direction: column; overflow: hidden; padding-bottom: 0; }
+  .review-view .view-head { flex: none; }
+  .review-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: 286px minmax(0, 1fr); gap: 14px; padding-bottom: 2px; }
+  .review-side { min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .side-tools { padding: 16px 15px 12px; border-bottom: 1px solid var(--line); flex: none; }
+  .search-field { position: relative; }
+  .search-field svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--muted); }
+  .search-field input {
+    width: 100%; height: 36px; padding: 0 12px 0 35px;
+    border: 1px solid var(--line); border-radius: 999px;
+    color: var(--ink); background: rgba(255, 253, 248, .64); outline: none;
+    font-size: 11px;
+  }
+  .search-field input:focus { border-color: rgba(64, 93, 76, .38); background: rgba(255, 253, 248, .94); }
+  .filter-tabs { display: flex; gap: 4px; margin-top: 11px; }
+  .filter-tab {
+    flex: 1; height: 28px; border: 1px solid transparent; border-radius: 999px;
+    background: transparent; color: var(--muted); font-size: 9.5px;
+  }
+  .filter-tab:hover { background: rgba(255, 255, 255, .38); }
+  .filter-tab.active { color: var(--sage-deep); background: rgba(223, 232, 222, .72); border-color: rgba(64, 93, 76, .16); }
+  .review-list { flex: 1; overflow: auto; padding: 7px 8px 12px; scrollbar-width: thin; }
+  .report-row {
+    width: 100%; display: block; padding: 12px 12px 11px; margin-bottom: 4px;
+    border: 1px solid transparent; border-radius: 13px;
+    background: transparent; color: var(--ink); text-align: left;
+  }
+  .report-row:hover { background: rgba(255, 253, 248, .5); }
+  .report-row.active {
+    background: linear-gradient(135deg, rgba(255, 253, 248, .82), rgba(238, 236, 225, .64));
+    border-color: rgba(64, 93, 76, .15);
+    box-shadow: 0 6px 18px rgba(47, 63, 53, .06);
+  }
+  .report-row-top { display: flex; align-items: center; gap: 8px; }
+  .report-row-top b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11.5px; font-weight: 500; }
+  .report-row-top time { margin-left: auto; color: var(--muted); font-size: 9px; }
+  .risk-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); flex: none; }
+  .risk-dot.L2 { background: var(--gold); }
+  .risk-dot.L3 { background: #c57957; }
+  .risk-dot.L4 { background: var(--red); }
+  .report-row-no { margin: 5px 0 0 15px; color: var(--muted); font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .report-row-bottom { display: flex; align-items: center; gap: 7px; margin: 8px 0 0 15px; }
+  .report-row-bottom small { color: var(--muted); font-size: 8.5px; }
+  .report-row-bottom .status-pill { height: 21px; font-size: 8.5px; padding: 0 7px; }
+  .report-row-bottom .level-pill { height: 21px; font-size: 8.5px; padding: 0 7px; }
+
+  .review-main { min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .review-toolbar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; border-bottom: 1px solid var(--line); background: rgba(255, 253, 248, .5); }
+  .review-toolbar-left { min-width: 0; }
+  .review-toolbar-left b { display: block; font-family: var(--serif); font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .review-toolbar-left small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+  .review-toolbar-right { display: flex; align-items: center; gap: 7px; flex: none; }
+  .paper-scroll { flex: 1; min-height: 0; overflow: auto; padding: 20px 22px 26px; background: #eae2d3; scrollbar-width: thin; }
+  .paper {
+    max-width: 820px; margin: 0 auto; padding: 36px 46px 48px;
+    background: #fffdf8;
+    border: 1px solid rgba(42, 63, 49, .12);
+    box-shadow: 0 18px 45px rgba(45, 58, 48, .12);
+    color: #202923;
+  }
+  .paper-head { border-bottom: 1px solid rgba(42, 63, 49, .22); padding-bottom: 18px; }
+  .paper-kicker { color: #7b8a7c; font-size: 8px; letter-spacing: .18em; }
+  .paper h1 { margin: 9px 0 0; font-family: var(--serif); font-size: 26px; font-weight: 600; letter-spacing: -.03em; line-height: 1.3; }
+  .paper-sub { margin: 5px 0 0; color: #708074; font-size: 9.5px; }
+  .paper-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-top: 17px; border: 1px solid rgba(42, 63, 49, .12); }
+  .paper-meta div { padding: 9px 11px; border-right: 1px solid rgba(42, 63, 49, .09); border-bottom: 1px solid rgba(42, 63, 49, .09); }
+  .paper-meta div:nth-child(3n) { border-right: 0; }
+  .paper-meta div:nth-last-child(-n+3) { border-bottom: 0; }
+  .paper-meta span { display: block; color: #8b978e; font-size: 7.5px; letter-spacing: .05em; }
+  .paper-meta b { display: block; margin-top: 4px; font-size: 9.5px; font-weight: 500; }
+  .basis-line { margin-top: 12px; color: #758279; font-size: 8.3px; line-height: 1.75; }
+  .basis-line b { color: #4d5e52; font-weight: 500; }
+  .chapter { padding: 20px 0 4px; border-bottom: 1px solid rgba(42, 63, 49, .1); }
+  .chapter:last-child { border-bottom: 0; }
+  .chapter-head { display: flex; align-items: baseline; gap: 10px; }
+  .chapter-num { font-family: var(--serif); color: #a17a4e; font-size: 13px; min-width: 14px; }
+  .chapter h3 { margin: 0; font-family: var(--serif); font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+  .chapter-aside { margin-left: auto; color: #8b978e; font-size: 8px; }
+  .chapter-body { margin-top: 11px; }
+  .paper-image { width: 100%; max-height: 210px; object-fit: cover; border-radius: 2px; border: 1px solid rgba(42, 63, 49, .12); background: #ece4d5; }
+  .figure-caption { margin-top: 6px; color: #8a958d; font-size: 7.8px; text-align: center; }
+  .mini-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+  .mini-card { padding: 10px 11px; border: 1px solid rgba(42, 63, 49, .1); background: #faf7f0; }
+  .mini-card label { display: block; color: #8b978e; font-size: 7.5px; letter-spacing: .05em; }
+  .mini-card p { margin: 5px 0 0; color: #33443a; font-size: 9.2px; line-height: 1.65; }
+  .paper-list { margin: 0; padding-left: 15px; }
+  .paper-list li { margin: 5px 0; color: #435349; font-size: 9.2px; line-height: 1.65; }
+  .dimension-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-top: 10px; }
+  .dimension-card { padding: 10px; border: 1px solid rgba(42, 63, 49, .1); background: #faf7f0; }
+  .dimension-card b { display: block; font-size: 9.5px; font-weight: 600; }
+  .dimension-card p { margin: 5px 0 0; color: #526157; font-size: 8.4px; line-height: 1.6; }
+  .dimension-card small { display: block; margin-top: 6px; color: #9a825f; font-size: 7.5px; }
+  .paper-table { width: 100%; border-collapse: collapse; margin-top: 9px; table-layout: fixed; }
+  .paper-table th, .paper-table td { padding: 6px 7px; border-bottom: 1px solid rgba(42, 63, 49, .1); text-align: left; vertical-align: top; font-size: 8.3px; line-height: 1.55; }
+  .paper-table th { color: #7d8a80; font-weight: 500; background: #f7f3eb; }
+  .paper-table td:first-child { width: 24%; }
+  .paper-table td:nth-child(2) { width: 15%; }
+  .paper-table .highlight-cell { color: #835c32; font-weight: 500; }
+  .risk-table td:first-child { width: 22%; }
+  .risk-table td:nth-child(2) { width: 18%; }
+  .risk-badge { display: inline-flex; padding: 2px 7px; border-radius: 99px; font-size: 7.5px; }
+  .risk-badge.L1 { color: #4e6959; background: #e6eee6; }
+  .risk-badge.L2 { color: #86602f; background: #f3e6d0; }
+  .risk-badge.L3 { color: #934f36; background: #f3ded4; }
+  .risk-badge.L4 { color: #7c3e38; background: #efd4d0; }
+  .question-block { margin-top: 7px; padding: 9px 10px; border-left: 2px solid #b99567; background: #faf7f0; }
+  .question-block b { font-size: 8.8px; color: #516056; }
+  .question-block p { margin: 4px 0 0; color: #4f5f55; font-size: 8.4px; line-height: 1.6; }
+  .action-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 9px; }
+  .action-box { padding: 9px 10px; border: 1px solid rgba(42, 63, 49, .1); background: #faf7f0; }
+  .action-box b { display: block; margin-bottom: 4px; color: #a0794d; font-size: 7.5px; letter-spacing: .05em; }
+  .action-box li { font-size: 8.1px; line-height: 1.55; }
+  .empty-paper, .loading-paper { padding: 46px; text-align: center; color: #8a968d; font-size: 11px; }
+
+  .review-actions {
+    flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 13px; align-items: end;
+    padding: 12px 15px 14px; border-top: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255, 253, 248, .72), rgba(251, 247, 239, .94));
+  }
+  .reviewer-line { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; color: var(--muted); font-size: 9px; }
+  .reviewer-line .avatar { width: 22px; height: 22px; font-size: 9px; box-shadow: none; }
+  .note-field {
+    width: 100%; height: 38px; min-height: 38px; max-height: 38px; resize: none;
+    padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px;
+    outline: none; color: var(--ink); background: rgba(255, 253, 248, .76);
+    font-size: 10.5px; line-height: 1.5;
+  }
+  .note-field:focus { border-color: rgba(64, 93, 76, .38); background: #fffdf8; }
+  .action-buttons { display: flex; align-items: center; gap: 7px; }
+  .action-buttons .btn { height: 38px; }
+  .qr-btn { min-width: 128px; }
+  .qr-btn[data-ready="false"] { opacity: .5; }
+
+  .role-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; margin-bottom: 14px; }
+  .role-card {
+    position: relative; padding: 16px 16px 15px; overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .7); border-radius: var(--radius-lg);
+    background: linear-gradient(145deg, rgba(255, 253, 247, .82), rgba(248, 244, 235, .62));
+    box-shadow: var(--shadow-soft); text-align: left; color: var(--ink);
+    transition: .18s ease;
+  }
+  .role-card:hover { transform: translateY(-2px); border-color: rgba(64, 93, 76, .18); }
+  .role-card.active { border-color: rgba(64, 93, 76, .28); box-shadow: 0 0 0 2px rgba(97, 125, 105, .1), var(--shadow-soft); }
+  .role-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .role-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); color: var(--sage); background: rgba(255, 255, 255, .42); }
+  .role-icon svg { width: 17px; height: 17px; }
+  .role-card em { font-family: var(--serif); font-size: 22px; font-style: normal; color: var(--ink-soft); }
+  .role-card b { display: block; margin-top: 11px; font-size: 12.5px; font-weight: 600; }
+  .role-card small { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.55; }
+  .role-card .role-perms { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 9px; }
+  .role-perms span { padding: 3px 6px; border-radius: 99px; background: rgba(223, 232, 222, .7); color: #54685a; font-size: 7.5px; }
+  .users-card { padding: 0; overflow: hidden; }
+  .table-tools { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+  .table-tools-left { display: flex; align-items: center; gap: 9px; }
+  .table-tools .search-field { width: 230px; }
+  .select-box {
+    height: 36px; padding: 0 28px 0 11px; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--ink-soft); background: rgba(255, 253, 248, .62);
+    outline: none; font-size: 10.5px;
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, #7b877f 50%), linear-gradient(135deg, #7b877f 50%, transparent 50%);
+    background-position: calc(100% - 13px) 15px, calc(100% - 9px) 15px;
+    background-size: 4px 4px, 4px 4px;
+    background-repeat: no-repeat;
+  }
+  .user-table { width: 100%; border-collapse: collapse; }
+  .user-table th { padding: 11px 14px; text-align: left; color: var(--muted); font-size: 9px; font-weight: 500; letter-spacing: .05em; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .user-table td { padding: 12px 14px; border-bottom: 1px solid rgba(42, 63, 49, .07); font-size: 10.5px; vertical-align: middle; }
+  .user-table tr:last-child td { border-bottom: 0; }
+  .user-table tr:hover td { background: rgba(255, 253, 248, .42); }
+  .user-cell { display: flex; align-items: center; gap: 9px; min-width: 145px; }
+  .user-cell .avatar { width: 30px; height: 30px; font-size: 11px; }
+  .user-cell b { display: block; font-size: 11px; font-weight: 500; }
+  .user-cell small { display: block; margin-top: 2px; color: var(--muted); font-size: 8.5px; }
+  .role-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 99px; font-size: 9px; white-space: nowrap; }
+  .role-pill.super_admin { color: #6d4b2e; background: #f0e1ca; }
+  .role-pill.counselor { color: #42624f; background: #deeadf; }
+  .role-pill.teacher { color: #4b6070; background: #dfe8ec; }
+  .role-pill.student { color: #68635a; background: #eae6dd; }
+  .role-pill svg { width: 11px; height: 11px; }
+  .user-meta { color: var(--muted); font-size: 9px; line-height: 1.55; }
+  .switch { position: relative; width: 34px; height: 19px; border: 0; border-radius: 99px; background: #c4cdc4; transition: .18s; padding: 0; }
+  .switch::after { content: ""; position: absolute; left: 3px; top: 3px; width: 13px; height: 13px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .18); transition: .18s; }
+  .switch.on { background: #6f8c76; }
+  .switch.on::after { left: 18px; }
+  .row-actions { display: flex; align-items: center; gap: 5px; }
+  .row-actions .icon-btn { width: 27px; height: 27px; border-radius: 8px; }
+  .row-actions .icon-btn svg { width: 13px; height: 13px; }
+  .empty-table { padding: 42px; text-align: center; color: var(--muted); font-size: 11px; }
+
+  .analytics-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .analytics-kpi { padding: 13px 15px; }
+  .analytics-kpi span { color: var(--muted); font-size: 9px; }
+  .analytics-kpi b { display: block; margin-top: 7px; font-family: var(--serif); font-size: 21px; font-weight: 600; }
+  .analytics-kpi small { display: block; margin-top: 4px; color: var(--muted); font-size: 8.5px; }
+  .chart-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 13px; padding-bottom: 15px; }
+  .chart-card { padding: 17px 17px 10px; overflow: hidden; }
+  .chart-card.risk { grid-column: span 5; }
+  .chart-card.module { grid-column: span 7; }
+  .chart-card.items { grid-column: span 7; }
+  .chart-card.heatmap { grid-column: span 5; }
+  .chart-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 0 2px 4px; }
+  .chart-head h3 { margin: 0; font-family: var(--serif); font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
+  .chart-head p { margin: 4px 0 0; color: var(--muted); font-size: 9px; }
+  .chart-insight { max-width: 170px; color: var(--sage); text-align: right; font-size: 8.5px; line-height: 1.5; }
+  .chart { width: 100%; height: 300px; }
+  .chart.tall { height: 430px; }
+  .chart.heat { height: 310px; }
+  .chart-fallback { height: 300px; display: grid; place-items: center; color: var(--muted); font-size: 11px; text-align: center; line-height: 1.7; }
+
+  .drawer-overlay, .modal-overlay {
+    position: fixed; inset: 0; z-index: 30;
+    background: rgba(26, 39, 31, .28); backdrop-filter: blur(5px);
+    opacity: 0; pointer-events: none; transition: .22s ease;
+  }
+  .drawer-overlay.show, .modal-overlay.show { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; z-index: 31; top: 14px; right: 14px; bottom: 14px; width: min(450px, calc(100vw - 28px));
+    display: flex; flex-direction: column;
+    transform: translateX(calc(100% + 30px)); visibility: hidden;
+    transition: transform .26s cubic-bezier(.2, .85, .25, 1), visibility .26s;
+    border: 1px solid rgba(255, 255, 255, .72); border-radius: 24px;
+    background: linear-gradient(155deg, rgba(255, 253, 248, .98), rgba(246, 241, 231, .96));
+    box-shadow: 0 30px 90px rgba(23, 37, 28, .22);
+    overflow: hidden;
+  }
+  .drawer.show { transform: translateX(0); visibility: visible; }
+  .drawer-head { flex: none; display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 20px 21px 15px; border-bottom: 1px solid var(--line); }
+  .drawer-head h3 { margin: 0; font-family: var(--serif); font-size: 21px; font-weight: 600; }
+  .drawer-head p { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+  .drawer-body { flex: 1; overflow: auto; padding: 18px 21px; }
+  .drawer-foot { flex: none; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 14px 21px 18px; border-top: 1px solid var(--line); background: rgba(255, 253, 248, .6); }
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field.full { grid-column: 1 / -1; }
+  .form-field label { color: var(--ink-soft); font-size: 10px; }
+  .form-field label em { color: var(--red); font-style: normal; }
+  .form-field input, .form-field select {
+    width: 100%; height: 38px; padding: 0 11px;
+    border: 1px solid var(--line); border-radius: 9px;
+    background: rgba(255, 253, 248, .72); color: var(--ink); outline: none; font-size: 11px;
+  }
+  .form-field input:focus, .form-field select:focus { border-color: rgba(64, 93, 76, .4); background: #fffdf8; }
+  .form-hint { color: var(--muted); font-size: 8.5px; line-height: 1.55; }
+  .form-divider { grid-column: 1 / -1; height: 1px; background: var(--line); margin: 4px 0; }
+
+  .qr-modal {
+    position: fixed; z-index: 31; left: 50%; top: 50%; width: min(390px, calc(100vw - 34px));
+    transform: translate(-50%, -46%) scale(.97); opacity: 0; visibility: hidden; pointer-events: none;
+    transition: transform .22s ease, opacity .22s ease, visibility .22s;
+    border: 1px solid rgba(255, 255, 255, .74); border-radius: 24px;
+    background: linear-gradient(155deg, rgba(255, 253, 248, .98), rgba(246, 241, 231, .96));
+    box-shadow: 0 30px 90px rgba(23, 37, 28, .24); padding: 21px;
+    text-align: center;
+  }
+  .qr-modal.show { transform: translate(-50%, -50%) scale(1); opacity: 1; visibility: visible; pointer-events: auto; }
+  .qr-modal h3 { margin: 0; font-family: var(--serif); font-size: 20px; font-weight: 600; }
+  .qr-modal p { margin: 6px 0 0; color: var(--muted); font-size: 9.5px; line-height: 1.6; }
+  .qr-frame { width: 206px; height: 206px; margin: 17px auto 12px; padding: 11px; border: 1px solid var(--line); border-radius: 14px; background: #fff; display: grid; place-items: center; }
+  .qr-frame img { width: 100%; height: 100%; object-fit: contain; }
+  .qr-meta { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--sage); font-size: 9px; }
+  .qr-modal-actions { display: flex; gap: 7px; justify-content: center; margin-top: 16px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; z-index: 40;
+    transform: translate(-50%, 16px); opacity: 0; pointer-events: none;
+    max-width: min(520px, calc(100vw - 40px)); padding: 10px 16px;
+    border: 1px solid rgba(255, 255, 255, .55); border-radius: 999px;
+    background: rgba(33, 50, 40, .92); color: #f7f1e4;
+    font-size: 11px; box-shadow: 0 12px 35px rgba(23, 37, 28, .22);
+    transition: .2s ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .toast.err { background: rgba(116, 55, 48, .94); }
+
+  .skeleton { position: relative; overflow: hidden; background: rgba(255, 253, 248, .45); }
+  .skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .45), transparent); animation: shimmer 1.5s infinite; }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
+  @keyframes rise { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+  .view:not(.hide) .view-head, .view:not(.hide) .hero, .view:not(.hide) .kpi-grid, .view:not(.hide) .overview-grid, .view:not(.hide) .role-grid, .view:not(.hide) .users-card, .view:not(.hide) .analytics-summary, .view:not(.hide) .chart-grid {
+    animation: rise .35s ease both;
+  }
+
+  @media (max-width: 1180px) {
+    .shell { grid-template-columns: 82px minmax(0, 1fr); }
+    .rail { padding-left: 9px; padding-right: 9px; }
+    .rail-label, .rail-note, .rail-link span { display: none; }
+    .nav-item { justify-content: center; padding: 0; }
+    .nav-item span { display: none; }
+    .nav-badge { position: absolute; right: 5px; top: 5px; }
+    .hero { grid-template-columns: 1fr; align-items: start; }
+    .hero-side { flex-direction: row; align-items: center; justify-content: space-between; }
+    .hero-date { text-align: left; }
+    .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .role-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .chart-card.risk, .chart-card.module, .chart-card.items, .chart-card.heatmap { grid-column: span 12; }
+  }
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; grid-template-rows: 70px minmax(0, 1fr); gap: 10px; padding: 10px; }
+    .topbar { grid-column: 1; }
+    .rail { display: none; }
+    .workspace { grid-column: 1; }
+    .topbar-right .sync-pill, .top-divider, .operator small { display: none; }
+    .overview-grid, .review-layout { grid-template-columns: 1fr; }
+    .review-side { max-height: 220px; }
+    .review-actions { grid-template-columns: 1fr; }
+    .action-buttons { justify-content: flex-end; }
+    .paper { padding: 27px 24px 36px; }
+    .dimension-grid, .paper-meta, .action-grid, .form-grid { grid-template-columns: 1fr; }
+    .paper-meta div { border-right: 0; }
+    .analytics-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">心</div>
+      <div>
+        <h1>心理沙盘 · 管理后台</h1>
+        <p>DEVELOPMENTAL ASSESSMENT · ADMIN CONSOLE</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="sync-pill" id="syncStatus"><i></i><span>正在同步数据</span></div>
+      <div class="top-divider"></div>
+      <div class="operator">
+        <div class="avatar">林</div>
+        <div><b>林知远</b><small>超级管理员</small></div>
+      </div>
+    </div>
+  </header>
+
+  <aside class="rail">
+    <div class="rail-label">NAVIGATION</div>
+    <nav>
+      <button class="nav-item active" data-view="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+        <span>工作概览</span>
+      </button>
+      <button class="nav-item" data-view="review">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v5h5"/><path d="M9 13h6M9 16h4"/><path d="M9.2 10.2 7.6 11.7l-1.1-1.1"/></svg>
+        <span>报告审核</span>
+        <em class="nav-badge" id="navReviewBadge">0</em>
+      </button>
+      <button class="nav-item" data-view="users">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="9" r="3"/><path d="M4 19c.4-3 2.3-4.5 5-4.5s4.6 1.5 5 4.5"/><circle cx="17" cy="8" r="2.2"/><path d="M15.5 14.3c3 0 4.6 1.4 5 4.2"/></svg>
+        <span>用户与角色</span>
+      </button>
+      <button class="nav-item" data-view="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 19V10M10 19V5M15 19v-7M20 19v-4"/><path d="M3.5 19h17"/></svg>
+        <span>数据看板</span>
+      </button>
+    </nav>
+    <div class="rail-spacer"></div>
+    <div class="rail-note">
+      <b>隐私提示</b>
+      后台仅限授权咨询师使用。家长 / 学生分享页会自动隐藏风险研判章节。
+    </div>
+    <a class="rail-link" href="sandplay_workbench_react.html" id="backToWorkbench">
+      <span>返回沙盘工作台</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 17 17 7M9 7h8v8"/></svg>
+    </a>
+  </aside>
+
+  <main class="workspace">
+    <!-- ========== 工作概览 ========== -->
+    <section class="view" id="view-overview" data-section="overview">
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="hero-kicker">ASSESSMENT OPERATIONS · 2026</div>
+          <h2 id="heroTitle">把每一份沙盘作品，读成一段成长。</h2>
+          <p>审核、修订、分享与群体画像，在一个工作台里完成。今天先把待审核的报告读完，再把需要关注的孩子放在心上。</p>
+        </div>
+        <div class="hero-side">
+          <div class="hero-date"><span>今天</span><b id="todayLabel">11 月 20 日</b><span id="todayWeek">星期四</span></div>
+          <button class="hero-btn" data-jump="review">
+            <span>进入审核队列</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="surface kpi">
+          <div class="kpi-top"><span class="kpi-label">评估报告</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v5h5"/><path d="M9 13h6M9 16h4"/></svg></span></div>
+          <div class="kpi-value" id="kpiReports">—</div>
+          <div class="kpi-foot"><b id="kpiReportsFoot">建立中的评估档案</b></div>
+        </div>
+        <div class="surface kpi gold">
+          <div class="kpi-top"><span class="kpi-label">待审核</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 1.5"/></svg></span></div>
+          <div class="kpi-value" id="kpiPending">—</div>
+          <div class="kpi-foot"><b id="kpiPendingFoot">需要咨询师确认</b></div>
+        </div>
+        <div class="surface kpi red">
+          <div class="kpi-top"><span class="kpi-label">重点关护</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3.8 19 7v5.2c0 4.3-2.8 7.1-7 8-4.2-.9-7-3.7-7-8V7z"/><path d="M9 12.3l2 2 4-4.2"/></svg></span></div>
+          <div class="kpi-value" id="kpiHighRisk">—</div>
+          <div class="kpi-foot"><b id="kpiHighRiskFoot">L2 及以上需关注</b></div>
+        </div>
+        <div class="surface kpi blue">
+          <div class="kpi-top"><span class="kpi-label">分享链接</span><span class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 12a4 4 0 0 1 4-4h2a4 4 0 0 1 0 8h-1"/><path d="M16 12a4 4 0 0 1-4 4H9a4 4 0 0 1 0-8h1"/></svg></span></div>
+          <div class="kpi-value" id="kpiShares">—</div>
+          <div class="kpi-foot"><b id="kpiSharesFoot">家长端可访问</b></div>
+        </div>
+      </div>
+
+      <div class="overview-grid">
+        <div class="surface queue-card">
+          <div class="card-head">
+            <div><h3 class="card-title">审核队列</h3><p class="card-sub">先看出现在风险线索里的报告，再按时间逐份确认。</p></div>
+            <button class="card-link" data-jump="review">查看全部</button>
+          </div>
+          <div class="queue-list" id="overviewQueue"><div class="empty-table">正在加载报告…</div></div>
+        </div>
+        <div class="surface risk-card">
+          <div class="card-head">
+            <div><h3 class="card-title">预警等级分布</h3><p class="card-sub">按单份报告的最高预警等级统计。</p></div>
+            <button class="card-link" data-jump="analytics">数据看板</button>
+          </div>
+          <div class="risk-body">
+            <div class="risk-donut">
+              <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#e9e1d3" stroke-width="9"/>
+                <g id="riskArcs"></g>
+              </svg>
+              <div class="risk-center"><b id="riskTotal">—</b><small>份报告</small></div>
+            </div>
+            <div class="risk-legend" id="riskLegend"></div>
+          </div>
+          <div class="high-risk-head"><strong>需要重点关护</strong><span id="highRiskCount">L2 及以上</span></div>
+          <div class="high-risk-list" id="highRiskList"><div class="empty-table">暂无关注名单</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 报告审核 ========== -->
+    <section class="view review-view hide" id="view-review" data-section="review">
+      <div class="view-head">
+        <div>
+          <div class="eyebrow">REPORT REVIEW</div>
+          <h2 class="view-title">报告审核修订工作台</h2>
+          <p class="view-desc">阅读完整九章报告，核对风险线索与训练建议；审核通过后生成家长 / 学生分享二维码。</p>
+        </div>
+        <div class="head-actions">
+          <button class="btn small" id="refreshReports">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 11a8 8 0 0 0-14-4L4 9"/><path d="M4 5v4h4"/><path d="M4 13a8 8 0 0 0 14 4l2-2"/><path d="M20 19v-4h-4"/></svg>
+            刷新队列
+          </button>
+        </div>
+      </div>
+      <div class="review-layout">
+        <aside class="surface review-side">
+          <div class="side-tools">
+            <div class="search-field">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="6.2"/><path d="m16 16 3.2 3.2"/></svg>
+              <input id="reportSearch" placeholder="搜索学生 / 报告编号" autocomplete="off">
+            </div>
+            <div class="filter-tabs" id="reportFilters">
+              <button class="filter-tab active" data-filter="all">全部</button>
+              <button class="filter-tab" data-filter="pending">待审核</button>
+              <button class="filter-tab" data-filter="changes">待修订</button>
+              <button class="filter-tab" data-filter="approved">已通过</button>
+            </div>
+          </div>
+          <div class="review-list" id="reviewList"><div class="empty-table">正在加载报告…</div></div>
+        </aside>
+        <section class="surface review-main" id="reviewMain">
+          <div class="review-toolbar">
+            <div class="review-toolbar-left"><b>正在载入报告</b><small>请稍候</small></div>
+          </div>
+          <div class="paper-scroll"><div class="paper loading-paper">正在读取报告内容…</div></div>
+          <div class="review-actions">
+            <div><div class="reviewer-line"><span>审核意见</span></div><textarea class="note-field" placeholder="写下修订建议，例如：补充家庭访谈问题、调整训练模块优先级…" disabled></textarea></div>
+            <div class="action-buttons"><button class="btn danger" disabled>退回修订</button><button class="btn primary" disabled>审核通过</button><button class="btn soft qr-btn" disabled>生成二维码</button></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ========== 用户与角色 ========== -->
+    <section class="view hide" id="view-users" data-section="users">
+      <div class="view-head">
+        <div>
+          <div class="eyebrow">PEOPLE & ROLES</div>
+          <h2 class="view-title">用户与角色</h2>
+          <p class="view-desc">管理学校心理服务团队的账号与权限。角色决定可见范围：学生只看个人报告，咨询师负责审核与分享。</p>
+        </div>
+        <div class="head-actions">
+          <button class="btn primary" id="addUserBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>新增用户</button>
+        </div>
+      </div>
+      <div class="role-grid" id="roleGrid"></div>
+      <div class="surface users-card">
+        <div class="table-tools">
+          <div class="table-tools-left">
+            <div class="search-field">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="6.2"/><path d="m16 16 3.2 3.2"/></svg>
+              <input id="userSearch" placeholder="搜索姓名 / 账号 / 部门" autocomplete="off">
+            </div>
+            <select class="select-box" id="userRoleFilter" aria-label="按角色筛选">
+              <option value="all">全部角色</option>
+              <option value="super_admin">超级管理员</option>
+              <option value="counselor">心理咨询师</option>
+              <option value="teacher">班主任</option>
+              <option value="student">受测学生</option>
+            </select>
+            <select class="select-box" id="userStatusFilter" aria-label="按状态筛选">
+              <option value="all">全部状态</option>
+              <option value="active">正常</option>
+              <option value="disabled">已停用</option>
+            </select>
+          </div>
+          <span class="card-sub" id="userCountLabel">— 位用户</span>
+        </div>
+        <div id="userTableWrap"><div class="empty-table">正在加载用户…</div></div>
+      </div>
+    </section>
+
+    <!-- ========== 数据看板 ========== -->
+    <section class="view hide" id="view-analytics" data-section="analytics">
+      <div class="view-head">
+        <div>
+          <div class="eyebrow">ANALYTICS</div>
+          <h2 class="view-title">数据统计看板</h2>
+          <p class="view-desc">从报告里提炼群体线索：预警等级、沙具偏好、空间聚集与训练模块需求，帮助学校安排下一步支持。</p>
+        </div>
+        <div class="head-actions">
+          <span class="sync-pill" id="analyticsSample"><i></i><span>实时数据</span></span>
+        </div>
+      </div>
+      <div class="analytics-summary" id="analyticsSummary"></div>
+      <div class="chart-grid">
+        <div class="surface chart-card risk">
+          <div class="chart-head"><div><h3>预警等级分布</h3><p>按报告最高等级</p></div><span class="chart-insight" id="riskInsight"></span></div>
+          <div class="chart" id="riskChart"></div>
+        </div>
+        <div class="surface chart-card module">
+          <div class="chart-head"><div><h3>六大训练模块需求分布</h3><p>一份报告可对应多个模块</p></div><span class="chart-insight" id="moduleInsight"></span></div>
+          <div class="chart" id="moduleChart"></div>
+        </div>
+        <div class="surface chart-card items">
+          <div class="chart-head"><div><h3>高频沙具 Top 20</h3><p>按出现频次排序</p></div><span class="chart-insight" id="itemsInsight"></span></div>
+          <div class="chart tall" id="itemsChart"></div>
+        </div>
+        <div class="surface chart-card heatmap">
+          <div class="chart-head"><div><h3>九宫格空间热力图</h3><p>沙具在画面分区中的聚集</p></div><span class="chart-insight" id="heatInsight"></span></div>
+          <div class="chart heat" id="heatmapChart"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="userDrawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div><h3 id="drawerTitle">新增用户</h3><p id="drawerDesc">为团队成员分配角色与所属范围。</p></div>
+    <button class="icon-btn" id="closeDrawer" aria-label="关闭"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="drawer-body">
+    <form id="userForm" class="form-grid" autocomplete="off">
+      <div class="form-field"><label for="userName">姓名 <em>*</em></label><input id="userName" name="name" placeholder="如：张老师" required></div>
+      <div class="form-field"><label for="userAccount">账号 <em>*</em></label><input id="userAccount" name="account" placeholder="如：zhang.laoshi" required></div>
+      <div class="form-field"><label for="userRole">角色</label><select id="userRole" name="role_key"></select></div>
+      <div class="form-field"><label for="userStatus">状态</label><select id="userStatus" name="status"><option value="active">正常</option><option value="disabled">已停用</option></select></div>
+      <div class="form-field full"><label for="userDepartment">所属部门 / 学段</label><input id="userDepartment" name="department" placeholder="如：心理发展中心 / 初中部"></div>
+      <div class="form-field"><label for="userGrade">年级</label><input id="userGrade" name="grade_level" placeholder="如：初二"></div>
+      <div class="form-field"><label for="userClass">班级</label><input id="userClass" name="class_name" placeholder="如：3 班"></div>
+      <div class="form-field full"><label for="userStudentNo">学生编号</label><input id="userStudentNo" name="student_no" placeholder="学生角色填写，如：PS-2026-018"><span class="form-hint">编号用于关联测评档案，可留空。</span></div>
+      <div class="form-divider"></div>
+      <div class="form-field full"><span class="form-hint">角色变更后，该账号下一次刷新页面时生效。学生与班主任看不到风险研判章节。</span></div>
+    </form>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn" id="cancelUserBtn">取消</button>
+    <button class="btn primary" id="saveUserBtn">保存用户</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="qrOverlay"></div>
+<div class="qr-modal" id="qrModal" aria-hidden="true">
+  <h3>报告分享二维码</h3>
+  <p id="qrSub">家长 / 学生扫码查看脱敏版报告，风险研判章节自动隐藏。</p>
+  <div class="qr-frame"><img id="qrImage" alt="报告分享二维码"></div>
+  <div class="qr-meta"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3.8 19 7v5.2c0 4.3-2.8 7.1-7 8-4.2-.9-7-3.7-7-8V7z"/><path d="M9 12.3l2 2 4-4.2"/></svg><span>长期有效 · 仅展示发展性内容</span></div>
+  <div class="qr-modal-actions">
+    <button class="btn" id="closeQrBtn">关闭</button>
+    <button class="btn primary" id="copyShareBtn">复制分享链接</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const API_BASE = (location.protocol === "http:" || location.protocol === "https:")
+    ? `${location.origin}/api/v1`
+    : "http://127.0.0.1:8000/api/v1";
+  const VIEWER_URL = (location.protocol === "http:" || location.protocol === "https:")
+    ? `${location.origin}/report-viewer`
+    : "report_viewer_v2.html";
+  const WORKBENCH_URL = (location.protocol === "http:" || location.protocol === "https:")
+    ? `${location.origin}/workbench`
+    : "sandplay_workbench_react.html";
+  const COUNSELOR_TOKEN = localStorage.getItem("sandplay_counselor_token") || "dev-counselor-token";
+
+  const state = {
+    view: "overview",
+    bootstrap: null,
+    users: [],
+    roles: [],
+    reports: [],
+    stats: null,
+    selectedId: null,
+    detail: null,
+    detailLoading: false,
+    detailError: "",
+    reviewStatus: "pending",
+    reviewNote: "",
+    reportFilter: "all",
+    reportSearch: "",
+    userSearch: "",
+    userRoleFilter: "all",
+    userStatusFilter: "all",
+    editingUserId: null,
+    share: null,
+    loading: true,
+    apiError: "",
+    charts: {},
+  };
+
+  const el = (id) => document.getElementById(id);
+  const esc = (value) => String(value == null ? "" : value)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  const text = (value, fallback = "—") => {
+    const v = String(value == null ? "" : value).trim();
+    return v || fallback;
+  };
+  const list = (value) => {
+    if (!value) return [];
+    return Array.isArray(value) ? value : [value];
+  };
+  const initials = (name) => String(name || "?").trim().slice(0, 1);
+  const roleName = (key) => (state.roles.find((role) => role.key === key) || {}).name || key;
+  const roleShort = (key) => (state.roles.find((role) => role.key === key) || {}).short || key;
+  const fmtTime = (value, withYear = false) => {
+    if (!value) return "—";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value);
+    const pad = (n) => String(n).padStart(2, "0");
+    const date = `${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    return `${withYear ? d.getFullYear() + "-" : ""}${date} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+  const fmtDate = (value) => {
+    if (!value) return "—";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value);
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  };
+  const pct = (part, total) => total ? Math.round((part / total) * 100) : 0;
+
+  const ICONS = {
+    report: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v5h5"/><path d="M9 13h6M9 16h4"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 1.5"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3.8 19 7v5.2c0 4.3-2.8 7.1-7 8-4.2-.9-7-3.7-7-8V7z"/><path d="M9 12.3l2 2 4-4.2"/></svg>',
+    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 12a4 4 0 0 1 4-4h2a4 4 0 0 1 0 8h-1"/><path d="M16 12a4 4 0 0 1-4 4H9a4 4 0 0 1 0-8h1"/></svg>',
+    user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="3"/><path d="M5.5 19c.5-3.4 2.8-5.2 6.5-5.2s6 1.8 6.5 5.2"/></svg>',
+    users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="9" r="3"/><path d="M4 19c.4-3 2.3-4.5 5-4.5s4.6 1.5 5 4.5"/><circle cx="17" cy="8" r="2.2"/><path d="M15.5 14.3c3 0 4.6 1.4 5 4.2"/></svg>',
+    class: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16v12H4z"/><path d="M8 21h8M12 17v4"/><path d="M8 9h5M8 12h8"/></svg>',
+    admin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3.8 19 7v5.2c0 4.3-2.8 7.1-7 8-4.2-.9-7-3.7-7-8V7z"/><circle cx="12" cy="10" r="2.2"/><path d="M8.7 16c.4-1.8 1.5-2.8 3.3-2.8s2.9 1 3.3 2.8"/></svg>',
+    arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M14 7l5 5-5 5"/></svg>',
+    edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m5 19 1-4 9.8-9.8 3 3L8 18z"/><path d="m13.8 6.2 3 3"/></svg>',
+    trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg>',
+    qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="5" height="5"/><rect x="15" y="4" width="5" height="5"/><rect x="4" y="15" width="5" height="5"/><path d="M15 15h2v2h-2zM19 15h1M15 19h1M19 19h1"/></svg>',
+  };
+
+  const roleIcon = (role) => ({ super_admin: ICONS.admin, counselor: ICONS.shield, teacher: ICONS.class, student: ICONS.user }[role] || ICONS.user);
+
+  function toast(message, isError = false) {
+    const node = el("toast");
+    node.textContent = message;
+    node.classList.toggle("err", isError);
+    node.classList.add("show");
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => node.classList.remove("show"), 2600);
+  }
+
+  async function api(path, options = {}) {
+    const response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        "X-Counselor-Token": COUNSELOR_TOKEN,
+        ...(options.headers || {}),
+      },
+    });
+    let body = {};
+    try { body = await response.json(); } catch (e) { body = {}; }
+    if (!response.ok || body.code !== "OK") {
+      throw new Error(body.message || `请求失败（${response.status}）`);
+    }
+    return body.data;
+  }
+
+  function setSync(ok, label) {
+    const node = el("syncStatus");
+    node.classList.toggle("err", !ok);
+    node.querySelector("span").textContent = label;
+  }
+
+  async function boot() {
+    const now = new Date();
+    const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+    el("todayLabel").textContent = `${now.getMonth() + 1} 月 ${now.getDate()} 日`;
+    el("todayWeek").textContent = weekdays[now.getDay()];
+    el("backToWorkbench").href = WORKBENCH_URL;
+
+    try {
+      const [bootstrap, reports, stats] = await Promise.all([
+        api("/admin/bootstrap"),
+        api("/admin/reports?limit=100"),
+        api("/admin/stats"),
+      ]);
+      state.bootstrap = bootstrap;
+      state.roles = bootstrap.roles || [];
+      state.users = bootstrap.users || [];
+      state.reports = reports.reports || [];
+      state.stats = stats;
+      state.loading = false;
+      renderRoleOptions("student");
+      setSync(true, `已同步 · ${fmtTime(new Date().toISOString())}`);
+    } catch (error) {
+      state.loading = false;
+      state.apiError = error.message || String(error);
+      setSync(false, "数据连接失败");
+      toast(`后台数据加载失败：${state.apiError}`, true);
+    }
+    renderAll();
+    if (state.view === "review") ensureDetail();
+  }
+
+  function renderAll() {
+    renderKPIs();
+    renderOverview();
+    renderReportList();
+    renderUsers();
+    renderAnalytics();
+    renderNav();
+    if (state.view === "review") renderReviewDetail();
+  }
+
+  function renderNav() {
+    document.querySelectorAll(".nav-item[data-view]").forEach((button) => {
+      button.classList.toggle("active", button.dataset.view === state.view);
+    });
+    const pending = state.stats ? state.stats.summary.pending_reviews : 0;
+    el("navReviewBadge").textContent = pending;
+    el("navReviewBadge").style.display = pending ? "" : "none";
+    document.querySelectorAll(".view[data-section]").forEach((section) => {
+      section.classList.toggle("hide", section.dataset.section !== state.view);
+    });
+    if (state.view === "analytics") requestAnimationFrame(() => initCharts());
+  }
+
+  function setView(view) {
+    state.view = view;
+    renderNav();
+    if (view === "review") {
+      ensureDetail();
+      renderReviewDetail();
+    }
+    if (view === "users") renderUsers();
+    if (view === "analytics") {
+      renderAnalytics();
+      requestAnimationFrame(() => initCharts());
+    }
+  }
+
+  function renderKPIs() {
+    const summary = state.stats ? state.stats.summary : null;
+    el("kpiReports").textContent = summary ? summary.total_reports : "—";
+    el("kpiPending").textContent = summary ? summary.pending_reviews : "—";
+    el("kpiHighRisk").textContent = summary ? summary.high_risk_reports : "—";
+    el("kpiShares").textContent = summary ? summary.share_links : "—";
+    if (summary) {
+      el("kpiReportsFoot").textContent = `覆盖 ${state.stats.grade_distribution.length} 个年级 · ${summary.total_items} 件沙具`;
+      el("kpiPendingFoot").textContent = summary.pending_reviews ? "等待咨询师确认" : "队列已清空";
+      el("kpiHighRiskFoot").textContent = summary.high_risk_reports ? "L2 及以上需关注" : "当前无重点线索";
+      el("kpiSharesFoot").textContent = summary.share_links ? "家长端可访问" : "尚未生成分享";
+    }
+  }
+
+  function renderOverview() {
+    const reports = [...state.reports].sort((a, b) => {
+      const rank = { pending: 0, changes: 1, approved: 2 };
+      return (rank[a.review_status] ?? 3) - (rank[b.review_status] ?? 3)
+        || String(b.created_at).localeCompare(String(a.created_at));
+    }).slice(0, 5);
+    el("overviewQueue").innerHTML = reports.length ? reports.map((report) => `
+      <button class="queue-row" data-report-id="${esc(report.assessment_id)}">
+        <span class="queue-bar ${esc(report.risk_level)}"></span>
+        <span class="queue-main">
+          <b>${esc(report.student_name)} <span class="level-pill ${esc(report.risk_level)}">${esc(report.risk_level)}</span></b>
+          <small>${esc(report.report_no)} · ${esc(text(report.grade_level, "年级未填"))} · ${esc(fmtTime(report.created_at))}</small>
+        </span>
+        <span class="queue-right">
+          <span class="status-pill ${esc(report.review_status)}">${statusText(report.review_status)}</span>
+          ${ICONS.arrow}
+        </span>
+      </button>
+    `).join("") : '<div class="empty-table">当前没有待处理报告</div>';
+
+    const stats = state.stats || {};
+    const risk = stats.risk_distribution || [];
+    const total = risk.reduce((sum, item) => sum + Number(item.value || 0), 0);
+    el("riskTotal").textContent = total || "0";
+    const colors = { L1: "#617d69", L2: "#bf8c58", L3: "#c57957", L4: "#a8584d" };
+    let riskStart = -90;
+    const riskArcs = [];
+    risk.forEach((item) => {
+      const sweep = total ? (Number(item.value || 0) / total) * 360 : 0;
+      if (!sweep) return;
+      const color = colors[item.level] || "#617d69";
+      if (sweep >= 359.9) {
+        riskArcs.push(`<circle cx="50" cy="50" r="38" fill="none" stroke="${color}" stroke-width="9"/>`);
+      } else {
+        const rad1 = (riskStart * Math.PI) / 180;
+        const rad2 = ((riskStart + sweep) * Math.PI) / 180;
+        const x1 = 50 + 38 * Math.cos(rad1), y1 = 50 + 38 * Math.sin(rad1);
+        const x2 = 50 + 38 * Math.cos(rad2), y2 = 50 + 38 * Math.sin(rad2);
+        riskArcs.push(`<path d="M ${x1.toFixed(2)} ${y1.toFixed(2)} A 38 38 0 ${sweep > 180 ? 1 : 0} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}" fill="none" stroke="${color}" stroke-width="9"/>`);
+      }
+      riskStart += sweep;
+    });
+    el("riskArcs").innerHTML = riskArcs.join("");
+    el("riskLegend").innerHTML = risk.map((item) => `
+      <div class="risk-legend-row">
+        <i class="${esc(item.level)}"></i><span>${esc(item.label)}</span><b>${esc(item.value)}</b>
+      </div>`).join("");
+
+    const highRisk = stats.high_risk_students || [];
+    el("highRiskCount").textContent = highRisk.length ? `${highRisk.length} 人 · L2 及以上` : "L2 及以上";
+    el("highRiskList").innerHTML = highRisk.slice(0, 5).map((item) => `
+      <div class="high-risk-row">
+        <span><b>${esc(item.student_name)}</b><small>${esc(text(item.grade_level, "年级未填"))}</small></span>
+        <span class="level-pill ${esc(item.risk_level)}">${esc(item.risk_level)}</span>
+      </div>`).join("") || '<div class="empty-table">当前没有需要重点关护的学生</div>';
+  }
+
+  function statusText(status) {
+    return { pending: "待审核", changes: "待修订", approved: "已通过" }[status] || status;
+  }
+  function riskText(level) {
+    return { L1: "L1 平稳", L2: "L2 轻度关注", L3: "L3 中度关注", L4: "L4 重点关注" }[level] || level;
+  }
+
+  function filteredReports() {
+    return state.reports.filter((report) => {
+      if (state.reportFilter !== "all" && report.review_status !== state.reportFilter) return false;
+      if (state.reportSearch.trim()) {
+        const keyword = state.reportSearch.trim().toLowerCase();
+        return [report.student_name, report.student_no, report.report_no, report.representative_item_name]
+          .join(" ").toLowerCase().includes(keyword);
+      }
+      return true;
+    });
+  }
+
+  function renderReportList() {
+    const reports = filteredReports();
+    el("reviewList").innerHTML = reports.length ? reports.map((report) => `
+      <button class="report-row ${report.assessment_id === state.selectedId ? "active" : ""}" data-report-id="${esc(report.assessment_id)}">
+        <div class="report-row-top">
+          <span class="risk-dot ${esc(report.risk_level)}"></span>
+          <b>${esc(report.student_name)}</b>
+          <time>${esc(fmtTime(report.created_at))}</time>
+        </div>
+        <div class="report-row-no">${esc(report.report_no)} · ${esc(text(report.grade_level, "年级未填"))}</div>
+        <div class="report-row-bottom">
+          <span class="status-pill ${esc(report.review_status)}">${statusText(report.review_status)}</span>
+          <span class="level-pill ${esc(report.risk_level)}">${esc(report.risk_level)}</span>
+          <small>${report.share_count ? `已分享 ${report.share_count}` : "未分享"}</small>
+        </div>
+      </button>`).join("") : '<div class="empty-table">没有符合筛选条件的报告</div>';
+  }
+
+  async function ensureDetail(force = false) {
+    if (!state.selectedId && state.reports.length) state.selectedId = state.reports[0].assessment_id;
+    if (!state.selectedId) return;
+    if (state.detail && state.detail.assessment_id === state.selectedId && !force) return;
+    state.detailLoading = true;
+    state.detailError = "";
+    renderReportList();
+    renderReviewDetail();
+    try {
+      const detail = await api(`/reports/${encodeURIComponent(state.selectedId)}`);
+      state.detail = detail;
+      const brief = state.reports.find((item) => item.assessment_id === state.selectedId);
+      state.reviewStatus = brief ? brief.review_status : "pending";
+      state.reviewNote = brief ? brief.review_note || "" : "";
+    } catch (error) {
+      state.detailError = error.message || String(error);
+      state.detail = null;
+    } finally {
+      state.detailLoading = false;
+      renderReviewDetail();
+    }
+  }
+
+  async function selectReport(id) {
+    if (!id || id === state.selectedId) return;
+    state.selectedId = id;
+    state.detail = null;
+    state.share = null;
+    renderReportList();
+    await ensureDetail(true);
+  }
+
+  function renderReviewDetail() {
+    const main = el("reviewMain");
+    const brief = state.reports.find((item) => item.assessment_id === state.selectedId) || null;
+    if (!brief) {
+      main.innerHTML = `<div class="review-toolbar"><div class="review-toolbar-left"><b>还没有可审核的报告</b><small>完成一次沙盘测评后，报告会自动进入队列</small></div></div><div class="paper-scroll"><div class="paper empty-paper">当前没有报告。<br>可以先回到沙盘工作台完成一次测评。</div></div>`;
+      return;
+    }
+    if (state.detailLoading) {
+      main.innerHTML = `<div class="review-toolbar"><div class="review-toolbar-left"><b>${esc(brief.student_name)} · ${esc(brief.report_no)}</b><small>正在读取完整报告…</small></div></div><div class="paper-scroll"><div class="paper loading-paper">正在整理九章内容…</div></div>`;
+      return;
+    }
+    if (state.detailError) {
+      main.innerHTML = `<div class="review-toolbar"><div class="review-toolbar-left"><b>${esc(brief.student_name)} · ${esc(brief.report_no)}</b><small>读取失败</small></div></div><div class="paper-scroll"><div class="paper empty-paper">${esc(state.detailError)}<br><br><button class="btn small" id="retryDetail">重新读取</button></div></div>`;
+      return;
+    }
+    const report = state.detail && state.detail.report;
+    if (!report) {
+      main.innerHTML = `<div class="review-toolbar"><div class="review-toolbar-left"><b>${esc(brief.student_name)} · ${esc(brief.report_no)}</b><small>报告尚未生成完整章节</small></div></div><div class="paper-scroll"><div class="paper empty-paper">这份记录还没有可审核的报告内容。</div></div>`;
+      return;
+    }
+
+    const status = state.reviewStatus;
+    main.innerHTML = `
+      <div class="review-toolbar">
+        <div class="review-toolbar-left">
+          <b>${esc(brief.student_name)} <span class="level-pill ${esc(brief.risk_level)}">${esc(brief.risk_level)}</span></b>
+          <small>${esc(brief.report_no)} · ${esc(text(brief.grade_level, "年级未填"))} · ${esc(fmtTime(brief.created_at))} · ${brief.chapter_count} 章</small>
+        </div>
+        <div class="review-toolbar-right">
+          <span class="status-pill ${esc(status)}">${statusText(status)}</span>
+          <button class="btn small" id="openCounselorView">完整报告</button>
+          <button class="btn small soft" id="openPublicView">家长版预览</button>
+        </div>
+      </div>
+      <div class="paper-scroll" id="paperScroll">
+        ${renderPaper(report, brief)}
+      </div>
+      <div class="review-actions">
+        <div>
+          <div class="reviewer-line"><span class="avatar">沈</span><span>沈岚 · 心理咨询师</span><span>·</span><span>审核意见会保存在报告记录中</span></div>
+          <textarea class="note-field" id="reviewNote" placeholder="写下修订建议，例如：补充家庭访谈问题、调整训练模块优先级…">${esc(state.reviewNote || "")}</textarea>
+        </div>
+        <div class="action-buttons">
+          <button class="btn danger" id="markChangesBtn" ${status === "approved" ? "disabled" : ""}>退回修订</button>
+          <button class="btn primary" id="approveBtn" ${status === "approved" ? "disabled" : ""}>${status === "approved" ? "已通过审核" : "审核通过"}</button>
+          <button class="btn soft qr-btn" id="qrBtn" data-ready="${status === "approved" ? "true" : "false"}" ${status === "approved" ? "" : "disabled"} title="${status === "approved" ? "" : "审核通过后可生成"}">${ICONS.qr}<span>生成二维码</span></button>
+        </div>
+      </div>`;
+    bindDetailActions();
+  }
+
+  function renderPaper(report, brief) {
+    const meta = report.meta || {};
+    const c1 = report.chapter_1_overview || {};
+    const c2 = report.chapter_2_imagery || {};
+    const c3 = report.chapter_3_six_dimensions || {};
+    const c4 = report.chapter_4_academic || {};
+    const c5 = report.chapter_5_risk || {};
+    const c6 = report.chapter_6_interview || {};
+    const c7 = report.chapter_7_career || {};
+    const c8 = report.chapter_8_training_modules || {};
+    const c9 = report.chapter_9_general_advice || {};
+    const dimensions = list(c3.dimensions).filter(Boolean);
+    const themes = list(c2.themes).filter(Boolean);
+    const academicSubjects = list(c4.subjects).filter(Boolean);
+    const riskDims = list(c5.dimensions).filter(Boolean);
+    const interview = list(c6.items).filter(Boolean);
+    const modules = list(c8.modules).filter(Boolean);
+    const basis = list(meta.assessment_basis).filter(Boolean).join(" · ");
+    const image = c1.sandplay_image_url ? `<img class="paper-image" src="${esc(c1.sandplay_image_url)}" alt="沙盘作品实拍" crossorigin="anonymous"><div class="figure-caption">图 1　沙盘作品实拍</div>` : "";
+
+    const chapter1 = `
+      <section class="chapter"><div class="chapter-head"><span class="chapter-num">一</span><h3>整体结果与场景概览</h3><span class="chapter-aside">沙盘作品 1 张</span></div>
+      <div class="chapter-body">
+        ${image}
+        <div class="mini-cards">
+          <div class="mini-card"><label>沙具聚集区</label><p>${esc(text(c1.clusters, "暂无聚集描述"))}</p></div>
+          <div class="mini-card"><label>留白区域</label><p>${esc(text(c1.blank_areas, "暂无留白描述").replace(/九宫格/g, "画面分区"))}</p></div>
+        </div>
+        <div class="mini-cards">
+          <div class="mini-card"><label>沙具类目统计</label><p>${list(c1.item_category_stats).length ? list(c1.item_category_stats).map((item) => `${esc(item.category)} · ${esc(item.count)}`).join("　") : "暂无类目统计"}</p></div>
+          <div class="mini-card"><label>地形观察</label><p>${esc(text(c1.terrain_observation, "暂未采集地形信息"))}</p></div>
+        </div>
+      </div></section>`;
+
+    const chapter2 = `
+      <section class="chapter"><div class="chapter-head"><span class="chapter-num">二</span><h3>沙盘作品意象分析</h3><span class="chapter-aside">探索性假设</span></div>
+      <div class="chapter-body">
+        <table class="paper-table"><thead><tr><th>主题</th><th>象征物</th><th>探索性理解</th><th>置信度</th></tr></thead><tbody>
+          ${themes.length ? themes.map((theme) => `<tr><td>${esc(text(theme.theme, "未命名主题"))}</td><td>${esc(list(theme.symbols).join("、") || "—")}</td><td>${esc(text(theme.hypothesis, "—"))}</td><td class="highlight-cell">${esc(text(theme.confidence, "待确认"))}</td></tr>`).join("") : '<tr><td colspan="4">暂无意象分析</td></tr>'}
+        </tbody></table>
+      </div></section>`;
+
+    const chapter3 = `
+      <section class="chapter"><div class="chapter-head"><span class="chapter-num">三</span><h3>六维方向判定与训练指向</h3><span class="chapter-aside">综合判断 · 非标签化结论</span></div>
+      <div class="chapter-body">
+        <div class="dimension-grid">
+          ${dimensions.length ? dimensions.map((dimension) => `<div class="dimension-card"><b>${esc(text(dimension.name, "未命名维度"))}</b><p>${esc(text(dimension.judgement, "—"))}</p><small>置信度 · ${esc(text(dimension.confidence, "待确认"))}</small></div>`).join("") : '<div class="mini-card">暂无六维判断</div>'}
+        </div>
+      </div></section>`;
+
+    const chapter4 = `
+      <section class="chapter"><div class="chapter-head"><span class="chapter-num">四</span><h3>学业成绩与学业评价</h3><span class="chapter-aside">成绩与方向</span></div>
+      <div class="chapter-body">
+        <div class="mini-cards">
+          <div class="mini-card"><label>学业整体解读</label><p>${esc(cleanAcademic(text(c4.overall_interpretation, "本次暂未包含成绩数据，建议后续补充后复核。")))}</p></div>
+          <div class="mini-card"><label>优势 / 待提升</label><p>优势：${esc(cleanAcademic(text(c4.strengths, "待补充成绩后确认")))}<br>待提升：${esc(cleanAcademic(text(c4.weaknesses, "待补充成绩后确认")))}</p></div>
+        </div>
+        ${academicSubjects.length ? `<table class="paper-table"><thead><tr><th>科目</th><th>成绩</th><th>满分</th></tr></thead><tbody>${academicSubjects.map((row) => `<tr><td>${esc(row.subject || "未命名")}</td><td>${esc(row.score)}</td><td>${esc(row.full_score)}</td></tr>`).join("")}</tbody></table>` : ""}
+      </div></section>`;
+
+    const chapter5 = `
+      <section class="chapter"><div class="chapter-head"><span class="chapter-num">五</span><h3>风险研判 · 九维度分级预警</h3><span class="chapter-aside">仅咨询师可见</span></div>
+      <div class="chapter-body">
+        <table class="paper-table risk-table"><thead><tr><th>维度</th><th>等级</th><th>研判线索</th></tr></thead><tbody>
+          ${riskDims.length ? riskDims.map((dimension) => `<tr><td>${esc(text(dimension.name, "—"))}</td><td><span class="risk-badge ${esc(dimension.level || "L1")}">${esc(dimension.label || dimension.level || "L1")}</span></td><td>${esc(text(dimension.judgement, "—"))}</td></tr>`).join("") : '<tr><td colspan="3">暂无风险研判数据</td></tr>'}
+        </tbody></table>
+      </div></section>`;
+
+    const chapter6 = `
+      <section class="chapter"><div class="chapter-head"><span class="chapter-num">六</span><h3>访谈建议</h3><span class="chapter-aside">下一轮沟通的入口</span></div>
+      <div class="chapter-body">
+        ${interview.length ? interview.map((item) => `<div class="question-block"><b>${esc(text(item.topic, "访谈主题"))} · ${esc(text(item.target, "受测者"))}</b><p>${list(item.questions).filter(Boolean).map(esc).join("　/　")}</p></div>`).join("") : '<p class="card-sub">暂无访谈建议</p>'}
+      </div></section>`;
+
+    const chapter7 = `
+      <section class="chapter"><div class="chapter-head"><span class="chapter-num">七</span><h3>职业发展优势</h3><span class="chapter-aside">${esc(text(c7.stage, "生涯探索"))}</span></div>
+      <div class="chapter-body">
+        <p class="card-sub">${esc(text(c7.summary, "—"))}</p>
+        <div class="action-grid">
+          <div class="action-box"><b>优势线索</b><ul class="paper-list">${list(c7.strengths).slice(0, 3).map((item) => `<li>${esc(item)}</li>`).join("") || "<li>—</li>"}</ul></div>
+          <div class="action-box"><b>老师可以</b><ul class="paper-list">${list(c7.teacher_actions).slice(0, 2).map((item) => `<li>${esc(item)}</li>`).join("") || "<li>—</li>"}</ul></div>
+          <div class="action-box"><b>家长可以</b><ul class="paper-list">${list(c7.parent_actions).slice(0, 2).map((item) => `<li>${esc(item)}</li>`).join("") || "<li>—</li>"}</ul></div>
+        </div>
+      </div></section>`;
+
+    const chapter8 = `
+      <section class="chapter"><div class="chapter-head"><span class="chapter-num">八</span><h3>学习能力训练模块方向</h3><span class="chapter-aside">聚焦 1–3 个模块</span></div>
+      <div class="chapter-body">
+        ${modules.length ? `<table class="paper-table"><thead><tr><th>训练模块</th><th>目标能力</th><th>开展形式</th></tr></thead><tbody>${modules.slice(0, 6).map((module) => `<tr><td>${esc(text(module.name, "未命名模块"))}</td><td>${esc(list(module.goals).slice(0, 2).join("、") || "—")}</td><td>${esc(text(module.format, "—"))}</td></tr>`).join("")}</tbody></table>` : '<p class="card-sub">暂无训练模块建议</p>'}
+      </div></section>`;
+
+    const chapter9 = `
+      <section class="chapter"><div class="chapter-head"><span class="chapter-num">九</span><h3>总体使用建议</h3><span class="chapter-aside">把报告变成行动</span></div>
+      <div class="chapter-body">
+        <div class="mini-cards">
+          <div class="mini-card"><label>成长型思维</label><ul class="paper-list">${list(c9.growth_mindset).slice(0, 3).map((item) => `<li>${esc(item)}</li>`).join("") || "<li>—</li>"}</ul></div>
+          <div class="mini-card"><label>优势迁移</label><ul class="paper-list">${list(c9.strength_transfer).slice(0, 2).map((item) => `<li>${esc(item)}</li>`).join("") || "<li>—</li>"}</ul></div>
+        </div>
+      </div></section>`;
+
+    return `<article class="paper">
+      <header class="paper-head">
+        <div class="paper-kicker">DEVELOPMENTAL ASSESSMENT REPORT</div>
+        <h1>心理沙盘发展性评估报告</h1>
+        <p class="paper-sub">${esc(meta.disclaimer || "发展性心理评估参考 · 非临床诊断")}</p>
+        <div class="paper-meta">
+          <div><span>受测编号</span><b>${esc(text(meta.student_no, brief.student_no || "未填写"))}</b></div>
+          <div><span>评估来源</span><b>${esc(text(meta.assessment_source, "沙盘作品评估"))}</b></div>
+          <div><span>生成时间</span><b>${esc(fmtTime(meta.generated_at || brief.created_at, true))}</b></div>
+          <div><span>年级段</span><b>${esc(text(meta.grade_level, brief.grade_level || "未填写"))}</b></div>
+          <div><span>性别</span><b>${esc(text(meta.gender, "不透露"))}</b></div>
+          <div><span>施测日期</span><b>${esc(fmtDate(meta.test_date || brief.created_at))}</b></div>
+        </div>
+        <div class="basis-line"><b>评估依据：</b>${esc(basis || "沙盘作品 · 画面分区 · 沙具使用 · 受测者自述")}</div>
+      </header>
+      ${chapter1}${chapter2}${chapter3}${chapter4}${chapter5}${chapter6}${chapter7}${chapter8}${chapter9}
+    </article>`.replace(/九宫格/g, "画面分区").replace(/\bcenter\b/gi, "中心区域");
+  }
+
+  function cleanAcademic(value) {
+    return String(value || "")
+      .replace(/可读成绩单/g, "成绩数据")
+      .replace(/成绩单待补/g, "成绩数据待补充")
+      .replace(/成绩单/g, "成绩数据")
+      .replace(/补测/g, "补充成绩")
+      .replace(/识别结果/g, "成绩数据");
+  }
+
+  function bindDetailActions() {
+    const retry = el("retryDetail");
+    if (retry) retry.addEventListener("click", () => ensureDetail(true));
+    const note = el("reviewNote");
+    if (note) note.addEventListener("input", () => { state.reviewNote = note.value; });
+    const approve = el("approveBtn");
+    if (approve) approve.addEventListener("click", () => saveReview("approved"));
+    const changes = el("markChangesBtn");
+    if (changes) changes.addEventListener("click", () => saveReview("changes"));
+    const qr = el("qrBtn");
+    if (qr) qr.addEventListener("click", generateShare);
+    const openCounselor = el("openCounselorView");
+    if (openCounselor) openCounselor.addEventListener("click", () => openReport("counselor"));
+    const openPublic = el("openPublicView");
+    if (openPublic) openPublic.addEventListener("click", () => openReport("public"));
+  }
+
+  async function saveReview(status) {
+    const brief = state.reports.find((item) => item.assessment_id === state.selectedId);
+    if (!brief) return;
+    const note = (el("reviewNote") && el("reviewNote").value || state.reviewNote || "").trim();
+    if (status === "changes" && !note) {
+      toast("退回修订前，请先写下具体修订意见", true);
+      if (el("reviewNote")) el("reviewNote").focus();
+      return;
+    }
+    try {
+      const result = await api(`/admin/reports/${encodeURIComponent(brief.assessment_id)}/review`, {
+        method: "POST",
+        body: JSON.stringify({ status, note, reviewer_id: "shen.lan" }),
+      });
+      state.reviewStatus = result.status;
+      state.reviewNote = result.note || "";
+      brief.review_status = result.status;
+      brief.review_note = result.note || "";
+      if (state.stats && state.stats.summary) {
+        state.stats.summary.pending_reviews = state.reports.filter((item) => item.review_status === "pending" || item.review_status === "changes").length;
+        state.stats.summary.approved_reports = state.reports.filter((item) => item.review_status === "approved").length;
+      }
+      renderKPIs();
+      renderReportList();
+      renderOverview();
+      renderReviewDetail();
+      renderNav();
+      toast(status === "approved" ? "报告已通过审核，可以生成分享二维码" : "已退回修订，意见已保存");
+    } catch (error) {
+      toast(`保存审核状态失败：${error.message || error}`, true);
+    }
+  }
+
+  async function generateShare() {
+    const brief = state.reports.find((item) => item.assessment_id === state.selectedId);
+    if (!brief) return;
+    if (state.reviewStatus !== "approved") {
+      toast("请先审核通过，再生成家长 / 学生分享二维码", true);
+      return;
+    }
+    try {
+      const share = await api(`/reports/${encodeURIComponent(brief.assessment_id)}/share`, {
+        method: "POST",
+        body: JSON.stringify({}),
+      });
+      state.share = share;
+      brief.share_count = Math.max(1, brief.share_count || 0);
+      el("qrImage").src = share.qr_png_base64;
+      el("qrSub").textContent = `${brief.student_name} · ${brief.report_no}　扫码查看脱敏版报告，风险研判章节自动隐藏。`;
+      el("qrOverlay").classList.add("show");
+      el("qrModal").classList.add("show");
+      el("qrModal").setAttribute("aria-hidden", "false");
+      renderOverview();
+      renderReportList();
+      toast("分享二维码已生成");
+    } catch (error) {
+      toast(`生成二维码失败：${error.message || error}`, true);
+    }
+  }
+
+  function closeQr() {
+    el("qrOverlay").classList.remove("show");
+    el("qrModal").classList.remove("show");
+    el("qrModal").setAttribute("aria-hidden", "true");
+  }
+
+  async function copyShare() {
+    if (!state.share || !state.share.share_url) return;
+    try {
+      await navigator.clipboard.writeText(state.share.share_url);
+      toast("分享链接已复制");
+    } catch (error) {
+      toast("当前浏览器不允许直接复制，请手动选择二维码保存", true);
+    }
+  }
+
+  function openReport(mode) {
+    if (!state.selectedId) return;
+    const target = `${VIEWER_URL}?report_id=${encodeURIComponent(state.selectedId)}&mode=${mode === "public" ? "public" : "counselor"}`;
+    window.open(target, "_blank", "noopener");
+  }
+
+  function renderRoleCards() {
+    const counts = {};
+    state.users.forEach((user) => { counts[user.role_key] = (counts[user.role_key] || 0) + 1; });
+    el("roleGrid").innerHTML = state.roles.map((role) => `
+      <button class="role-card ${state.userRoleFilter === role.key ? "active" : ""}" data-role-filter="${esc(role.key)}">
+        <div class="role-card-top"><span class="role-icon">${roleIcon(role.key)}</span><em>${counts[role.key] || 0}</em></div>
+        <b>${esc(role.name)}</b>
+        <small>${esc(role.description)}</small>
+        <div class="role-perms">${list(role.permissions).map((item) => `<span>${esc(item)}</span>`).join("")}</div>
+      </button>`).join("");
+  }
+
+  function filteredUsers() {
+    return state.users.filter((user) => {
+      if (state.userRoleFilter !== "all" && user.role_key !== state.userRoleFilter) return false;
+      if (state.userStatusFilter !== "all" && user.status !== state.userStatusFilter) return false;
+      if (state.userSearch.trim()) {
+        const keyword = state.userSearch.trim().toLowerCase();
+        return [user.name, user.account, user.department, user.student_no].join(" ").toLowerCase().includes(keyword);
+      }
+      return true;
+    });
+  }
+
+  function renderUsers() {
+    renderRoleCards();
+    const users = filteredUsers();
+    const table = el("userTableWrap");
+    el("userCountLabel").textContent = `${users.length} 位用户`;
+    if (!state.users.length) {
+      table.innerHTML = state.apiError
+        ? `<div class="empty-table">用户数据未加载：${esc(state.apiError)}</div>`
+        : '<div class="empty-table">正在加载用户…</div>';
+      return;
+    }
+    table.innerHTML = users.length ? `
+      <table class="user-table">
+        <thead><tr><th>用户</th><th>角色</th><th>所属 / 学段</th><th>编号</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>${users.map((user) => {
+          const scope = [user.department, user.grade_level, user.class_name].filter(Boolean).join(" · ") || "—";
+          return `<tr data-user-id="${esc(user.user_id)}">
+            <td><div class="user-cell"><span class="avatar">${esc(initials(user.name))}</span><div><b>${esc(user.name)}</b><small>${esc(user.account)} · ${esc(fmtDate(user.created_at))}</small></div></div></td>
+            <td><span class="role-pill ${esc(user.role_key)}">${roleIcon(user.role_key)}${esc(roleShort(user.role_key))}</span></td>
+            <td><div class="user-meta">${esc(scope)}</div></td>
+            <td><div class="user-meta">${esc(user.student_no || "—")}</div></td>
+            <td><button class="switch ${user.status === "active" ? "on" : ""}" data-status-toggle="${esc(user.user_id)}" aria-label="切换用户状态"></button></td>
+            <td><div class="row-actions"><button class="icon-btn" data-edit-user="${esc(user.user_id)}" title="编辑用户">${ICONS.edit}</button><button class="icon-btn" data-delete-user="${esc(user.user_id)}" title="删除用户">${ICONS.trash}</button></div></td>
+          </tr>`;
+        }).join("")}</tbody>
+      </table>` : '<div class="empty-table">没有符合筛选条件的用户</div>';
+  }
+
+  function renderRoleOptions(selected = "student") {
+    const select = el("userRole");
+    select.innerHTML = state.roles.map((role) => `<option value="${esc(role.key)}">${esc(role.name)}</option>`).join("");
+    if (selected) select.value = selected;
+  }
+
+  function openUserDrawer(userId = null) {
+    state.editingUserId = userId;
+    const user = userId ? state.users.find((item) => item.user_id === userId) : null;
+    renderRoleOptions(user ? user.role_key : "student");
+    el("drawerTitle").textContent = user ? "编辑用户" : "新增用户";
+    el("drawerDesc").textContent = user ? "调整角色、所属范围或账号状态。" : "为团队成员分配角色与所属范围。";
+    el("userName").value = user ? user.name : "";
+    el("userAccount").value = user ? user.account : "";
+    el("userRole").value = user ? user.role_key : "student";
+    el("userStatus").value = user ? user.status : "active";
+    el("userDepartment").value = user ? user.department : "";
+    el("userGrade").value = user ? user.grade_level : "";
+    el("userClass").value = user ? user.class_name : "";
+    el("userStudentNo").value = user ? user.student_no : "";
+    el("drawerOverlay").classList.add("show");
+    el("userDrawer").classList.add("show");
+    el("userDrawer").setAttribute("aria-hidden", "false");
+    setTimeout(() => el("userName").focus(), 80);
+  }
+
+  function closeUserDrawer() {
+    el("drawerOverlay").classList.remove("show");
+    el("userDrawer").classList.remove("show");
+    el("userDrawer").setAttribute("aria-hidden", "true");
+    state.editingUserId = null;
+  }
+
+  async function saveUser() {
+    const form = {
+      name: el("userName").value.trim(),
+      account: el("userAccount").value.trim(),
+      role_key: el("userRole").value,
+      status: el("userStatus").value,
+      department: el("userDepartment").value.trim(),
+      grade_level: el("userGrade").value.trim(),
+      class_name: el("userClass").value.trim(),
+      student_no: el("userStudentNo").value.trim(),
+    };
+    if (!form.name || !form.account) {
+      toast("请填写姓名和账号", true);
+      if (!form.name) el("userName").focus(); else el("userAccount").focus();
+      return;
+    }
+    const saveBtn = el("saveUserBtn");
+    const old = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = "保存中…";
+    try {
+      if (state.editingUserId) {
+        await api(`/admin/users/${encodeURIComponent(state.editingUserId)}`, { method: "PATCH", body: JSON.stringify(form) });
+        toast("用户信息已更新");
+      } else {
+        await api("/admin/users", { method: "POST", body: JSON.stringify(form) });
+        toast("用户已新增");
+      }
+      await refreshUsers();
+      closeUserDrawer();
+    } catch (error) {
+      toast(`保存用户失败：${error.message || error}`, true);
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = old;
+    }
+  }
+
+  async function refreshUsers() {
+    try {
+      const data = await api("/admin/users");
+      state.users = data.users || [];
+      if (state.bootstrap) state.bootstrap.users = state.users;
+      renderUsers();
+    } catch (error) {
+      toast(`用户列表刷新失败：${error.message || error}`, true);
+    }
+  }
+
+  async function toggleUserStatus(userId) {
+    const user = state.users.find((item) => item.user_id === userId);
+    if (!user) return;
+    try {
+      const updated = await api(`/admin/users/${encodeURIComponent(userId)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: user.status === "active" ? "disabled" : "active" }),
+      });
+      Object.assign(user, updated.user);
+      renderUsers();
+      toast(updated.user.status === "active" ? "用户已启用" : "用户已停用");
+    } catch (error) {
+      toast(`状态更新失败：${error.message || error}`, true);
+    }
+  }
+
+  async function deleteUser(userId) {
+    const user = state.users.find((item) => item.user_id === userId);
+    if (!user) return;
+    if (!window.confirm(`确定删除用户“${user.name}”？此操作不可恢复。`)) return;
+    try {
+      await api(`/admin/users/${encodeURIComponent(userId)}`, { method: "DELETE" });
+      state.users = state.users.filter((item) => item.user_id !== userId);
+      renderUsers();
+      toast("用户已删除");
+    } catch (error) {
+      toast(`删除用户失败：${error.message || error}`, true);
+    }
+  }
+
+  function renderAnalytics() {
+    if (!state.stats) {
+      el("analyticsSummary").innerHTML = '<div class="surface analytics-kpi"><span>数据</span><b>—</b><small>正在加载</small></div>';
+      return;
+    }
+    const s = state.stats;
+    const total = s.summary.total_reports;
+    const high = s.summary.high_risk_reports;
+    const riskL2 = (s.risk_distribution || []).filter((item) => item.level !== "L1").reduce((sum, item) => sum + Number(item.value || 0), 0);
+    const center = (s.grid_heatmap || []).find((item) => item.label === "中心");
+    const topModule = (s.module_distribution || [])[0];
+    el("analyticsSummary").innerHTML = `
+      <div class="surface analytics-kpi"><span>纳入统计</span><b>${total}</b><small>份完整评估报告</small></div>
+      <div class="surface analytics-kpi"><span>L2 及以上</span><b>${high}</b><small>${pct(high, total)}% 需要关注</small></div>
+      <div class="surface analytics-kpi"><span>中心区聚集</span><b>${center ? center.value : 0}</b><small>件沙具落在中心区域</small></div>
+      <div class="surface analytics-kpi"><span>首要训练需求</span><b style="font-size:16px">${esc(topModule ? topModule.name.replace(/^模块[一二三四五六]、/, "") : "—")}</b><small>${topModule ? `${topModule.value} 份报告提及` : "暂无模块建议"}</small></div>`;
+    el("riskInsight").textContent = `L2 及以上 ${riskL2} 份 · ${pct(riskL2, total)}%`;
+    el("moduleInsight").textContent = topModule ? `出现最多：${topModule.value} 份` : "暂无模块数据";
+    el("itemsInsight").textContent = `${s.summary.total_items} 件沙具 · ${(s.top_items || []).length} 类进入榜单`;
+    el("heatInsight").textContent = center ? `中心区 ${center.value} 次，居首位` : "暂无空间分布";
+    if (state.view === "analytics") initCharts();
+  }
+
+  function chartBase() {
+    return {
+      color: ["#617d69", "#bf8c58", "#c57957", "#a8584d", "#617d8a", "#8c7b62"],
+      textStyle: { fontFamily: '"Noto Sans SC", "Microsoft YaHei", sans-serif', color: "#415047" },
+      tooltip: {
+        backgroundColor: "rgba(255,253,248,.96)",
+        borderColor: "rgba(42,63,49,.2)",
+        borderWidth: 1,
+        textStyle: { color: "#1c2722", fontSize: 11 },
+        extraCssText: "box-shadow:0 10px 30px rgba(35,51,42,.12);border-radius:10px;padding:9px 11px;",
+      },
+    };
+  }
+
+  function initCharts() {
+    if (!state.stats) return;
+    if (!window.echarts) {
+      document.querySelectorAll(".chart").forEach((node) => { node.innerHTML = '<div class="chart-fallback">图表组件未能加载。<br>请检查网络后刷新页面。</div>'; });
+      return;
+    }
+    const base = chartBase();
+    const riskData = state.stats.risk_distribution || [];
+    const total = riskData.reduce((sum, item) => sum + Number(item.value || 0), 0);
+    const riskColors = { L1: "#617d69", L2: "#bf8c58", L3: "#c57957", L4: "#a8584d" };
+    const riskChart = state.charts.risk || (state.charts.risk = echarts.init(el("riskChart")));
+    riskChart.setOption({
+      ...base,
+      title: {
+        text: String(total), subtext: "份报告", left: "center", top: "27%",
+        textStyle: { fontFamily: '"Noto Serif SC", serif', fontSize: 27, fontWeight: 600, color: "#1c2722" },
+        subtextStyle: { fontSize: 9, color: "#7b877f" },
+      },
+      tooltip: { ...base.tooltip, trigger: "item", formatter: (p) => `${p.name}<br><b>${p.value} 份</b> · ${p.percent}%` },
+      series: [{
+        type: "pie", radius: ["46%", "70%"], center: ["50%", "46%"],
+        itemStyle: { borderColor: "#fffdf8", borderWidth: 3, borderRadius: 4 },
+        label: { show: false },
+        data: riskData.map((item) => ({ name: item.label, value: item.value, itemStyle: { color: riskColors[item.level] } })),
+      }],
+      legend: {
+        bottom: 4, left: "center", orient: "horizontal", icon: "circle", itemWidth: 7, itemHeight: 7,
+        itemGap: 13, textStyle: { color: "#738076", fontSize: 9 },
+      },
+    }, true);
+
+    const modules = state.stats.module_distribution || [];
+    const moduleChart = state.charts.module || (state.charts.module = echarts.init(el("moduleChart")));
+    moduleChart.setOption({
+      ...base,
+      tooltip: { ...base.tooltip, trigger: "item", formatter: (p) => `${p.name}<br><b>${p.value} 份报告</b> · ${p.percent}%` },
+      series: [{
+        type: "pie", radius: ["30%", "66%"], center: ["42%", "46%"], roseType: "radius",
+        itemStyle: { borderColor: "#fffdf8", borderWidth: 2, borderRadius: 4 },
+        label: { show: true, position: "outside", formatter: (p) => `${p.name.replace(/^模块[一二三四五六]、/, "")}\n${p.value} 份`, fontSize: 9, color: "#526157", lineHeight: 15 },
+        labelLine: { length: 8, length2: 6, lineStyle: { color: "rgba(42,63,49,.16)" } },
+        data: modules.map((item) => ({ name: item.name, value: item.value })),
+      }],
+      legend: {
+        right: 2, top: "middle", orient: "vertical", icon: "circle", itemWidth: 6, itemHeight: 6,
+        itemGap: 9, textStyle: { color: "#738076", fontSize: 8.5 },
+        formatter: (name) => name.replace(/^模块[一二三四五六]、/, ""),
+      },
+    }, true);
+
+    const items = state.stats.top_items || [];
+    const names = items.map((item) => item.name).reverse();
+    const values = items.map((item) => item.value).reverse();
+    const itemsChart = state.charts.items || (state.charts.items = echarts.init(el("itemsChart")));
+    itemsChart.setOption({
+      ...base,
+      grid: { left: 92, right: 36, top: 12, bottom: 12 },
+      tooltip: { ...base.tooltip, trigger: "axis", axisPointer: { type: "shadow" }, formatter: (params) => { const p = params[0]; return `${p.name}<br><b>${p.value} 次</b>`; } },
+      xAxis: { type: "value", splitLine: { lineStyle: { color: "rgba(42,63,49,.07)" } }, axisLabel: { color: "#8b978e", fontSize: 8 }, axisLine: { show: false }, axisTick: { show: false } },
+      yAxis: { type: "category", data: names, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: "#4f5f55", fontSize: 8.5, width: 86, overflow: "truncate" } },
+      series: [{
+        type: "bar", data: values, barWidth: 8, barCategoryGap: "38%",
+        itemStyle: { borderRadius: [0, 5, 5, 0], color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ offset: 0, color: "#8ba691" }, { offset: 1, color: "#496656" }]) },
+        label: { show: true, position: "right", color: "#617d69", fontSize: 8.5, formatter: "{c}" },
+        emphasis: { itemStyle: { color: "#2a4135" } },
+      }],
+    }, true);
+
+    const heatLabels = ["左上", "上中", "右上", "左中", "中心", "右中", "左下", "下中", "右下"];
+    const heatMap = state.stats.grid_heatmap || [];
+    const data = heatMap.map((item, index) => {
+      const col = index % 3;
+      const row = Math.floor(index / 3);
+      return [col, 2 - row, item.value, item.label];
+    });
+    const maxHeat = Math.max(1, ...heatMap.map((item) => Number(item.value || 0)));
+    const heatChart = state.charts.heatmap || (state.charts.heatmap = echarts.init(el("heatmapChart")));
+    heatChart.setOption({
+      ...base,
+      grid: { left: 45, right: 24, top: 12, bottom: 34 },
+      tooltip: { ...base.tooltip, formatter: (p) => `${p.data[3]}<br><b>${p.data[2]} 件沙具</b>` },
+      xAxis: { type: "category", data: ["左", "中", "右"], splitArea: { show: true }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: "#738076", fontSize: 9 } },
+      yAxis: { type: "category", data: ["下", "中", "上"], splitArea: { show: true }, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: "#738076", fontSize: 9 } },
+      visualMap: { min: 0, max: maxHeat, show: false, inRange: { color: ["#f4efe4", "#dce7dc", "#a9c0ac", "#6b8c76", "#355441"] } },
+      series: [{
+        type: "heatmap", data,
+        label: { show: true, fontSize: 9, color: "#304338", formatter: (p) => p.data[2] ? String(p.data[2]) : "0" },
+        itemStyle: { borderColor: "#fffdf8", borderWidth: 5, borderRadius: 4 },
+        emphasis: { itemStyle: { borderColor: "#bf8c58", borderWidth: 2 } },
+      }],
+    }, true);
+
+    Object.values(state.charts).forEach((chart) => chart.resize());
+  }
+
+  // events
+  document.querySelectorAll(".nav-item[data-view]").forEach((button) => {
+    button.addEventListener("click", () => setView(button.dataset.view));
+  });
+  document.querySelectorAll("[data-jump]").forEach((button) => {
+    button.addEventListener("click", () => setView(button.dataset.jump));
+  });
+  el("reportFilters").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-filter]");
+    if (!button) return;
+    state.reportFilter = button.dataset.filter;
+    document.querySelectorAll("#reportFilters .filter-tab").forEach((item) => item.classList.toggle("active", item === button));
+    renderReportList();
+  });
+  el("reportSearch").addEventListener("input", (event) => {
+    state.reportSearch = event.target.value;
+    renderReportList();
+  });
+  el("overviewQueue").addEventListener("click", (event) => {
+    const row = event.target.closest("[data-report-id]");
+    if (!row) return;
+    state.selectedId = row.dataset.reportId;
+    state.detail = null;
+    setView("review");
+    selectReport(row.dataset.reportId);
+  });
+  el("reviewList").addEventListener("click", (event) => {
+    const row = event.target.closest("[data-report-id]");
+    if (!row) return;
+    selectReport(row.dataset.reportId);
+  });
+  el("refreshReports").addEventListener("click", async () => {
+    try {
+      const reports = await api("/admin/reports?limit=100");
+      state.reports = reports.reports || [];
+      await ensureDetail(true);
+      renderReportList();
+      renderOverview();
+      toast("审核队列已刷新");
+    } catch (error) {
+      toast(`刷新失败：${error.message || error}`, true);
+    }
+  });
+  el("addUserBtn").addEventListener("click", () => openUserDrawer());
+  el("drawerOverlay").addEventListener("click", closeUserDrawer);
+  el("closeDrawer").addEventListener("click", closeUserDrawer);
+  el("cancelUserBtn").addEventListener("click", closeUserDrawer);
+  el("saveUserBtn").addEventListener("click", saveUser);
+  el("userSearch").addEventListener("input", (event) => { state.userSearch = event.target.value; renderUsers(); });
+  el("userRoleFilter").addEventListener("change", (event) => { state.userRoleFilter = event.target.value; renderUsers(); });
+  el("userStatusFilter").addEventListener("change", (event) => { state.userStatusFilter = event.target.value; renderUsers(); });
+  el("roleGrid").addEventListener("click", (event) => {
+    const card = event.target.closest("[data-role-filter]");
+    if (!card) return;
+    state.userRoleFilter = card.dataset.roleFilter;
+    el("userRoleFilter").value = state.userRoleFilter;
+    renderUsers();
+  });
+  el("userTableWrap").addEventListener("click", (event) => {
+    const edit = event.target.closest("[data-edit-user]");
+    if (edit) { openUserDrawer(edit.dataset.editUser); return; }
+    const remove = event.target.closest("[data-delete-user]");
+    if (remove) { deleteUser(remove.dataset.deleteUser); return; }
+    const toggle = event.target.closest("[data-status-toggle]");
+    if (toggle) toggleUserStatus(toggle.dataset.statusToggle);
+  });
+  el("qrOverlay").addEventListener("click", closeQr);
+  el("closeQrBtn").addEventListener("click", closeQr);
+  el("copyShareBtn").addEventListener("click", copyShare);
+  window.addEventListener("resize", () => {
+    Object.values(state.charts).forEach((chart) => chart.resize());
+  });
+
+  boot();
+})();
+</script>
+</body>
+</html>

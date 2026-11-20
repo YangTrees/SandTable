@@ -1,0 +1,54 @@
+# ---- Secrets ----
+.env
+.env.*
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# ---- Runtime data and uploads ----
+backend/data/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.pid
+backend/uploads/
+
+# ---- Logs and test artifacts ----
+*.log
+backend/live_test_response.json
+backend/share_response.json
+backend/test_assessment.json
+backend/test_transcript.png
+
+# ---- Large generation sources not needed at runtime ----
+assets/generated/white/
+assets/sample_cutout/
+assets/report_preview/
+
+# ---- Copyrighted reference books and rendered theory pages ----
+参考/
+_theory_pages/
+
+# ---- Scratch screenshots ----
+_preview_*.png
+_preview_*.jpg
+_screen_*.png
+_export_mound.png
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- Node / editors / OS ----
+node_modules/
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/

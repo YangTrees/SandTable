@@ -1,0 +1,177 @@
+[
+  {
+    "id": "VEHICLE_016",
+    "name": "坦克",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与战争、防御、压迫和重型保护有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_016. Subject: one single tank, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_017",
+    "name": "战车",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与冲突、权力、冲锋和速度攻击有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_017. Subject: one single armored vehicle, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_018",
+    "name": "帆船",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与航行、借风、自由和方向调整有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_018. Subject: one single sailboat, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_019",
+    "name": "轮船",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与远行、承载、稳定和跨海连接有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_019. Subject: one single ship, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_020",
+    "name": "游艇",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与享受、地位、逃离和休闲有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_020. Subject: one single yacht, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_021",
+    "name": "渔船",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与生计、冒险、捕捞和海上劳作有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_021. Subject: one single fishing boat, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_022",
+    "name": "皮划艇",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与个人探索、平衡、孤立和体力有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_022. Subject: one single kayak, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_023",
+    "name": "潜艇",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与隐蔽、深处、潜伏和隔离有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_023. Subject: one single submarine, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_024",
+    "name": "飞机",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与跨越、速度、脱离地面和远行有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_024. Subject: one single airplane, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_025",
+    "name": "直升机",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与救援、灵活、俯瞰和悬停能力有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_025. Subject: one single helicopter, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_026",
+    "name": "火箭",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与突破、雄心、逃离和高速上升有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_026. Subject: one single rocket, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_027",
+    "name": "热气球",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与飘浮、浪漫、失控和缓慢升空有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_027. Subject: one single hot air balloon, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_028",
+    "name": "飞艇",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与缓慢巡视、漂浮、监控和稳定滞空有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_028. Subject: one single airship, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_029",
+    "name": "高铁",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与效率、连接、快速变迁和压缩距离有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_029. Subject: one single high-speed train, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_030",
+    "name": "火车",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与轨道、旅程、集体和不可偏离的路线有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_030. Subject: one single train, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_031",
+    "name": "地铁",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与地下、规律、拥挤和日常通勤有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_031. Subject: one single subway train, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_032",
+    "name": "缆车",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与牵引、上升、依赖和悬空过渡有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_032. Subject: one single cable car, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_033",
+    "name": "红绿灯",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与规则、等待、控制和暂停冲动有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_033. Subject: one single traffic light, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_034",
+    "name": "路标",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与方向、指引、选择和信息不确定有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_034. Subject: one single road sign, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_035",
+    "name": "路灯",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与照明、守护、夜间安全和温暖有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_035. Subject: one single street lamp, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_036",
+    "name": "斑马线",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与边界、过街、规则保护和风险过渡有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_036. Subject: one single crosswalk, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_037",
+    "name": "加油站",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与补给、能量、停靠和续航有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_037. Subject: one single gas station, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_038",
+    "name": "充电桩",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与恢复、续航、依赖和现代补给有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_038. Subject: one single charging station, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_039",
+    "name": "电话",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与联系、距离、声音沟通和旧时记忆有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_039. Subject: one single telephone, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  },
+  {
+    "id": "VEHICLE_040",
+    "name": "手机",
+    "category": "交通工具与现代器物",
+    "psychology_meaning": "常与即时连接、依赖、信息和边界模糊有关；具体含义需结合沙具位置、组合关系与访谈确认，不作为诊断结论。",
+    "prompt": "2.5D clay miniature sandplay figurine, isometric 45-degree view, warm studio lighting, pure solid white background #FFFFFF, soft contact shadow, clean cutout edges, high detail, single centered object, no text, no watermark. Asset ID: VEHICLE_040. Subject: one single smartphone, directly on the white ground; no roof box, no road, no circular base, no plinth, no platform, no props, no scenery. IMPORTANT: it is the only object; soft contact shadow directly beneath it."
+  }
+]
