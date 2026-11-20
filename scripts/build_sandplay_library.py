@@ -90,9 +90,20 @@ def main() -> int:
     items = payload.get("items", [])
     rows = []
     missing = []
+    schema_issues = []
     total_bytes = 0
 
+    required_fields = (
+        "subcategory", "asset_group", "psychology_meaning",
+        "supportive_hypothesis", "alternative_hypothesis",
+        "verification_question", "risk_tier", "spatial_role",
+    )
     for item in items:
+        absent = [key for key in required_fields if not item.get(key)]
+        if absent:
+            schema_issues.append({"id": item.get("id"), "missing": absent})
+        if "themes" not in item:
+            schema_issues.append({"id": item.get("id"), "missing": ["themes"]})
         path = find_transparent(item)
         if not path:
             missing.append(item["id"])
@@ -104,7 +115,14 @@ def main() -> int:
             "label": item["name"],
             "category": item["category"],
             "subcategory": item.get("subcategory", ""),
+            "asset_group": item.get("asset_group", ""),
             "themes": item.get("themes", []),
+            "risk_tier": item.get("risk_tier", "none"),
+            "spatial_role": item.get("spatial_role", ""),
+            "psychology_meaning": item.get("psychology_meaning", ""),
+            "supportive_hypothesis": item.get("supportive_hypothesis", ""),
+            "alternative_hypothesis": item.get("alternative_hypothesis", ""),
+            "verification_question": item.get("verification_question", ""),
             "icon": CATEGORY_ICONS.get(item["category"], "◆"),
             "image": data_uri,
         })
@@ -137,11 +155,13 @@ def main() -> int:
         "items": len(rows),
         "missing": len(missing),
         "missing_ids": missing[:20],
+        "schema_issues": schema_issues[:20],
+        "schema_issue_count": len(schema_issues),
         "encoded_bytes": total_bytes,
         "js_mb": round(OUT.stat().st_size / 1024 / 1024, 2),
         "output": str(OUT),
     }, ensure_ascii=False))
-    return 0 if not missing else 1
+    return 0 if not missing and not schema_issues else 1
 
 
 if __name__ == "__main__":

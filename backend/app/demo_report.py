@@ -73,6 +73,59 @@ def _category_counts(items: list[dict[str, Any]]) -> Counter:
     return categories
 
 
+def _subcategory_counts(items: list[dict[str, Any]]) -> Counter:
+    counts = Counter()
+    for item in items:
+        key = str(item.get("subcategory") or "").strip()
+        if key:
+            counts[key] += 1
+    return counts
+
+
+def _theme_counts(items: list[dict[str, Any]]) -> Counter:
+    counts = Counter()
+    for item in items:
+        for code in item.get("themes") or []:
+            key = str(code or "").strip()
+            if key:
+                counts[key] += 1
+    return counts
+
+
+THEME_LIBRARY = {
+    "conflict": {
+        "name": "冲突与对抗",
+        "hypothesis": "沙盘中出现兵器、军事、争夺或高对抗意象，可能表达攻击性张力、边界维护，也可能反映对冲突升级的担忧。",
+        "alternative": "另一种可能是，这些意象在具体位置与组合中承载的是保护、规则感或对力量的自保需要，而非攻击意图。",
+        "question": "这些对抗性沙具更像是在表达愤怒与冲突，还是在表达保护边界、争取空间或对威胁的警觉？",
+    },
+    "pressure": {
+        "name": "限制与压力",
+        "hypothesis": "封闭、束缚、监控、学业堆积等意象集中出现，可能反映被规则、期待或评价压住的体验。",
+        "alternative": "另一种可能是，这些结构在作品里提供秩序、边界和可预期的安全感，需结合朝向与是否可进入判断。",
+        "question": "这些限制性意象更像是让人窒息的压力，还是提供秩序与边界的保护结构？",
+    },
+    "crisis": {
+        "name": "崩解与丧失",
+        "hypothesis": "灾害、破损、死亡、枯竭等意象出现，可能提示失控、丧失或支撑系统松动的体验。",
+        "alternative": "另一种可能是，它们作为旧阶段的结束标记，正在为重建与转化腾出空间。",
+        "question": "这些崩解意象更像是在表达仍在发生的丧失，还是在表达旧阶段结束后的重建起点？",
+    },
+    "shadow": {
+        "name": "阴影与隐匿",
+        "hypothesis": "面具、影子、躲藏、背对等意象出现，可能承载羞耻、压抑、退缩或不愿被看见的部分。",
+        "alternative": "另一种可能是，它们表达的是隐私边界、独处需要或尚未准备好的自我暴露。",
+        "question": "这些隐匿意象更像是在回避与羞耻，还是在保护尚未准备好公开的私人空间？",
+    },
+    "transformation": {
+        "name": "修复与转化",
+        "hypothesis": "桥梁、钥匙、门、萌发、救援等意象出现，可能提示连接重建、束缚解除或生命力恢复的资源。",
+        "alternative": "另一种可能是，它们表达的是对修复的渴望而非已经完成的转化，仍需访谈确认现实支持。",
+        "question": "这些转化意象更像是已经发生的修复，还是仍在期待中的出路与支持？",
+    },
+}
+
+
 def _grid_label_map(grid: dict[str, Any]) -> dict[str, Any]:
     cells = grid.get("cells") or []
     return {cell.get("key"): cell for cell in cells if isinstance(cell, dict)}
@@ -145,6 +198,8 @@ def build_demo_report(
         rep_name = str(rep_item.get("label") or rep_item.get("name") or "代表沙具")
 
     category_counts = _category_counts(items)
+    subcategory_counts = _subcategory_counts(items)
+    theme_counts = _theme_counts(items)
     categories = [name for name, _ in category_counts.most_common()]
     top_categories = categories[:3] or ["未分类"]
     clusters = _top_clusters(grid)
@@ -185,34 +240,58 @@ def build_demo_report(
         "堆高、挖低与水面区域共同构成空间张力"
     )
 
-    # 第二章：从类别和代表沙具生成探索性假设
-    theme_library = {
-        "人物与角色": ("关系与自我位置", "人物沙具常承载自我、重要他人或关系期待；代表沙具「" + rep_name + "」可作为自我认同的入口。"),
-        "建筑与家园": ("边界与安全感", "建筑、围合与通道常与安全边界、归属和家庭经验相关；需结合沙盘聚集区判断开放或防御程度。"),
-        "自然与植物": ("生命力与情绪调节", "植物、山水等自然意象常表达生命力、成长节律与情绪容纳空间。"),
-        "动物与神兽": ("本能、陪伴与警觉", "动物意象可承载本能冲动、陪伴需要或警觉防御，需结合其位置与朝向理解。"),
-        "交通与器物": ("迁移、目标与行动", "车辆、道路与工具常与行动方向、离开/抵达、资源感和目标推进相关。"),
-        "学习与生活": ("规则、成就与日常自我", "书本、文具、生活物件常连接学业角色、规则适应与日常胜任感。"),
-        "神秘与符号": ("未知、恐惧与精神资源", "神秘符号可表达难以言说的恐惧、直觉或超越性资源，不能单凭符号作诊断。"),
-        "饮食与丰饶": ("滋养、匮乏与满足", "食物与器皿常与滋养、被照顾、匮乏感或丰盛期待相关。"),
-    }
+    # 第二章：优先使用沙具主题标签形成竞争性假设；无标签时回退到器物类别。
     themes = []
-    for category in top_categories:
-        matches = next((v for k, v in theme_library.items() if k in category), None)
-        if matches:
-            theme, hypothesis = matches
-            themes.append({
-                "theme": theme,
-                "symbols": [str(x.get("label") or x.get("name")) for x in items if str(x.get("category") or "") == category][:5] or [category],
-                "hypothesis": hypothesis + f" 代表沙具「{rep_name}」位于{rep_item.get('grid_key') or '沙盘中'}，可进一步访谈其选择理由。",
-                "theory_basis": "张日昇《箱庭疗法》强调从作品整体、区域关系与象征物理解表达；申荷永《心理分析：理解与体验》强调象征与体验性理解，避免单一对应。",
-                "confidence": "中" if len(items) >= 5 else "低",
-            })
+    for code, count in theme_counts.most_common(3):
+        definition = THEME_LIBRARY.get(code)
+        if not definition:
+            continue
+        symbols = [
+            str(x.get("label") or x.get("name") or "未命名沙具")
+            for x in items
+            if code in (x.get("themes") or [])
+        ][:6]
+        themes.append({
+            "theme": definition["name"],
+            "symbols": symbols or [rep_name],
+            "hypothesis": definition["hypothesis"] + f" 本次共有 {count} 件沙具带此主题标签；代表沙具「{rep_name}」位于{rep_item.get('grid_key') or '沙盘中'}，需访谈其选择理由。",
+            "alternative_hypothesis": definition["alternative"],
+            "verification_question": definition["question"],
+            "theory_basis": "张日昇《箱庭疗法》强调从作品整体、区域关系与象征物理解表达；申荷永《心理分析：理解与体验》强调象征与体验性理解，避免单一对应。",
+            "confidence": "中" if len(items) >= 5 else "低",
+        })
+
+    if not themes:
+        category_library = {
+            "人物与角色": ("关系与自我位置", "人物沙具常承载自我、重要他人或关系期待；代表沙具「" + rep_name + "」可作为自我认同的入口。"),
+            "建筑与家园": ("边界与安全感", "建筑、围合与通道常与安全边界、归属和家庭经验相关；需结合沙盘聚集区判断开放或防御程度。"),
+            "自然与植物": ("生命力与情绪调节", "植物、山水等自然意象常表达生命力、成长节律与情绪容纳空间。"),
+            "动物与神兽": ("本能、陪伴与警觉", "动物意象可承载本能冲动、陪伴需要或警觉防御，需结合其位置与朝向理解。"),
+            "交通与器物": ("迁移、目标与行动", "车辆、道路与工具常与行动方向、离开/抵达、资源感和目标推进相关。"),
+            "学习与生活": ("规则、成就与日常自我", "书本、文具、生活物件常连接学业角色、规则适应与日常胜任感。"),
+            "神秘与符号": ("未知、恐惧与精神资源", "神秘符号可表达难以言说的恐惧、直觉或超越性资源，不能单凭符号作诊断。"),
+            "饮食与丰饶": ("滋养、匮乏与满足", "食物与器皿常与滋养、被照顾、匮乏感或丰盛期待相关。"),
+        }
+        for category in top_categories:
+            matches = next((v for k, v in category_library.items() if k in category), None)
+            if matches:
+                theme, hypothesis = matches
+                themes.append({
+                    "theme": theme,
+                    "symbols": [str(x.get("label") or x.get("name")) for x in items if str(x.get("category") or "") == category][:5] or [category],
+                    "hypothesis": hypothesis + f" 代表沙具「{rep_name}」位于{rep_item.get('grid_key') or '沙盘中'}，可进一步访谈其选择理由。",
+                    "alternative_hypothesis": "另一种可能是，这些器物主要提供秩序、资源或安全感，不能仅凭类别推断心理困扰。",
+                    "verification_question": "这些同类沙具更像是在表达困扰，还是在表达资源、秩序与安全感？",
+                    "theory_basis": "张日昇《箱庭疗法》强调从作品整体、区域关系与象征物理解表达；申荷永《心理分析：理解与体验》强调象征与体验性理解，避免单一对应。",
+                    "confidence": "中" if len(items) >= 5 else "低",
+                })
     if not themes:
         themes.append({
             "theme": "自我表达的起点",
             "symbols": [rep_name],
             "hypothesis": f"当前沙盘以「{rep_name}」为核心意象，作品尚在形成中，需通过访谈了解其选择与摆放意图。",
+            "alternative_hypothesis": "另一种可能是，代表沙具主要承担稳定、陪伴或资源功能，不能仅凭单件沙具推断困扰。",
+            "verification_question": "这件代表沙具更像是在表达需要被看见的困扰，还是在表达可用的支持与资源？",
             "theory_basis": "申荷永《荣格与分析心理学》重视象征与个体化过程；单一意象不直接等同于结论。",
             "confidence": "低",
         })
@@ -437,6 +516,15 @@ def build_demo_report(
             "clusters": cluster_text,
             "blank_areas": blank_text,
             "item_category_stats": [{"category": k, "count": v} for k, v in category_counts.most_common()],
+            "item_subcategory_stats": [{"subcategory": k, "count": v} for k, v in subcategory_counts.most_common()],
+            "item_theme_stats": [
+                {
+                    "theme": code,
+                    "name": (THEME_LIBRARY.get(code) or {}).get("name", code),
+                    "count": count,
+                }
+                for code, count in theme_counts.most_common()
+            ],
             "nine_grid_distribution": grid,
             "terrain_observation": terrain_text,
             "scene_imagery": [

@@ -1297,6 +1297,14 @@
         id: uid("item"), icon, label, image: image || null,
         source_id: (asset && asset.id) || null,
         category: (asset && asset.category) || "未分类",
+        subcategory: (asset && asset.subcategory) || "",
+        themes: (asset && Array.isArray(asset.themes)) ? asset.themes.slice() : [],
+        risk_tier: (asset && asset.risk_tier) || "none",
+        spatial_role: (asset && asset.spatial_role) || "",
+        psychology_meaning: (asset && asset.psychology_meaning) || "",
+        supportive_hypothesis: (asset && asset.supportive_hypothesis) || "",
+        alternative_hypothesis: (asset && asset.alternative_hypothesis) || "",
+        verification_question: (asset && asset.verification_question) || "",
         x: clamp(x, -WORLD.width / 2 + 30, WORLD.width / 2 - 30),
         z: clamp(z, -WORLD.depth / 2 + 30, WORLD.depth / 2 - 30),
         scale: 1, rotation: 0
@@ -1831,7 +1839,9 @@
     function IconCard({ data, index, onAdd }) {
       return h("div", {
         draggable: true,
-        title: `拖入 3D 沙盘或点击放置：${data.label}`,
+        title: data.subcategory
+          ? `${data.label} · ${data.subcategory}｜拖入 3D 沙盘或点击放置`
+          : `拖入 3D 沙盘或点击放置：${data.label}`,
         onClick: () => onAdd && onAdd(data),
         onDragStart: (event) => {
           event.dataTransfer.setData("application/x-sandplay-icon", JSON.stringify(data));

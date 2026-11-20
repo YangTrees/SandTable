@@ -26,9 +26,26 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
     student = payload.get("student") or {}
 
     category_counts: dict[str, int] = {}
+    subcategory_counts: dict[str, int] = {}
+    theme_counts: dict[str, int] = {}
     for item in items:
         category = str(item.get("category") or item.get("category_name") or "未分类")
         category_counts[category] = category_counts.get(category, 0) + 1
+        subcategory = str(item.get("subcategory") or "").strip()
+        if subcategory:
+            subcategory_counts[subcategory] = subcategory_counts.get(subcategory, 0) + 1
+        for theme in item.get("themes") or []:
+            code = str(theme).strip()
+            if code:
+                theme_counts[code] = theme_counts.get(code, 0) + 1
+
+    theme_defs = {
+        "conflict": "冲突与对抗：攻击、防御、争夺、战争与攻击性张力",
+        "pressure": "限制与压力：封闭、束缚、监控、学业负担与难以呼吸的处境",
+        "crisis": "崩解与丧失：灾害、破损、死亡、枯竭、失控与不可逆的丧失感",
+        "shadow": "阴影与隐匿：被压抑、羞耻、退缩、隐藏及人格面具背后的部分",
+        "transformation": "修复与转化：破裂后的修复、束缚解除、生命萌发、连接与方向重建",
+    }
 
     schema = {
         "schema_version": "1.0",
@@ -49,6 +66,8 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
             "clusters": "string：沙具聚集区与布局特征",
             "blank_areas": "string：留白区域及其心理含义假设",
             "item_category_stats": [{"category": "string", "count": 0}],
+            "item_subcategory_stats": [{"subcategory": "string", "count": 0}],
+            "item_theme_stats": [{"theme": "string", "name": "string", "count": 0}],
             "nine_grid_distribution": grid,
             "scene_imagery": ["string"],
         },
@@ -154,11 +173,43 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         },
     }
 
+    rep_id = str(payload.get("representative_item_id") or "")
+    rep_item = next((x for x in items if str(x.get("id")) == rep_id), {})
+    notable = []
+    for x in items:
+        if len(notable) >= 60:
+            break
+        if (
+            str(x.get("id")) == rep_id
+            or x.get("themes")
+            or str(x.get("risk_tier") or "none") in {"watch", "high_risk"}
+        ):
+            notable.append({
+                "id": x.get("id"),
+                "label": x.get("label") or x.get("name"),
+                "subcategory": x.get("subcategory"),
+                "themes": x.get("themes") or [],
+                "risk_tier": x.get("risk_tier"),
+                "spatial_role": x.get("spatial_role"),
+                "psychology_meaning": x.get("psychology_meaning"),
+                "alternative_hypothesis": x.get("alternative_hypothesis"),
+                "verification_question": x.get("verification_question"),
+            })
+
     ctx = {
         "student": student,
         "representative_item": {
             "id": payload.get("representative_item_id"),
-            "name": payload.get("representative_item_name"),
+            "name": payload.get("representative_item_name") or rep_item.get("label") or rep_item.get("name"),
+            "category": rep_item.get("category"),
+            "subcategory": rep_item.get("subcategory"),
+            "themes": rep_item.get("themes") or [],
+            "risk_tier": rep_item.get("risk_tier"),
+            "spatial_role": rep_item.get("spatial_role"),
+            "psychology_meaning": rep_item.get("psychology_meaning"),
+            "supportive_hypothesis": rep_item.get("supportive_hypothesis"),
+            "alternative_hypothesis": rep_item.get("alternative_hypothesis"),
+            "verification_question": rep_item.get("verification_question"),
         },
         "sandplay_description": payload.get("sandplay_description"),
         "self_narrative": payload.get("self_narrative"),
@@ -171,14 +222,22 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         ),
         "item_count": len(items),
         "category_counts": category_counts,
+        "subcategory_counts": subcategory_counts,
+        "theme_counts": theme_counts,
+        "theme_definitions": theme_defs,
         "items": [
             {
                 "id": x.get("id"), "label": x.get("label") or x.get("name"),
-                "category": x.get("category"), "x": x.get("x"), "z": x.get("z"),
+                "category": x.get("category"), "subcategory": x.get("subcategory"),
+                "themes": x.get("themes") or [],
+                "risk_tier": x.get("risk_tier"),
+                "spatial_role": x.get("spatial_role"),
+                "x": x.get("x"), "z": x.get("z"),
                 "scale": x.get("scale"), "rotation": x.get("rotation"), "grid_key": x.get("grid_key"),
             }
             for x in items[:400]
         ],
+        "notable_items": notable,
         "grid_summary": grid.get("summary", {}),
         "grid_cells": grid.get("cells", []),
         "heightmap_stats": heightmap.get("stats", {}),
@@ -207,7 +266,8 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
 - chapter_8_training_modules.modules 必须恰好 6 项，名称固定：{module_names}
 - chapter_8 的 6 个模块中，只能有 1-2 个 active=true；其余 active=false，status 写“暂不启动，待信息补充”。低置信度维度不得生成训练细节。
 - chapter_5 只能出现在 chapter_5_risk，不得把风险分级复制到其他章节。
-- 每个沙盘结论必须至少有一条来自沙盘描述、代表沙具、九宫格、地形高度或成绩单的佐证；没有对应输入时不得写“有该数据”。
+- 主题标签是检索与形成假设的轴，不是诊断：先看 `theme_counts` 与 `subcategory_counts`，再结合具体位置、组合、朝向和访谈；不得把单个主题标签直接写成结论。
+- 每个沙具结论必须至少有一条来自沙盘描述、代表沙具、九宫格、地形高度或成绩单的佐证；没有对应输入时不得写“有该数据”。
 - 成绩单：如果提供了图片，先逐科读取满分、得分、得分率和等级；只读清晰可辨的数字。没有把握的科目 score/rate 填 null，grade 填“待核对”。
 - chapter_2 每个主题必须给出两个竞争性假设：hypothesis 写支持性/资源性解释，alternative_hypothesis 写防御、阻抗或发展滞后解释，verification_question 写一句能区分两者的访谈提问。不得只做单向积极美化。
 - chapter_7 不得仅凭一件沙具推断稳定人格特质或能力水平；每条优势必须能回到沙盘或自述中的具体行为线索，并写明证据边界。
