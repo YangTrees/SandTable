@@ -5,6 +5,7 @@ from collections import Counter
 from datetime import datetime, timezone
 from typing import Any
 
+from .quality import build_assessment_basis, build_sample_quality, terrain_observation
 from .theory import CHAPTER_TITLES, RISK_DIMENSIONS, SIX_DIMENSIONS, THEORY_EVIDENCE, TRAINING_MODULES
 
 
@@ -187,7 +188,6 @@ def build_demo_report(
     items = payload.get("items") or []
     student = payload.get("student") or {}
     grid = payload.get("grid_distribution") or {}
-    heightmap = payload.get("heightmap") or {}
     description = str(payload.get("sandplay_description") or "")
     narrative = str(payload.get("self_narrative") or "")
     teacher_observation = str(payload.get("teacher_observation") or "")
@@ -202,10 +202,10 @@ def build_demo_report(
     theme_counts = _theme_counts(items)
     categories = [name for name, _ in category_counts.most_common()]
     top_categories = categories[:3] or ["未分类"]
-    clusters = _top_clusters(grid)
-    occupied = int((grid.get("summary") or {}).get("occupied_cells") or 0)
-    center_count = int((grid.get("summary") or {}).get("center_count") or 0)
-    height_stats = _height_stats(heightmap)
+    quality = build_sample_quality(payload, transcript_image_url)
+    clusters = [cell for cell in quality["cell_counts"] if str(cell.get("key") or "") != "unknown"]
+    occupied = int(quality["occupied_cells"] or 0)
+    center_count = int(quality["center_count"] or 0)
     scores = _parse_transcript_text(str(payload.get("transcript_text") or "")) if payload.get("transcript_text") else []
     if not scores and isinstance(payload.get("transcript"), dict):
         raw_subjects = payload["transcript"].get("subjects") or []
@@ -227,23 +227,56 @@ def build_demo_report(
 
     text_all = f"{description}\n{narrative}\n{teacher_observation}"
     strongest_cluster = clusters[0] if clusters and int(clusters[0].get("count") or 0) > 0 else None
-    cluster_text = (
-        f"沙具主要聚集于{strongest_cluster.get('label')}区域（{strongest_cluster.get('count')} 件），"
-        f"中心区共 {center_count} 件" if strongest_cluster else "当前沙盘尚未形成明显的沙具聚集区"
-    )
+    if strongest_cluster and occupied > 1 and int(strongest_cluster.get("count") or 0) <= 1:
+        cluster_text = f"沙具分散于 {occupied} 个区域，中心区共 {center_count} 件"
+    elif strongest_cluster:
+        cluster_text = (
+            f"沙具主要聚集于{strongest_cluster.get('label')}区域（{strongest_cluster.get('count')} 件），"
+            f"中心区共 {center_count} 件"
+        )
+    else:
+        cluster_text = "当前沙盘尚未形成明显的沙具聚集区"
     blank_text = (
-        f"九宫格中有 {9 - occupied} 个区域未被占用，留白率约 {round((9 - occupied) / 9, 1):.0%}；"
+        f"画面分区中有 {9 - occupied} 个区域未被占用，留白率约 {round((9 - occupied) / 9, 1):.0%}；"
         "留白可作为距离感、回避或尚未表达之内容的探索线索"
     )
-    terrain_text = (
-        f"沙面高度范围为 {height_stats['min']}～{height_stats['max']}，起伏幅度 {height_stats['relief']}；"
-        "堆高、挖低与水面区域共同构成空间张力"
-    )
-    terrain_metrics = payload.get("terrain_metrics") if isinstance(payload.get("terrain_metrics"), dict) else {}
-    if str(terrain_metrics.get("terrain_summary") or "").strip():
-        terrain_text = str(terrain_metrics["terrain_summary"]).strip()
-    elif terrain_metrics.get("terrain_edited") is False:
-        terrain_text = "沙面基本平整，未进行明显地形塑形。"
+    terrain_text = quality["terrain_summary"]
+    cluster_by_key = {
+        str(cell.get("key") or ""): cell
+        for cell in (quality.get("cell_counts") or [])
+        if isinstance(cell, dict)
+    }
+    grid_cells: list[dict[str, Any]] = []
+    seen_keys: set[str] = set()
+    for raw_cell in (grid.get("cells") or []):
+        if not isinstance(raw_cell, dict):
+            continue
+        key = str(raw_cell.get("key") or "").strip()
+        if not key:
+            continue
+        seen_keys.add(key)
+        cluster = cluster_by_key.get(key) or {}
+        grid_cells.append({
+            "key": key,
+            "label": str(raw_cell.get("label") or cluster.get("label") or key),
+            "count": int(cluster.get("count") or 0),
+        })
+    for key, cluster in cluster_by_key.items():
+        if key in seen_keys:
+            continue
+        grid_cells.append({
+            "key": key,
+            "label": str(cluster.get("label") or key),
+            "count": int(cluster.get("count") or 0),
+        })
+    grid_display = {
+        "summary": {
+            "occupied_cells": occupied,
+            "center_count": center_count,
+            "blank_cells": int(quality.get("blank_cells") or 0),
+        },
+        "cells": grid_cells,
+    }
 
     # 第二章：优先使用沙具主题标签形成竞争性假设；无标签时回退到器物类别。
     themes = []
@@ -412,17 +445,25 @@ def build_demo_report(
     ]
 
     # 第七章
+    has_scores = bool(scores)
     career = {
         "stage": "生涯探索",
-        "summary": f"以「{rep_name}」和{top_categories[0]}类意象为兴趣入口，结合可读成绩探索优势方向；当前目标是建立学习与未来的连接感。",
+        "summary": (
+            f"以「{rep_name}」和{top_categories[0]}类意象为兴趣入口，结合可读成绩探索优势方向；"
+            "当前目标是建立学习与未来的连接感。"
+            if has_scores
+            else f"以「{rep_name}」和{top_categories[0]}类意象为兴趣入口，暂不结合成绩排序；"
+                 "先探索兴趣与任务投入，待补充成绩后再评估优势方向。"
+        ),
         "strengths": [
-            f"{top_categories[0]}类意象投入明显，具备从兴趣进入任务的潜力",
-            "沙盘布局具备一定的空间组织感，可迁移到计划与分类",
-            "在可读成绩中显示出相对稳定的记忆/理解类学习基础" if subjects else "愿意通过沙盘表达，具备自我观察的起点",
+            f"代表沙具「{rep_name}」属于{top_categories[0]}类，可作为观察兴趣与任务投入的入口",
+            f"沙盘布局中{cluster_text}，可作为观察任务组织与空间安排的线索",
+            "在可读成绩中显示出相对稳定的记忆/理解类学习基础" if has_scores else "愿意通过沙盘表达，具备自我观察的起点",
         ],
         "teacher_actions": ["每两周用 10 分钟做一次兴趣—学科连接访谈", "把一个长期任务拆成 2-3 个可见小目标"],
         "parent_actions": ["每月安排一次低评价的职业/社会场景体验", "把“考多少分”改为“今天完成了哪一步”"],
         "student_actions": ["每周记录一个感兴趣的职业及其能力要求", "每周完成一次小目标复盘：做到/卡住/下一步"],
+        "career_postponed": False,
     }
 
     # 第八章
@@ -507,13 +548,7 @@ def build_demo_report(
             "gender": student.get("gender") or "未填写",
             "student_name": student.get("name") or "匿名受测者",
             "student_no": student.get("student_no") or "",
-            "assessment_basis": [
-                "沙盘作品照片1张", "九宫格空间分布", "沙具使用数据",
-            ] + ([
-                "沙盘地形高度图"
-            ] if terrain_metrics.get("terrain_edited") is True or payload.get("terrain_image_url") else []) + [
-                "代表沙具1件", "受测者沙盘描述1段",
-            ] + (["受测者自述文本"] if narrative else []) + (["教师观察记录"] if teacher_observation else []) + (["学习成绩单1张"] if transcript_image_url else []),
+            "assessment_basis": build_assessment_basis(payload, transcript_image_url),
             "disclaimer": "发展性心理评估参考·非临床诊断",
             "theory_sources": [x["source"] for x in THEORY_EVIDENCE],
             "engine_note": engine_note,
@@ -533,7 +568,7 @@ def build_demo_report(
                 }
                 for code, count in theme_counts.most_common()
             ],
-            "nine_grid_distribution": grid,
+            "nine_grid_distribution": grid_display,
             "terrain_observation": terrain_text,
             "representative_item_name": rep_name,
             "scene_imagery": [

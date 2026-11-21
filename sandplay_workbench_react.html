@@ -1151,6 +1151,10 @@
     .report-card-head strong { font-size: 11.5px; color: #111; }
     .report-card-head span { font-family: var(--mono); font-size: 8px; color: var(--ink-soft); padding: 2px 7px; border: 1px solid rgba(255,255,255,.6); border-radius: 999px; background: rgba(255,255,255,.3); }
     .report-card p { margin: 0; font-size: 9.5px; line-height: 1.55; color: var(--ink-soft); }
+    .report-quality { padding: 7px 9px; border: 1px solid rgba(160,120,76,.28); border-left: 2px solid rgba(160,120,76,.55); border-radius: 8px; background: rgba(255,250,240,.55); display: grid; gap: 3px; }
+    .report-quality strong { font-size: 9px; color: #6f4f2f; }
+    .report-quality div { font-size: 8.5px; line-height: 1.45; color: #62513f; }
+    .report-quality code { margin-right: 5px; padding: 1px 4px; border-radius: 4px; background: rgba(160,120,76,.12); font-family: var(--mono); font-size: 7.5px; }
     .report-card .report-actions { display: flex; gap: 7px; flex-wrap: wrap; }
     .mini-btn { border: 1px solid rgba(255,255,255,.62); border-radius: 999px; background: rgba(255,255,255,.36); padding: 6px 10px; font-size: 9.5px; color: #111; cursor: pointer; }
     .mini-btn:hover { background: rgba(255,255,255,.65); }
@@ -2123,8 +2127,15 @@
       const adviceItems = Array.isArray(advice.growth_mindset) ? advice.growth_mindset : [];
       const total = academic.total || {};
       const summary = payload.grid_distribution && payload.grid_distribution.summary ? payload.grid_distribution.summary : {};
+      const sample = meta.sample_quality && typeof meta.sample_quality === "object" ? meta.sample_quality : {};
+      const sampleCount = sample.item_count != null ? sample.item_count : (summary.total_items || 0);
+      const sampleOccupied = sample.occupied_cells != null ? sample.occupied_cells : (summary.occupied_cells || 0);
+      const sampleCenter = sample.center_count != null ? sample.center_count : (summary.center_count || 0);
+      const qualityWarnings = Array.isArray(meta.quality_warnings)
+        ? meta.quality_warnings.filter((item) => item && (item.message || item.code) && String(item.code || "") !== "DEMO_ENGINE")
+        : [];
       const reportNo = meta.report_no || "—";
-      const isDemo = payload.report_engine === "demo";
+      const isDemo = payload.report_engine === "demo" || String(meta.engine || "").toLowerCase() === "demo";
       const generatedAt = (() => {
         if (!meta.generated_at) return "";
         const date = new Date(meta.generated_at);
@@ -2196,9 +2207,9 @@
               payload.server_error ? h("div", { className: "finish-error" }, "报告暂时没有生成，作品图已保留。请稍后重试。") : null,
               h("img", { src: payload.canvas_image_base64, alt: "沙盘作品高清图", className: "export-image" }),
               h("div", { className: "stat-grid" },
-                h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, summary.total_items || 0), h("div", { className: "stat-label" }, "沙具数")),
-                h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, summary.occupied_cells || 0), h("div", { className: "stat-label" }, "占用区域")),
-                h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, summary.center_count || 0), h("div", { className: "stat-label" }, "中心区域沙具"))
+                h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleCount), h("div", { className: "stat-label" }, "沙具数")),
+                h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleOccupied), h("div", { className: "stat-label" }, "占用区域")),
+                h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleCenter), h("div", { className: "stat-label" }, "中心区域沙具"))
               ),
               report ? h("div", { className: "report-card" },
                 h("div", { className: "report-card-head" },
@@ -2206,6 +2217,13 @@
                   h("span", null, isDemo ? "示例报告" : "报告已生成")
                 ),
                 h("p", null, `报告编号 ${reportNo}。完整报告包含整体解读、六维分析、学业建议与训练方向；家长 / 学生版会自动隐藏咨询师内部内容。`),
+                qualityWarnings.length ? h("div", { className: "report-quality" },
+                  h("strong", null, "报告质量提示"),
+                  qualityWarnings.map((item, index) => h("div", { key: `${item.code || "notice"}-${index}` },
+                    h("code", null, item.code || "NOTICE"),
+                    item.message || ""
+                  ))
+                ) : null,
                 h("div", { className: "report-actions" },
                   h("button", { type: "button", className: "mini-btn dark", onClick: () => openReport("counselor") }, "查看完整报告"),
                   h("button", { type: "button", className: "mini-btn", onClick: () => openReport("public") }, "家长 / 学生版"),

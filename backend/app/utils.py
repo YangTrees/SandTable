@@ -83,13 +83,13 @@ def public_copy(report: dict[str, Any]) -> dict[str, Any]:
     data = _public_scrub(data)
     if l4_guard:
         data["share_guard"] = {
-            "blocked": True,
-            "title": "由心理老师优先一对一沟通",
+            "blocked": False,
+            "title": "建议家长先与心理老师沟通",
             "message": (
-                "这份沙盘作品需要心理老师先与家长和孩子进行一对一沟通。"
-                "沟通完成后，老师会根据家庭与孩子的实际需要，提供更合适的支持建议。"
+                "本报告为发展性评估参考。建议家长先联系学校心理老师沟通后再解读；"
+                "如报告涉及需要优先关注的线索，心理老师会按学校流程单独与家长沟通。"
             ),
-            "note": "报告内容暂不在本页展示。",
+            "note": "家长版已隐藏咨询师内部研判与风险分级，仅保留发展性建议。",
         }
     data["share_visibility"] = "student_guardian"
     data["redacted_chapters"] = ["chapter_5_risk", "priority_banner"]

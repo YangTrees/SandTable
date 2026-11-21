@@ -19,7 +19,14 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from .admin_api import ensure_admin_seed, router as admin_router
-from .config import COUNSELOR_TOKEN, CORS_ORIGINS, PUBLIC_BASE_URL, UPLOAD_DIR
+from .config import (
+    COUNSELOR_TOKEN,
+    CORS_ORIGINS,
+    MULTIMODAL_API_KEY,
+    MULTIMODAL_MODEL,
+    PUBLIC_BASE_URL,
+    UPLOAD_DIR,
+)
 from .db import SessionLocal, get_db, init_db
 from .models import Assessment, ShareLink
 from .report_engine import generate_report
@@ -256,6 +263,81 @@ async def get_assessment(
         return fail(request, "NOT_FOUND", "评估记录不存在", 404)
     report = json.loads(row.report_json) if row.report_json else None
     return ok(request, {**_assessment_summary(row), "report": report})
+
+
+@app.post("/api/v1/reports/{assessment_id}/reanalyze")
+async def reanalyze_report(
+    request: Request,
+    assessment_id: str,
+    db: Session = Depends(get_db),
+    _: None = Depends(require_counselor),
+):
+    """用已配置的多模态模型重新分析既有记录，不允许静默退回模板报告。"""
+    row = db.get(Assessment, assessment_id)
+    if not row or not row.report_json:
+        return fail(request, "NOT_FOUND", "报告不存在或尚未生成", 404)
+    if not MULTIMODAL_API_KEY:
+        return fail(
+            request,
+            "MODEL_NOT_CONFIGURED",
+            "尚未配置多模态模型。请在 backend/.env 设置 MULTIMODAL_API_KEY、MULTIMODAL_BASE_URL、MULTIMODAL_MODEL 后重启后端。",
+            409,
+        )
+
+    sandplay_path = Path(row.sandplay_image_path or "")
+    if not sandplay_path.is_file():
+        return fail(request, "IMAGE_NOT_FOUND", "原始沙盘图片已丢失，无法重新分析", 409)
+    sandplay_bytes = sandplay_path.read_bytes()
+    transcript_bytes = None
+    transcript_url = None
+    if row.transcript_image_path and Path(row.transcript_image_path).is_file():
+        transcript_bytes = Path(row.transcript_image_path).read_bytes()
+        transcript_url = f"{PUBLIC_BASE_URL}/media/{row.id}/transcript.png"
+
+    try:
+        payload = json.loads(row.input_payload or "{}")
+    except json.JSONDecodeError:
+        return fail(request, "PAYLOAD_INVALID", "原始测评数据损坏，无法重新分析", 422)
+
+    try:
+        report, engine = await generate_report(
+            payload,
+            sandplay_image=sandplay_bytes,
+            transcript_image=transcript_bytes,
+            image_url=f"{PUBLIC_BASE_URL}/media/{row.id}/sandplay.png",
+            transcript_url=transcript_url,
+            allow_demo_fallback=False,
+        )
+    except Exception as exc:
+        return fail(request, "MODEL_CALL_FAILED", f"多模态模型调用失败：{type(exc).__name__}: {exc}", 502)
+
+    if engine != "multimodal":
+        return fail(request, "MODEL_CALL_FAILED", "模型未返回有效报告，已保留原报告未覆盖", 502)
+
+    old_report = json.loads(row.report_json)
+    old_meta = old_report.get("meta") or {}
+    meta = report.setdefault("meta", {})
+    if old_meta.get("report_no"):
+        meta["report_no"] = old_meta["report_no"]
+    meta["reanalyzed_at"] = iso_utc(datetime.utcnow())
+    meta["reanalyze_source"] = "counselor"
+    meta["engine"] = "multimodal"
+    meta["engine_note"] = f"多模态模型生成（{MULTIMODAL_MODEL}），固定算法负责风险分级与质量门控"
+
+    row.report_json = json.dumps(report, ensure_ascii=False)
+    row.report_engine = engine
+    row.status = "completed"
+    db.commit()
+    db.refresh(row)
+
+    return ok(request, {
+        "assessment_id": row.id,
+        "report_no": meta.get("report_no"),
+        "engine": engine,
+        "model": MULTIMODAL_MODEL,
+        "generation_usage": meta.get("generation_usage"),
+        "report": report,
+    }, message="report reanalyzed by multimodal model")
 
 
 @app.get("/api/v1/reports/{assessment_id}")

@@ -18,6 +18,12 @@ from .config import (
 )
 from .demo_report import build_demo_report
 from .prompt import SYSTEM_PROMPT, build_user_prompt
+from .quality import (
+    QUALITY_FLAG_META,
+    build_assessment_basis,
+    build_sample_quality,
+    terrain_observation,
+)
 from .process_metrics import (
     build_process_analysis,
     build_process_metrics,
@@ -284,66 +290,6 @@ def validate_report(report: dict[str, Any]) -> dict[str, Any]:
     return report
 
 
-def _heightmap_max_abs(payload: dict[str, Any]) -> float:
-    heightmap = payload.get("heightmap") or {}
-    values = heightmap.get("values") or []
-    if not isinstance(values, list):
-        return 0.0
-    max_abs = 0.0
-    for value in values:
-        try:
-            max_abs = max(max_abs, abs(float(value)))
-        except (TypeError, ValueError):
-            continue
-    return max_abs
-
-
-def _has_terrain_image(payload: dict[str, Any]) -> bool:
-    return any(
-        bool(payload.get(key))
-        for key in ("terrain_image_url", "terrain_image_path", "terrain_heightmap_url", "terrain_map_url")
-    )
-
-
-def _terrain_metric_bool(payload: dict[str, Any], key: str) -> bool | None:
-    metrics = payload.get("terrain_metrics")
-    if not isinstance(metrics, dict) or key not in metrics:
-        return None
-    value = metrics.get(key)
-    if isinstance(value, bool):
-        return value
-    return str(value).strip().lower() in {"1", "true", "yes", "y", "是", "已编辑"}
-
-
-def _has_terrain(payload: dict[str, Any]) -> bool:
-    edited = _terrain_metric_bool(payload, "terrain_edited")
-    if edited is not None:
-        return edited or _has_terrain_image(payload)
-    if _has_terrain_image(payload):
-        return True
-    return _heightmap_max_abs(payload) > 0.5
-
-
-def _terrain_observation(payload: dict[str, Any]) -> str:
-    metrics = payload.get("terrain_metrics") if isinstance(payload.get("terrain_metrics"), dict) else {}
-    summary = str(metrics.get("terrain_summary") or "").strip()
-    if summary:
-        return summary
-    if _has_terrain(payload):
-        water = metrics.get("water_area_pct")
-        mound = metrics.get("mound_area_pct")
-        relief = metrics.get("elevation_range")
-        parts = []
-        if isinstance(water, (int, float)) and water > 0:
-            parts.append(f"挖出水域约占 {round(float(water), 1)}%")
-        if isinstance(mound, (int, float)) and mound > 0:
-            parts.append(f"隆起沙丘/沙岛约占 {round(float(mound), 1)}%")
-        if isinstance(relief, (int, float)) and relief > 0:
-            parts.append(f"高程差约 {round(float(relief), 1)}")
-        return "已进行明显地形塑形：" + "，".join(parts) + "。" if parts else "已进行地形塑形。"
-    return "沙面基本平整，未进行明显地形塑形。"
-
-
 def _process_telemetry(payload: dict[str, Any]) -> dict[str, Any]:
     return process_telemetry(payload)
 
@@ -365,48 +311,7 @@ def _raw_record_echo(payload: dict[str, Any]) -> dict[str, str]:
 
 
 def _report_basis(payload: dict[str, Any], transcript_url: str | None) -> list[str]:
-    items = payload.get("items") or []
-    grid = payload.get("grid_distribution") or {}
-    basis = ["沙盘作品照片1张"]
-    if grid.get("cells"):
-        basis.append("九宫格空间分布")
-    if items:
-        basis.append("沙具使用数据")
-    if _terrain_metric_bool(payload, "terrain_edited") is True or _has_terrain_image(payload):
-        basis.append("沙盘地形高度图")
-    if payload.get("representative_item_id") or payload.get("representative_item_name"):
-        basis.append("代表沙具1件")
-    if str(payload.get("sandplay_description") or "").strip():
-        basis.append("受测者沙盘描述1段")
-    if str(payload.get("self_narrative") or "").strip():
-        basis.append("受测者自述文本")
-    if str(payload.get("teacher_observation") or "").strip():
-        basis.append("教师观察记录")
-    if _has_process_data(payload):
-        basis.append("制作过程操作数据")
-    if transcript_url:
-        basis.append("学习成绩单1张")
-    return basis
-
-
-def _sample_quality(payload: dict[str, Any]) -> dict[str, Any]:
-    items = payload.get("items") or []
-    grid = payload.get("grid_distribution") or {}
-    summary = grid.get("summary") or {}
-    item_count = len(items)
-    has_terrain = _has_terrain(payload)
-    low_projection = item_count < 3 and not has_terrain
-    return {
-        "item_count": item_count,
-        "occupied_cells": summary.get("occupied_cells", 0),
-        "has_terrain": has_terrain,
-        "terrain_edited": _terrain_metric_bool(payload, "terrain_edited"),
-        "terrain_summary": _terrain_observation(payload),
-        "heightmap_max_abs": round(_heightmap_max_abs(payload), 4),
-        "process_data_available": _has_process_data(payload),
-        "low_projection": low_projection,
-        "label": "低投射量样本" if low_projection else "常规样本",
-    }
+    return build_assessment_basis(payload, transcript_url)
 
 
 def _canonical_dimension_name(value: Any, expected_names: list[str]) -> str:
@@ -448,7 +353,12 @@ def _risk_dimension_levels(report: dict[str, Any]) -> dict[str, str]:
     return levels
 
 
-def _apply_training_gates(report: dict[str, Any], sample_quality: dict[str, Any]) -> None:
+def _apply_training_gates(
+    report: dict[str, Any],
+    sample_quality: dict[str, Any],
+    *,
+    max_active: int = 2,
+) -> None:
     """先决算 Top 1-2 模块，再由 _backfill_dimension_training 回填第三章。"""
     chapter = report.get("chapter_8_training_modules")
     if not isinstance(chapter, dict):
@@ -501,7 +411,7 @@ def _apply_training_gates(report: dict[str, Any], sample_quality: dict[str, Any]
 
     ranked = sorted(candidates, key=lambda item: (-item[0], item[1]))
     active_indices = {ranked[0][1]}
-    if len(ranked) > 1 and ranked[1][0] >= max(2.0, ranked[0][0] - 0.35):
+    if max_active > 1 and len(ranked) > 1 and ranked[1][0] >= max(2.0, ranked[0][0] - 0.35):
         active_indices.add(ranked[1][1])
 
     for index, module in enumerate(modules):
@@ -519,11 +429,16 @@ def _apply_training_gates(report: dict[str, Any], sample_quality: dict[str, Any]
     chapter["active_modules"] = [str(module.get("name") or "") for module in active_modules]
     chapter["deferred_modules"] = deferred
     chapter["decision_basis"] = "先按六维置信度与九维风险紧迫度决算 Top 1-2 模块，再由第三章统一回填启动状态。"
-    chapter["intro"] = (
-        "当前样本投射信息有限，仅启动最相关的 1-2 个模块；其余模块待访谈、量表或更充分沙盘信息后再评估。"
-        if sample_quality.get("low_projection")
-        else "本次先决算 Top 1-2 个优先模块，其余模块列为次级观察方向，避免同时增加多项训练负担。"
-    )
+    if max_active <= 1:
+        chapter["intensity_note"] = "当前为优先关注/证据有限阶段：暂停高强度训练，本轮仅保留 1 个低强度优先模块。"
+        chapter["intro"] = "当前阶段先保留 1 个低强度、低负担的优先模块；其余模块待访谈、量表或更充分沙盘信息后再评估。"
+    else:
+        chapter["intensity_note"] = ""
+        chapter["intro"] = (
+            "当前样本投射信息有限，仅启动最相关的 1-2 个模块；其余模块待访谈、量表或更充分沙盘信息后再评估。"
+            if sample_quality.get("low_projection")
+            else "本次先决算 Top 1-2 个优先模块，其余模块列为次级观察方向，避免同时增加多项训练负担。"
+        )
 
 
 def _backfill_dimension_training(report: dict[str, Any]) -> None:
@@ -556,14 +471,33 @@ def _backfill_dimension_training(report: dict[str, Any]) -> None:
             dimension["training_plan_status"] = "次级观察"
 
 
-def _cap_low_sample_confidence(report: dict[str, Any]) -> None:
-    """低投射量样本不允许出现“高”置信度，避免用少量沙具做强判断。"""
+def _cap_low_sample_confidence(report: dict[str, Any], sample_quality: dict[str, Any]) -> None:
+    """按样本证据等级限制置信度：低投射量/证据缺失最高为“低”，证据有限最高为“中”。"""
+    if sample_quality.get("low_projection") or sample_quality.get("evidence_level") == "minimal":
+        cap = "低"
+    elif sample_quality.get("evidence_level") == "limited":
+        cap = "中"
+    else:
+        cap = None
+    if not cap:
+        return
+    rank = {"高": 3, "中": 2, "低": 1}
+    cap_rank = rank[cap]
     for dimension in _chapter_list(report, "chapter_3_six_dimensions", "dimensions"):
-        if isinstance(dimension, dict) and str(dimension.get("confidence") or "").strip() == "高":
-            dimension["confidence"] = "中"
+        if not isinstance(dimension, dict):
+            continue
+        current = str(dimension.get("confidence") or "").strip()
+        if rank.get(current, 1) > cap_rank:
+            dimension["confidence"] = cap
     for theme in _chapter_list(report, "chapter_2_imagery", "themes"):
-        if isinstance(theme, dict) and str(theme.get("confidence") or "").strip() == "高":
-            theme["confidence"] = "中"
+        if not isinstance(theme, dict):
+            continue
+        current = str(theme.get("confidence") or "").strip()
+        if rank.get(current, 1) > cap_rank:
+            theme["confidence"] = cap
+    process = report.get("chapter_3_six_dimensions", {}).get("process_integration")
+    if isinstance(process, dict) and process.get("available") is False:
+        process["confidence"] = "低"
 
 
 def _has_interview_material(payload: dict[str, Any], transcript_url: str | None) -> bool:
@@ -603,13 +537,11 @@ def _dimension_has_exploration_blocker(dimension: dict[str, Any]) -> bool:
 
 def _sandplay_clues(payload: dict[str, Any]) -> dict[str, Any]:
     items = [item for item in (payload.get("items") or []) if isinstance(item, dict)]
-    grid = payload.get("grid_distribution") or {}
-    grid_summary = grid.get("summary") or {}
-    occupied = int(grid_summary.get("occupied_cells") or 0)
-    center_count = int(grid_summary.get("center_count") or 0)
-    heightmap = payload.get("heightmap") or {}
-    values = [float(v) for v in (heightmap.get("values") or []) if isinstance(v, (int, float))]
-    relief = round(max(values) - min(values), 3) if values else 0.0
+    quality = build_sample_quality(payload)
+    occupied = int(quality["occupied_cells"] or 0)
+    center_count = int(quality["center_count"] or 0)
+    relief = float(quality["heightmap_relief"] or 0.0)
+    has_terrain = bool(quality["has_terrain"])
 
     category_counts: Counter[str] = Counter()
     theme_counts: Counter[str] = Counter()
@@ -637,7 +569,7 @@ def _sandplay_clues(payload: dict[str, Any]) -> dict[str, Any]:
         f"九宫格占据 {occupied}/9 格、中心区 {center_count} 件、留白 {max(0, 9 - occupied)} 格"
         if occupied else "九宫格空间信息较少，仅能参考沙具分布"
     )
-    terrain_text = _terrain_observation(payload)
+    terrain_text = quality["terrain_summary"]
     return {
         "items_count": len(items),
         "occupied": occupied,
@@ -646,6 +578,7 @@ def _sandplay_clues(payload: dict[str, Any]) -> dict[str, Any]:
         "relief": relief,
         "layout_text": layout_text,
         "terrain_text": terrain_text,
+        "has_terrain": has_terrain,
         "categories": [name for name, _ in category_counts.most_common(3)],
         "themes": [name for name, _ in theme_counts.most_common(3)],
         "support_labels": support_labels,
@@ -674,9 +607,18 @@ def _exploration_text_for_dimension(
             f"从沙盘空间看，{layout}，{terrain}；主要意象为{categories}。"
             "这些线索可用于观察注意资源分配、任务组织与持续投入方式，但不能直接替代学科能力判断。"
         )
+        terrain_clue = (
+            "地形塑形为计划性、步骤组织和元认知监控提供探索线索"
+            if clues.get("has_terrain")
+            else "当前沙面基本平整，地形线索不足以支持计划性判断"
+        )
+        pressure_clue = (
+            f"压力与阴影主题共 {clues['pressure_count']} 件，提示情绪负荷可能占用专注带宽"
+            if clues["pressure_count"]
+            else "本次未识别压力/阴影主题标签，不能据此判断情绪负荷高低"
+        )
         result = (
-            f"压力与阴影主题共 {clues['pressure_count']} 件，提示情绪负荷可能占用专注带宽；"
-            f"{layout}与地形塑形提供计划性、步骤组织和元认知监控的探索线索。"
+            f"{pressure_clue}；{layout}，{terrain_clue}。"
             "在无成绩单时，这些只能作为学习过程的假设，需结合课堂任务表现核验。"
         )
     elif name == "文理选科适配":
@@ -944,6 +886,181 @@ def _apply_risk_guardrails(report: dict[str, Any], sample_quality: dict[str, Any
                 (judgement + "；" if judgement else "")
                 + "该结论仅基于当前沙盘，未见显性线索不等于无风险，需结合访谈/量表核实。"
             )
+
+
+_RISK_LABELS = {
+    "L1": "L1 平稳",
+    "L2": "L2 轻度关注",
+    "L3": "L3 中度关注",
+    "L4": "L4 高度关注",
+}
+
+
+def _risk_label(level: str) -> str:
+    return _RISK_LABELS.get(level, level)
+
+
+def _set_risk_dimension_floor(
+    report: dict[str, Any],
+    key: str,
+    level: str,
+    *,
+    judgement: str = "",
+    evidence: str = "",
+) -> None:
+    for dimension in _chapter_list(report, "chapter_5_risk", "dimensions"):
+        if not isinstance(dimension, dict):
+            continue
+        if str(dimension.get("key") or "").strip() != key:
+            continue
+        current = str(dimension.get("level") or "").strip().upper()
+        if _RISK_RANK.get(current, 0) >= _RISK_RANK.get(level, 0):
+            return
+        dimension["level"] = level
+        dimension["label"] = _risk_label(level)
+        if judgement:
+            dimension["judgement"] = judgement
+        if evidence:
+            existing = str(dimension.get("evidence") or "").strip()
+            dimension["evidence"] = f"{existing}；{evidence}" if existing else evidence
+        if key == "self_harm":
+            dimension["norm_reference"] = RISK_INSTRUMENTS.get("self_harm", dimension.get("norm_reference"))
+        return
+
+
+def _apply_risk_consistency(report: dict[str, Any], priority_level: str) -> None:
+    """让顶部预警、第五章总体等级与风险表不再互相矛盾。"""
+    chapter = report.get("chapter_5_risk")
+    if not isinstance(chapter, dict):
+        return
+    banner = report.get("priority_banner") if isinstance(report.get("priority_banner"), dict) else {}
+    banner_level = str(banner.get("level") or priority_level or "").strip().upper()
+    banner_match = re.search(r"L[1-4]", banner_level)
+    banner_rank_level = banner_match.group(0) if banner_match else banner_level
+    triggers = [str(item) for item in (banner.get("triggers") or []) if str(item).strip()]
+    levels = _risk_dimension_levels(report)
+    max_dimension_level = max((_RISK_RANK.get(level, 0) for level in levels.values()), default=0)
+    banner_rank = _RISK_RANK.get(banner_rank_level, 0)
+
+    if banner_rank >= 4:
+        trigger_blob = " ".join(triggers)
+        if any(word in trigger_blob for word in ("自伤", "绝望", "不想活", "活着没意思", "自杀")):
+            note = "本次出现 L4 自伤/绝望文本触发线索，需优先核查自伤与死亡相关表达；该分级来自触发线索，需访谈与 C-SSRS 核实。"
+        else:
+            note = "本次出现 L4 高危画面触发线索，需优先核查死亡、自伤与危机相关表达；该分级来自触发线索，需访谈与 C-SSRS 核实。"
+        _set_risk_dimension_floor(
+            report,
+            "self_harm",
+            "L3",
+            judgement=note,
+            evidence="；".join(triggers[:4]) or "L4 优先级触发",
+        )
+        max_dimension_level = max(
+            max((_RISK_RANK.get(level, 0) for level in _risk_dimension_levels(report).values()), default=0),
+            max_dimension_level,
+        )
+
+    overall_rank = max(banner_rank, max_dimension_level)
+    overall_level = next((level for level, rank in _RISK_RANK.items() if rank == overall_rank), "")
+    if overall_level:
+        chapter["overall_level"] = overall_level
+        chapter["overall_label"] = _risk_label(overall_level)
+    if banner_rank:
+        chapter["priority_override"] = {
+            "level": banner_level,
+            "triggers": triggers[:8],
+            "message": "顶部预警由文本/高危画面/过程线索触发，优先级高于九维模型分级；风险表需结合访谈与量表人工核对。",
+        }
+    if banner_rank > max_dimension_level:
+        chapter["consistency_warning"] = (
+            f"顶部预警来自文本/沙具/过程线索（{banner_level}），九维风险表为模型分级，最高为 "
+            f"{_risk_label(next((level for level, rank in _RISK_RANK.items() if rank == max_dimension_level), 'L1'))}；"
+            "已标注优先级覆盖，需人工核对，不能把风险表低等级理解为“无风险”。"
+        )
+
+
+def _career_text_has_score_claim(text: str) -> bool:
+    value = str(text or "")
+    value = re.sub(r"(暂不|不|未)(结合|以|使用|提供|依赖)成绩", "", value)
+    value = re.sub(r"(没有|无|缺少)成绩", "", value)
+    return any(word in value for word in ("可读成绩", "成绩中", "成绩基础", "结合成绩"))
+
+
+def _rewrite_career_for_evidence(
+    report: dict[str, Any],
+    sample_quality: dict[str, Any],
+    priority_level: str,
+) -> None:
+    """低投射量/证据有限或缺失时暂停职业定位；没有成绩时删除“可读成绩”类表述。"""
+    chapter = report.get("chapter_7_career")
+    if not isinstance(chapter, dict):
+        return
+    chapter4 = report.get("chapter_4_academic") if isinstance(report.get("chapter_4_academic"), dict) else {}
+    has_scores = bool(sample_quality.get("has_scores")) or any(
+        isinstance(row, dict) and row.get("score") is not None
+        for row in (chapter4.get("subjects") or [])
+    )
+    low_evidence = (
+        bool(sample_quality.get("low_projection"))
+        or sample_quality.get("evidence_level") in ("minimal", "limited")
+    )
+    text_fields = ("summary", "evidence_note", "career_resume_note")
+    if not has_scores:
+        for field in text_fields:
+            value = str(chapter.get(field) or "")
+            if _career_text_has_score_claim(value):
+                value = (
+                    value.replace("结合可读成绩探索优势方向", "暂不结合成绩排序，先探索兴趣与任务投入")
+                    .replace("在可读成绩中显示出相对稳定的记忆/理解类学习基础", "在访谈与任务表现中继续观察学习基础")
+                    .replace("可读成绩", "现有文本线索")
+                    .replace("结合成绩", "结合后续成绩")
+                )
+                chapter[field] = value
+        strengths = chapter.get("strengths")
+        if isinstance(strengths, list):
+            chapter["strengths"] = [
+                str(item) for item in strengths
+                if not _career_text_has_score_claim(str(item))
+            ] or ["当前未提供成绩数据，暂不以成绩推断优势；建议先补充访谈与任务表现。"]
+    if priority_level in ("L3_ORANGE", "L4_RED"):
+        return
+    if not low_evidence:
+        return
+
+    strengths = chapter.get("strengths")
+    filtered: list[str] = []
+    if isinstance(strengths, list):
+        for item in strengths:
+            text = str(item)
+            if _career_text_has_score_claim(text) and not has_scores:
+                continue
+            if "愿意通过沙盘表达" in text and not sample_quality.get("has_narrative"):
+                continue
+            if any(word in text for word in ("投入明显", "空间组织感")) and int(sample_quality.get("item_count") or 0) < 3:
+                continue
+            if not any(marker in text for marker in ("代表沙具", "沙盘布局中", "自述", "教师观察")):
+                continue
+            filtered.append(text)
+    if not filtered:
+        filtered = [
+            f"当前仅有 {int(sample_quality.get('item_count') or 0)} 件沙具，尚不足以形成稳定的兴趣或优势判断；"
+            "建议在访谈中补充选择理由、任务坚持性与真实项目体验。"
+        ]
+    chapter.update({
+        "title": PROTECTIVE_CHAPTER_TITLE,
+        "stage": "证据补充与资源观察优先",
+        "career_postponed": True,
+        "summary": (
+            "当前沙具/文本证据有限，暂缓具体职业定位与优势排序；先呈现可观察的兴趣与资源线索，"
+            "待补充访谈、教师观察或成绩后再评估。"
+        ),
+        "strengths": filtered,
+        "career_resume_note": "待补充自述、教师观察、成绩或过程数据后，再评估职业发展方向。",
+    })
+    chapter["evidence_note"] = (
+        "以上仅为当前沙盘与有限文本中的探索性观察，不等同于能力测评或稳定人格结论；"
+        "低投射量/证据缺失阶段不做职业优势排序。"
+    )
 
 
 def _priority_text_blob(payload: dict[str, Any]) -> str:
@@ -1446,6 +1563,56 @@ def _guard_process_integration(report: dict[str, Any], payload: dict[str, Any]) 
     chapter_3["process_integration"] = current
 
 
+def _collect_quality_report(
+    report: dict[str, Any],
+    sample_quality: dict[str, Any],
+    priority_level: str,
+) -> tuple[list[str], list[dict[str, str]], str]:
+    flags = list(sample_quality.get("quality_flags") or [])
+    warnings = [dict(item) for item in (sample_quality.get("quality_warnings") or []) if isinstance(item, dict)]
+
+    def add(code: str, message: str) -> None:
+        if code in flags:
+            return
+        flags.append(code)
+        severity, _ = QUALITY_FLAG_META.get(code, ("warning", code))
+        warnings.append({"code": code, "severity": severity, "message": message})
+
+    chapter5 = report.get("chapter_5_risk") if isinstance(report.get("chapter_5_risk"), dict) else {}
+    consistency = str(chapter5.get("consistency_warning") or "").strip()
+    if consistency:
+        add("RISK_LEVEL_CONFLICT", consistency)
+
+    chapter8 = report.get("chapter_8_training_modules") if isinstance(report.get("chapter_8_training_modules"), dict) else {}
+    active_count = int(chapter8.get("active_count") or 0)
+    if priority_level in ("L3_ORANGE", "L4_RED") and active_count > 1:
+        add("TRAINING_INTENSITY_CONFLICT", "当前处于优先关注/危机阶段，但第八章仍启动超过 1 个模块；建议收束为低强度优先模块。")
+
+    chapter7 = report.get("chapter_7_career") if isinstance(report.get("chapter_7_career"), dict) else {}
+    chapter4 = report.get("chapter_4_academic") if isinstance(report.get("chapter_4_academic"), dict) else {}
+    has_scores = bool(sample_quality.get("has_scores")) or any(
+        isinstance(row, dict) and row.get("score") is not None
+        for row in (chapter4.get("subjects") or [])
+    )
+    career_blob = " ".join(
+        str(chapter7.get(field) or "")
+        for field in ("summary", "evidence_note", "career_resume_note")
+    ) + " " + " ".join(str(item) for item in (chapter7.get("strengths") or []))
+    if not has_scores and _career_text_has_score_claim(career_blob):
+        add("SCORE_BASIS_MISMATCH", "报告职业章节引用了成绩依据，但本次没有可读成绩；已要求改为不结合成绩排序。")
+
+    meta = report.get("meta") if isinstance(report.get("meta"), dict) else {}
+    if str(meta.get("engine") or "").strip().lower() == "demo":
+        add("DEMO_ENGINE", "当前为本地示例报告，未接入多模态模型；内容用于流程演示，不能直接作为真实评估结论交付。")
+
+    severity_rank = {"info": 0, "warning": 1, "critical": 2}
+    quality_level = "ok"
+    for item in warnings:
+        if severity_rank.get(str(item.get("severity")), 0) > severity_rank.get(quality_level, -1):
+            quality_level = str(item.get("severity") or "warning")
+    return flags, warnings, quality_level
+
+
 def apply_report_quality_gates(
     report: dict[str, Any],
     *,
@@ -1454,9 +1621,9 @@ def apply_report_quality_gates(
 ) -> dict[str, Any]:
     """服务端质量门控：动态评估依据、低投射量提示、原始记录与训练模块优先级。"""
     meta = report.setdefault("meta", {})
-    sample_quality = _sample_quality(payload)
+    sample_quality = build_sample_quality(payload, transcript_url)
     process_note = _process_note(payload)
-    terrain_observation = _terrain_observation(payload)
+    terrain_text = terrain_observation(payload)
     raw_record = _raw_record_echo(payload)
     meta["assessment_basis"] = _report_basis(payload, transcript_url)
     meta["sample_quality"] = sample_quality
@@ -1467,7 +1634,7 @@ def apply_report_quality_gates(
         "teacher_observation": raw_record["teacher_observation"],
         "representative_item_name": str(payload.get("representative_item_name") or "").strip(),
         "terrain_metrics": payload.get("terrain_metrics") or {},
-        "terrain_observation": terrain_observation,
+        "terrain_observation": terrain_text,
         "process_telemetry": _process_telemetry(payload),
         "interaction_summary": payload.get("interaction_summary") or {},
         "process_note": process_note,
@@ -1478,25 +1645,35 @@ def apply_report_quality_gates(
         representative = str(payload.get("representative_item_name") or chapter_1.get("representative_item_name") or "").strip()
         if representative:
             chapter_1["representative_item_name"] = representative
-        chapter_1["terrain_observation"] = terrain_observation
+        chapter_1["terrain_observation"] = terrain_text
         chapter_1["process_observation"] = process_note
         _ensure_process_analysis(report, payload)
     _ensure_process_integration(report, payload)
     _guard_process_integration(report, payload)
-    if sample_quality.get("low_projection"):
-        _cap_low_sample_confidence(report)
     priority_level = _apply_priority_routing(report, payload, transcript_url)
     _apply_theory_guardrails(report, payload, transcript_url)
     _apply_risk_guardrails(report, sample_quality)
-    _ensure_chapter9(report)
+    _apply_risk_consistency(report, priority_level)
+    _cap_low_sample_confidence(report, sample_quality)
     if priority_level != "L4_RED":
-        _apply_training_gates(report, sample_quality)
+        max_active = 1 if (
+            priority_level == "L3_ORANGE"
+            or sample_quality.get("low_projection")
+            or sample_quality.get("evidence_level") == "minimal"
+        ) else 2
+        _apply_training_gates(report, sample_quality, max_active=max_active)
         _backfill_dimension_training(report)
+    _rewrite_career_for_evidence(report, sample_quality, priority_level)
+    _ensure_chapter9(report)
     report["chapter_5_risk"]["visibility"] = "counselor_only"
     for chapter_key, chapter_value in report.items():
         if re.fullmatch(r"chapter_[1-9]_[a-z_]+", str(chapter_key)) and chapter_key != "chapter_6_interview":
             report[chapter_key] = _enforce_third_person(chapter_value)
     _ensure_dialogue_second_person(report)
+    flags, warnings, quality_level = _collect_quality_report(report, sample_quality, priority_level)
+    meta["quality_flags"] = flags
+    meta["quality_warnings"] = warnings
+    meta["quality_level"] = quality_level
     return report
 
 
@@ -1592,7 +1769,9 @@ async def generate_report(
     transcript_image: bytes | None,
     image_url: str,
     transcript_url: str | None,
+    allow_demo_fallback: bool | None = None,
 ) -> tuple[dict[str, Any], str]:
+    allow_demo = ALLOW_DEMO_REPORT if allow_demo_fallback is None else allow_demo_fallback
     if MULTIMODAL_API_KEY:
         try:
             report = await call_multimodal(payload, sandplay_image, transcript_image, image_url, transcript_url)
@@ -1602,7 +1781,7 @@ async def generate_report(
             )
             return report, "multimodal"
         except Exception as exc:  # 生产可改为记录并返回 502；默认允许降级演示报告
-            if not ALLOW_DEMO_REPORT:
+            if not allow_demo:
                 raise
             note = f"多模态调用失败，已降级为本地演示报告：{type(exc).__name__}: {exc}"
     else:

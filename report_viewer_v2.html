@@ -214,6 +214,22 @@
     }
     .sample-alert b { flex: 0 0 auto; color: #9d5e42; font-weight: 700; }
     .sample-alert span { min-width: 0; }
+    .demo-badge {
+      display: inline-flex; align-items: center; padding: 1.6mm 3mm; border-radius: 999px;
+      border: 1px dashed #a67c52; background: #fff7e8; color: #8a5a2b;
+      font-size: 7.6pt; font-weight: 700; letter-spacing: .04em;
+    }
+    .demo-note { margin-top: 2mm; color: #8a5a2b; font-size: 7.6pt; line-height: 1.5; }
+    .quality-alert {
+      margin-top: 3mm; padding: 3mm 4.5mm; border-radius: 0 2.5mm 2.5mm 0;
+      border: 1px solid #d9cfc0; border-left: 4px solid #b7794b;
+      background: #fdfaf4; color: #5f5443; font-size: 7.8pt; line-height: 1.6;
+    }
+    .quality-alert.warning { border-left-color: #c08a3e; background: #fffaf0; }
+    .quality-alert.critical { border-left-color: #a8554e; background: #fff5f3; }
+    .quality-alert b { display: block; margin-bottom: 1.5mm; color: #7d4d2c; }
+    .quality-list { display: grid; gap: 1mm; }
+    .quality-code { display: inline-block; margin-right: 2mm; padding: .3mm 1.4mm; border-radius: 1mm; background: #f0e6d6; color: #7a5a35; font-size: 6.8pt; letter-spacing: .02em; }
 
     /* ===== 章节与卡片 ===== */
     .section { position: relative; margin-top: 8mm; }
@@ -461,6 +477,12 @@
       background: #fdf4ea; color: #7b5142; font-size: 8pt; line-height: 1.65;
     }
     .risk-low-note b { color: var(--accent-deep); }
+    .risk-overall-note {
+      margin-bottom: 3mm; padding: 3mm 4mm; border: 1px solid #e3cfc8;
+      border-left: 4px solid var(--accent); border-radius: 0 2.5mm 2.5mm 0;
+      background: #fff8f5; color: #6f4640; font-size: 8pt; line-height: 1.65;
+    }
+    .risk-overall-note b { color: var(--accent-deep); }
     .risk-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3mm; margin-bottom: 4mm; }
     .risk-card {
       min-height: 19mm; padding: 3.2mm 4mm; border: 1px solid var(--line);
@@ -571,8 +593,13 @@
     .priority-banner h3 { margin: 0 0 2mm; font-size: 11pt; color: #fff; }
     .priority-banner p { margin: 0 0 2mm; font-size: 8.8pt; line-height: 1.7; }
     .priority-banner .pb-label { font-weight: 700; color: #ffe9c9; }
-    .priority-banner ul { margin: 1mm 0 3mm; padding-left: 5mm; }
-    .priority-banner li { margin: .8mm 0; font-size: 8.4pt; line-height: 1.6; }
+    .priority-banner ul { margin: 1mm 0 3mm; padding-left: 5mm; color: #fff; }
+    .priority-banner li { margin: .8mm 0; font-size: 8.4pt; line-height: 1.6; color: #fff; }
+    .priority-banner li::marker { color: #ffdca8; }
+    .priority-banner .plain-list li,
+    .priority-banner .scene-quote li { color: #fff; }
+    .priority-banner .plain-list li::marker,
+    .priority-banner .scene-quote li::marker { color: #ffdca8; }
     .priority-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2mm; margin: 2mm 0 3mm; }
     .priority-flow-step {
       padding: 2.2mm 2.6mm; border: 1px solid rgba(255,255,255,.22); border-radius: 2mm;
@@ -595,6 +622,22 @@
     .share-guard-card h1 { margin: 0; color: #173f34; font-family: var(--serif); font-size: 20pt; line-height: 1.4; }
     .share-guard-card p { margin: 4mm 0 0; color: #5f6c64; font-size: 9.5pt; line-height: 1.8; text-align: left; }
     .share-guard-note { margin-top: 5mm; padding-top: 4mm; border-top: 1px solid #dfe5dc; color: #7a817a; font-size: 8pt; }
+
+    .share-notice {
+      display: flex; gap: 3.5mm; margin: 0 0 5mm; padding: 4mm 5mm;
+      border: 1px solid #e5c9a8; border-left: 4px solid #a67745; border-radius: 0 2.5mm 2.5mm 0;
+      background: linear-gradient(100deg, #fbf0e2, #fffdf8 70%);
+      color: #5f4733; break-inside: avoid; page-break-inside: avoid;
+    }
+    .share-notice-mark {
+      flex: 0 0 auto; width: 7mm; height: 7mm; display: grid; place-items: center;
+      border: 1px solid #d8bfa0; border-radius: 50%; color: #92683e;
+      background: #fff8ee; font-family: var(--serif); font-size: 9pt;
+    }
+    .share-notice-body { min-width: 0; }
+    .share-notice-body b { display: block; margin-bottom: 1mm; color: #7b4d27; font-size: 9.2pt; }
+    .share-notice-body p { margin: 0; color: #5f4733; font-size: 8.4pt; line-height: 1.7; }
+    .share-notice-body small { display: block; margin-top: 1.5mm; color: #7d6a56; font-size: 7.8pt; line-height: 1.6; }
 
 
     .qr-zone {
@@ -836,6 +879,13 @@
         delete data.meta.review_note;
         delete data.meta.client_inputs;
         delete data.meta.generation_usage;
+        const riskCodes = ["RISK_LEVEL_CONFLICT", "TRAINING_INTENSITY_CONFLICT"];
+        data.meta.quality_warnings = list(data.meta.quality_warnings).filter((item) => item && !riskCodes.includes(String(item.code || "")));
+        data.meta.quality_flags = list(data.meta.quality_flags).filter((code) => !riskCodes.includes(String(code || "")));
+        if (data.meta.sample_quality && typeof data.meta.sample_quality === "object") {
+          data.meta.sample_quality.quality_warnings = list(data.meta.sample_quality.quality_warnings).filter((item) => item && !riskCodes.includes(String(item.code || "")));
+          data.meta.sample_quality.quality_flags = list(data.meta.sample_quality.quality_flags).filter((code) => !riskCodes.includes(String(code || "")));
+        }
       }
       if (data.chapter_1_overview) {
         delete data.chapter_1_overview.process_observation;
@@ -861,10 +911,10 @@
       const result = scrub(data);
       if (l4Guard) {
         result.share_guard = {
-          blocked: true,
-          title: "由心理老师优先一对一沟通",
-          message: "这份沙盘作品需要心理老师先与家长和孩子进行一对一沟通。沟通完成后，老师会根据家庭与孩子的实际需要，提供更合适的支持建议。",
-          note: "报告内容暂不在本页展示。"
+          blocked: false,
+          title: "建议家长先与心理老师沟通",
+          message: "本报告为发展性评估参考。建议家长先联系学校心理老师沟通后再解读；如报告涉及需要优先关注的线索，心理老师会按学校流程单独与家长沟通。",
+          note: "家长版已隐藏咨询师内部研判与风险分级，仅保留发展性建议。"
         };
       }
       result.share_visibility = "student_guardian";
@@ -902,6 +952,15 @@
       const meta = report.meta || {};
       const academic = report.chapter_4_academic || {};
       const sample = meta.sample_quality || {};
+      const isDemo = String(meta.engine || "").toLowerCase() === "demo";
+      const qualityWarnings = list(meta.quality_warnings)
+        .filter((item) => item && (item.message || item.code))
+        .filter((item) => String(item.code || "") !== "DEMO_ENGINE");
+      const qualityLevel = String(meta.quality_level || "").toLowerCase();
+      const qualityClass = qualityLevel === "critical" ? "critical" : (qualityLevel === "warning" ? "warning" : "info");
+      const qualityAlert = qualityWarnings.length
+        ? `<div class="quality-alert ${qualityClass}"><b>报告质量提示</b><div class="quality-list">${qualityWarnings.map((item) => `<div><span class="quality-code">${esc(item.code || "提示")}</span>${esc(item.message || "")}</div>`).join("")}</div></div>`
+        : "";
       const hasScores = Array.isArray(academic.subjects) && academic.subjects.some((subject) => subject && (subject.score != null || subject.rate != null || (subject.grade && subject.grade !== "待核对")));
       const basisItems = list(meta.assessment_basis).filter(Boolean)
         .filter((item) => hasScores || !String(item).includes("成绩单"))
@@ -921,8 +980,10 @@
             <p class="subtitle">${esc(meta.disclaimer || "发展性心理评估参考·非临床诊断")}</p>
             <div class="hero-badges">
               <span class="mode-tag ${state.mode === "counselor" ? "counselor" : "public"}">${esc(modeText)}</span>
+              ${isDemo ? `<span class="demo-badge">示例报告 · DEMO 引擎</span>` : ""}
               <span class="hero-report-no">报告编号 · ${esc(reportNo)}</span>
             </div>
+            ${isDemo ? `<p class="demo-note">示例报告：未配置多模态模型，内容由本地模板生成。</p>` : ""}
           </div>
           <div class="hero-emblem" aria-hidden="true"><strong>${chapterCount}</strong><span>CHAPTERS</span></div>
         </div>
@@ -936,6 +997,7 @@
         </div>
         <div class="basis-card"><b>评估依据</b>${esc(basis)}</div>
         ${sampleAlert}
+        ${qualityAlert}
       </header>`;
     }
     function metaItem(label, value) {
@@ -1103,9 +1165,17 @@
     function renderChapter5(c5, index) {
       if (state.mode !== "counselor") return "";
       const dimensions = list(c5.dimensions).filter(Boolean);
+      const overall = c5.overall_label || c5.overall_level || "";
+      const override = c5.priority_override && (c5.priority_override.level || c5.priority_override.message)
+        ? `<div>优先级覆盖：${esc(c5.priority_override.level || "")}${c5.priority_override.message ? " · " + esc(c5.priority_override.message) : ""}</div>`
+        : "";
+      const overallNote = overall
+        ? `<div class="risk-overall-note"><b>总体风险等级：${esc(overall)}。</b>${esc(c5.consistency_warning || "九维分级用于形成访谈假设，不等同于临床诊断；总体等级已综合顶部触发线索。")}${override}</div>`
+        : "";
       return `<section class="section" data-chapter="5">
         ${sectionHead(index, c5.title || "风险研判（九维度分级预警·仅咨询师可见）", "仅咨询师可见")}
         <p class="risk-disclaimer">${esc(c5.disclaimer || "以下内容仅供咨询师在专业范围内审阅，不可直接呈现给受测者及其家属。")}</p>
+        ${overallNote}
         ${state.full && state.full.meta && state.full.meta.sample_quality && state.full.meta.sample_quality.low_projection ? `<div class="risk-low-note"><b>低投射量提醒：</b>本次沙具数量少，投射信息有限。以下“L1 平稳”仅表示当前沙盘未见显性线索，不等于无风险；建议结合访谈与相应心理量表核实。</div>` : ""}
         <div class="risk-grid">${dimensions.map((dimension) => `<div class="risk-card ${levelClass(dimension.level)}">
           <div class="risk-card-head"><h4>${esc(dimension.name || "—")}</h4><span class="risk-status ${levelClass(dimension.level)}">${esc(dimension.label || dimension.level || "—")}</span></div>
@@ -1177,6 +1247,17 @@
         ${flowItems.length ? `<p class="pb-label">24 小时处置流程</p><div class="priority-flow">${flowItems.map((item, i) => `<div class="priority-flow-step"><b>STEP ${String(i + 1).padStart(2, "0")}</b>${esc(item)}</div>`).join("")}</div>` : ""}
       </section>`;
     }
+    function renderShareNotice(guard) {
+      const data = guard || {};
+      return `<div class="share-notice">
+        <div class="share-notice-mark">心</div>
+        <div class="share-notice-body">
+          <b>${esc(data.title || "建议家长先与心理老师沟通")}</b>
+          <p>${esc(data.message || "本报告为发展性评估参考，建议家长先联系学校心理老师沟通后再解读。")}</p>
+          <small>${esc(data.note || "家长版已隐藏咨询师内部研判与风险分级。")}</small>
+        </div>
+      </div>`;
+    }
     function renderShareGuard(guard) {
       const data = guard || {};
       return `<div class="share-guard-page">
@@ -1196,6 +1277,7 @@
       return `<section class="section" data-chapter="8">
         ${sectionHead(index, c8.title || "学习能力训练模块方向建议", "")}
         <p class="section-intro">${esc(c8.intro || "每个维度只指向 1-3 个模块，保证训练聚焦、不分散。")}</p>
+        ${c8.intensity_note ? `<div class="warn-strip"><b>训练强度提示：</b><span>${esc(c8.intensity_note)}</span></div>` : ""}
         ${modules.map((module) => `<article class="module-card avoid-break">
           <div class="module-head"><span class="module-number">${allModules.indexOf(module) + 1}</span><h3>${esc(module.name || "未命名训练模块")}</h3></div>
           <div class="module-meta"><b>训练目标能力</b></div><div class="module-goals">${list(module.goals).filter(Boolean).map((goal) => `<span class="module-goal">${esc(goal)}</span>`).join("")}</div>
@@ -1272,6 +1354,9 @@
         return;
       }
       const sections = [renderHeader(report)];
+      if (state.mode === "public" && report.share_guard && !report.share_guard.blocked) {
+        sections.push(renderShareNotice(report.share_guard));
+      }
       const priorityBanner = renderPriorityBanner(report.priority_banner);
       if (priorityBanner) sections.push(priorityBanner);
       const chapterRenderers = [

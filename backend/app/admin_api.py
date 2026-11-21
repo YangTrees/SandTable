@@ -214,6 +214,11 @@ def _risk_rank(level: str | None) -> int:
 
 def _highest_risk(report: dict[str, Any]) -> str:
     levels = []
+    banner = report.get("priority_banner") or {}
+    banner_level = str(banner.get("level") or "").upper()
+    banner_match = re.search(r"L(\d)", banner_level)
+    if banner_match:
+        levels.append(f"L{banner_match.group(1)}")
     dimensions = ((report.get("chapter_5_risk") or {}).get("dimensions") or [])
     for item in dimensions:
         if isinstance(item, dict):
