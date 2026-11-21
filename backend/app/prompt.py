@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from .process_metrics import build_process_metrics, process_telemetry
 from .theory import (
     CHAPTER_TITLES,
     PROTECTIVE_CHAPTER_TITLE,
@@ -26,8 +27,8 @@ SYSTEM_PROMPT = """你是一名学校心理评估咨询师与沙盘分析师。�
 8. 沙盘投射量有限（沙具少于3件且无有效地形塑形）时，必须降低结论确定性；不得把“未见负向沙具”写成“无风险”或“心理支撑稳定”。
 9. 训练建议必须有优先级，只把1-2个与当前主要困扰最相关、置信度较高的模块设为优先启动；其余模块写“暂不启动，待信息补充”，不得把六套训练同时推给受测者。
 10. 缺少成绩单或访谈材料时，仍须依据沙盘空间结构、地形塑形、沙具意象、受测者自述和教师观察，对六个维度全部给出探索性学习推理；不得用“无足够线索”“无法判定”代替分析。此时置信度只能写“中”或“低”，并在每条结论末尾写“以上为基于沙盘与现有线索的探索性推断，需结合后续成绩与访谈核验”。
-11. 咨询师完整版除第六章访谈提问可使用第二人称引语外，其余章节的叙述、判断和建议必须用第三人称“受测者/该生”，不得写“你”“你们”“孩子”“你家孩子”。
-12. 制作过程数据（耗时、放入/删除、拖拽犹豫、推沙/挖水、掩埋人物、短时反复放删）只用于过程动力学探索：可讨论投入节奏、犹豫与修改、控制感和破坏—修复循环，但不得把单次动作直接等同于病理或稳定人格；若出现掩埋人物或反复放删，应提高风险核查优先级。
+11. 咨询师完整版的所有叙述、判断、建议和第九章统一使用第三人称“受测者/该生”，不得写“你”“你们”“孩子”“你家孩子”。但第二章 `verification_question` 与第六章 `items[].questions` 是咨询师直接开口的对话脚本，必须使用口语化第二人称：对受测者用“你”，对家长或教师用“您/你们”；提问句中不得出现“受测者把……”“该生把……”。
+12. 制作过程数据（耗时、放入/删除、拖拽、撤销、长停顿、推沙/挖水、掩埋人物、短时反复放删）是报告的一手分析依据，不是附录：只要 `process_metrics.available=true`，必须写 chapter_1 `process_analysis`，并在 chapter_3 至少两个相关维度引用过程指标。只用于过程动力学探索：讨论投入节奏、犹豫与修改、控制感和破坏—修复循环，但不得把单次动作直接等同于病理或稳定人格；若出现掩埋人物或反复放删，应提高风险核查优先级。无过程数据时不得编造数值。
 """
 
 
@@ -67,6 +68,7 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         "transformation": "修复与转化：破裂后的修复、束缚解除、生命萌发、连接与方向重建",
     }
     theory_map = dict(SIX_DIMENSION_THEORIES)
+    process_metrics = build_process_metrics(payload)
     risk_instrument_map = {
         dict(RISK_DIMENSIONS)[key]: value for key, value in RISK_INSTRUMENTS.items()
     }
@@ -94,6 +96,17 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
             "item_theme_stats": [{"theme": "string", "name": "string", "count": 0}],
             "nine_grid_distribution": grid,
             "scene_imagery": ["string"],
+            "process_analysis": {
+                "available": True,
+                "title": "制作过程动力学观察",
+                "pace": "string：完成节奏、首次落手前停留、长停顿与结束后停留，引用耗时/件数/动作密度",
+                "revision": "string：删除/撤回、拖拽调整、撤销所反映的修改与犹豫模式",
+                "terrain_control": "string：推沙/挖水笔触占比，及其对沙面控制、容器与边界建构的含义",
+                "theory_interpretation": "string：用箱庭理论解释上述过程，不直接病理化",
+                "integrated_finding": "string：把过程动力与场景意象、核心主题、六维假设相互校验",
+                "evidence": ["string：必须引用 process_metrics 中的原始数值"],
+                "confidence": "中/低",
+            },
         },
         "chapter_2_imagery": {
             "title": CHAPTER_TITLES["chapter_2_imagery"],
@@ -103,7 +116,7 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
                 "symbols": ["string"],
                 "hypothesis": "string：先写支持性/资源性解释（假设A），不得只做单向积极美化",
                 "alternative_hypothesis": "string：写防御/阻抗/发展滞后等竞争性解释（假设B）",
-                "verification_question": "string：一句可用于区分假设A与假设B的访谈提问",
+                "verification_question": "string：一句可直接对受测者开口的访谈提问，必须用“你”，不得用“受测者/该生”作主语",
                 "theory_basis": "string：只写与当前假设真正相关的概念，不要求每段罗列三本书，不伪造原文或页码",
                 "confidence": "高|中|低",
             }],
@@ -123,6 +136,13 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
                 "training_module_directions": ["string：服务端最终回填，模型可给出初步方向"],
                 "conclusion": "string：缺少成绩或访谈时，末尾必须写“以上为基于沙盘与现有线索的探索性推断，需结合后续成绩与访谈核验”",
             }],
+            "process_integration": {
+                "available": True,
+                "summary": "string：制作过程数据如何参与六维判断，至少点名两个维度",
+                "referenced_dimensions": ["string：必须是给定六维名称"],
+                "notes": ["string：每个维度一条，写明过程指标支持/削弱/待核验了哪一部分"],
+                "confidence": "中/低",
+            },
         },
         "chapter_4_academic": {
             "title": CHAPTER_TITLES["chapter_4_academic"],
@@ -159,7 +179,7 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         },
         "chapter_6_interview": {
             "title": CHAPTER_TITLES["chapter_6_interview"],
-            "items": [{"topic": "string", "questions": ["string"], "target": "受测者|家长|教师"}],
+            "items": [{"topic": "string", "questions": ["string：咨询师可直接开口的访谈脚本，对受测者用“你”，对家长/教师用“您”，不得用“受测者/该生”作主语"], "target": "受测者|家长|教师"}],
         },
         "chapter_7_career": {
             "title": CHAPTER_TITLES["chapter_7_career"],
@@ -277,7 +297,8 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         "grid_cells": grid.get("cells", []),
         "terrain_metrics": terrain_metrics,
         "terrain_observation": str(terrain_metrics.get("terrain_summary") or ""),
-        "process_telemetry": payload.get("process_telemetry") or {},
+        "process_telemetry": process_telemetry(payload),
+        "process_metrics": process_metrics,
         "heightmap_stats": heightmap.get("stats", {}),
         "heightmap_max_abs": heightmap_max_abs,
         "low_projection": len(items) < 3 and not bool(terrain_edited),
@@ -306,6 +327,10 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
 - chapter_5 只能出现在 chapter_5_risk，不得把风险分级复制到其他章节。
 - 主题标签是检索与形成假设的轴，不是诊断：先看 `theme_counts` 与 `subcategory_counts`，再结合具体位置、组合、朝向和访谈；不得把单个主题标签直接写成结论。
 - 每个沙具结论必须至少有一条来自沙盘描述、代表沙具、九宫格、地形高度或成绩单的佐证；没有对应输入时不得写“有该数据”。
+- chapter_1 `scene_imagery` 必须以沙盘实拍图和 `terrain_metrics` 为准：先描述实际可见的沙面、沙丘、凹陷或水域，再写受测者赋予的含义。`terrain_metrics` 已显示水域塑形（`water_area_pct>0` 或摘要含“水域塑形”）时，直接按实拍水域描述，不得再降级写成“轻度塑形”。若受测者自述“挖出水域”但实拍与指标仅显示轻微起伏/局部凹陷（`water_area_pct=0`），应写成“受测者将沙面轻度塑形区域定义为情绪水域”，不得写成画面中已出现大面积水域、湖泊或深谷；不得脑补实拍与地形指标中不存在的元素。同一段内不得同时出现“明显水域塑形”和“轻度塑形”两种互相矛盾的定性。
+- chapter_1 `process_analysis` 必须读取 `process_metrics` 和 `process_telemetry` 的原始值：pace 必须引用总耗时、放入件数、每件秒数或动作密度；revision 必须引用删除/撤回、拖拽、撤销；terrain_control 必须引用推沙/挖水笔数及占比。不得只复述数字，必须用箱庭理论解释制作节奏、修改犹豫、主动塑形与控制感，并在 integrated_finding 中与场景意象、核心主题和六维假设相互校验。`process_metrics.available=false` 时 available 写 false，不得编造耗时或动作。若 `bury_count` 或 `destructive_loops` 非 0，必须写明优先风险核查。
+- 若 `process_metrics.available=true`，chapter_3 必须写 `process_integration`：summary 点名至少两个与当前线索最相关的维度，referenced_dimensions 必须使用给定六维名称，notes 每个维度一条，写明过程指标支持、削弱或待核验了哪一部分；同时至少两个维度的 judgement 或 assessment_result 要引用过程指标。不得把过程数据只放在第一章。
+- 过程发现只能写成“过程层面的弱证据/待核验”，不得写“说明家庭关系整体正向、动力未耗竭、无选择困难、认可度高”等结论；低修改既可能是果断，也可能是回避深入，必须保留竞争假设。
 - 成绩单：如果提供了图片，先逐科读取满分、得分、得分率和等级；只读清晰可辨的数字。没有把握的科目 score/rate 填 null，grade 填“待核对”。
 - chapter_2 每个主题必须给出两个竞争性假设：hypothesis 写支持性/资源性解释，alternative_hypothesis 写防御、阻抗或发展滞后解释，verification_question 写一句能区分两者的访谈提问。不得只做单向积极美化。
 - chapter_7 不得仅凭一件沙具推断稳定人格特质或能力水平；每条优势必须能回到沙盘或自述中的具体行为线索，并写明证据边界。
@@ -315,7 +340,7 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
 - chapter_5 的 `norm_reference` 必须按 `risk_instrument_map` 逐维填写；不得全篇统一写 MHT/GAD-7/PHQ-9。
 - chapter_3 `training_module_directions` 只写初步方向，最终由服务端按第八章 Top 1-2 模块统一回填；不得在第三章自行宣称某模块已启动。
 - chapter_7 默认写职业发展优势；若服务端命中 L3/L4，会将标题切换为“内在心理资源与保护性因素（发展性视角）”并暂缓职业定位。模型无需自行生成 priority_banner。
-- chapter_9 及第一至第八章的叙述性文字必须使用第三人称“受测者/该生”；仅第六章访谈提问可以使用第二人称引语。不得出现“你”“你们”“孩子”“你家孩子”。
+- chapter_9 及第一至第八章的叙述、分析、判断和建议性正文必须使用第三人称“受测者/该生”；仅第二章 `verification_question` 与第六章 `items[].questions` 使用第二人称对话脚本。叙述正文不得出现“你”“你们”“孩子”“你家孩子”；提问脚本不得出现“受测者/该生把……”。
 - 若 item_count < 3 且 heightmap_max_abs <= 0.001，视为低投射量样本：六维 confidence 不得为“高”，风险 L1 只能写“当前沙盘未见显性线索，需结合访谈/量表核实”，不得写“无风险/心理支撑稳定”。
 - 训练建议必须做优先级门控：优先选择与当前主要困扰（如焦虑、学习压力、家庭支持）最相关且置信度较高的 1-2 个模块，不得把六套训练同时推给受测者。
 

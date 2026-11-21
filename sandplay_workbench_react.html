@@ -1349,9 +1349,10 @@
       const position = terrain.geometry && terrain.geometry.attributes ? terrain.geometry.attributes.position : null;
       if (!position || position.count !== heights.length) return empty;
 
-      const waterLevel = -16;
-      const moundLevel = 2;
-      let waterCount = 0, moundCount = 0, centerWaterCount = 0, peripheralWaterCount = 0;
+      const waterLevel = -14;
+      const moundLevel = 1.2;
+      const depressionLevel = -2;
+      let waterCount = 0, moundCount = 0, depressionCount = 0, centerWaterCount = 0, peripheralWaterCount = 0;
       let min = Infinity, max = -Infinity;
       for (let i = 0; i < heights.length; i += 1) {
         const h = Number(heights[i]);
@@ -1365,28 +1366,36 @@
           else peripheralWaterCount += 1;
         }
         if (h > moundLevel) moundCount += 1;
+        if (h < depressionLevel) depressionCount += 1;
       }
       const total = heights.length || 1;
       const waterPct = Number(((waterCount / total) * 100).toFixed(1));
       const moundPct = Number(((moundCount / total) * 100).toFixed(1));
+      const depressionPct = Number(((depressionCount / total) * 100).toFixed(1));
       const centerWaterPct = Number(((centerWaterCount / total) * 100).toFixed(1));
       const peripheralWaterPct = Number(((peripheralWaterCount / total) * 100).toFixed(1));
       const elevationRange = Number((max - min).toFixed(2));
-      const edited = waterPct >= 2 || moundPct >= 2 || elevationRange >= 3;
+      const localWater = waterCount >= 8 || waterPct >= 0.8;
+      const localMound = moundCount >= 6 || moundPct >= 0.6;
+      const localDepression = depressionCount >= 4 || depressionPct >= 0.4;
+      const edited = localWater || localMound || localDepression || elevationRange >= 3;
       let summary;
       if (!edited) {
         summary = "沙面基本平整，未进行明显地形塑形。";
-      } else if (waterPct >= 2) {
-        summary = `已进行明显地形塑形：挖出水域约占 ${waterPct}%（中心区 ${centerWaterPct}%、周边 ${peripheralWaterPct}%），局部隆起形成沙岛/沙丘约占 ${moundPct}%，高程差约 ${elevationRange}。`;
-      } else if (moundPct >= 2) {
-        summary = `已进行明显地形塑形：局部隆起形成沙丘/沙山约占 ${moundPct}%，高程差约 ${elevationRange}；未见明显水域。`;
+      } else if (localWater) {
+        summary = `已进行明显水域塑形：水域约占 ${waterPct}%（中心区 ${centerWaterPct}%、周边 ${peripheralWaterPct}%），局部隆起形成沙岛/沙丘约占 ${moundPct}%，高程差约 ${elevationRange}。`;
+      } else if (localMound) {
+        summary = `已进行局部沙丘塑形：${moundPct >= 0.1 ? `局部隆起约占 ${moundPct}%，` : ""}高程差约 ${elevationRange}；未见成片水域。`;
+      } else if (localDepression) {
+        summary = `已进行局部凹陷塑形：${depressionPct >= 0.1 ? `局部凹陷约占 ${depressionPct}%，` : ""}高程差约 ${elevationRange}；未见成片水域。`;
       } else {
-        summary = `已进行轻度地形塑形：高程差约 ${elevationRange}，未见明显水域或沙丘聚集。`;
+        summary = `已进行轻度地形塑形：高程差约 ${elevationRange}，以局部起伏为主。`;
       }
       return {
         terrain_edited: edited,
         water_area_pct: waterPct,
         mound_area_pct: moundPct,
+        depression_area_pct: depressionPct,
         elevation_range: elevationRange,
         terrain_summary: summary
       };
@@ -2307,7 +2316,12 @@
       const strokeRef = useRef(null);
       const toastTimerRef = useRef(null);
       const telemetryRef = useRef({
-        startedAt: Date.now(),
+        pageStartedAt: Date.now(),
+        startedAt: null,
+        firstActionAt: null,
+        lastActionAt: null,
+        actionCount: 0,
+        actionEvents: [],
         itemAddedTotal: 0,
         itemDeletedTotal: 0,
         hesitationCount: 0,
@@ -2397,8 +2411,19 @@
         window.clearTimeout(toastTimerRef.current);
         toastTimerRef.current = window.setTimeout(() => setToast(""), 2200);
       }, []);
+      const noteAction = (type) => {
+        const t = telemetryRef.current;
+        const now = Date.now();
+        if (!t.startedAt) t.startedAt = now;
+        if (!t.firstActionAt) t.firstActionAt = now;
+        t.lastActionAt = now;
+        t.actionCount += 1;
+        t.actionEvents.push({ type, at_sec: Math.round((now - t.startedAt) / 1000) });
+        if (t.actionEvents.length > 80) t.actionEvents = t.actionEvents.slice(-80);
+      };
       const noteItemAdded = useCallback((item) => {
         const t = telemetryRef.current;
+        noteAction("add");
         t.itemAddedTotal += 1;
         const key = item.source_id || item.label || item.id;
         const now = Date.now();
@@ -2421,6 +2446,7 @@
       }, []);
       const noteItemDeleted = useCallback((item) => {
         const t = telemetryRef.current;
+        noteAction("delete");
         t.itemDeletedTotal += 1;
         if (!item) return;
         const key = item.source_id || item.label || item.id;
@@ -2431,6 +2457,7 @@
       }, []);
       const noteItemMoved = useCallback((item) => {
         const t = telemetryRef.current;
+        noteAction("move");
         t.hesitationCount += 1;
         if (!item) return;
         const isPerson = /人物|角色/.test(item.category || "") || /爷爷|奶奶|爸爸|妈妈|男孩|女孩|人物/.test(item.label || "");
@@ -2451,15 +2478,29 @@
       }, []);
       const buildProcessTelemetry = useCallback(() => {
         const t = telemetryRef.current;
+        const now = Date.now();
+        const startedAt = t.startedAt || t.pageStartedAt;
+        const events = t.actionEvents.slice(-80);
+        const times = events.map((event) => Number(event.at_sec) || 0);
+        const intervals = times.slice(1).map((value, index) => value - times[index]).filter((value) => value >= 0);
+        const longPauses = intervals.filter((value) => value >= 8);
         return {
-          total_duration_sec: Math.max(1, Math.round((Date.now() - t.startedAt) / 1000)),
+          total_duration_sec: Math.max(1, Math.round((now - startedAt) / 1000)),
           item_added_total: t.itemAddedTotal,
           item_deleted_total: t.itemDeletedTotal,
           hesitation_count: t.hesitationCount,
+          item_moved_total: t.hesitationCount,
           terrain_stroke_count: t.terrainStrokeCount,
           bury_actions: t.buryActions.slice(),
           destructive_loops: t.destructiveLoops,
-          undo_count: t.undoCount
+          undo_count: t.undoCount,
+          action_count: t.actionCount,
+          first_action_at_sec: t.firstActionAt ? Math.max(0, Math.round((t.firstActionAt - t.pageStartedAt) / 1000)) : 0,
+          last_action_at_sec: t.lastActionAt ? Math.max(0, Math.round((t.lastActionAt - startedAt) / 1000)) : 0,
+          post_finish_idle_sec: t.lastActionAt ? Math.max(0, Math.round((now - t.lastActionAt) / 1000)) : 0,
+          long_pause_count: longPauses.length,
+          longest_pause_sec: longPauses.length ? Math.max(...longPauses) : 0,
+          action_events: events.slice(-60)
         };
       }, []);
 
@@ -2589,6 +2630,7 @@
           const snapshot = next.pop();
           restoreSnapshot(snapshot);
           telemetryRef.current.undoCount += 1;
+          noteAction("undo");
           showToast(`已撤销，剩余 ${next.length} 步`);
           return next;
         });
@@ -3033,6 +3075,7 @@
         if (toolRef.current !== "select") {
           if (["mound", "dig", "water"].includes(toolRef.current)) {
             telemetryRef.current.terrainStrokeCount += 1;
+            noteAction("terrain");
           }
           const point = intersectTerrain(event.clientX, event.clientY);
           updateBrushCursor(point);
@@ -3179,6 +3222,7 @@
       const clearAll = useCallback(() => {
         const snapshot = makeSnapshot();
         telemetryRef.current.itemDeletedTotal += itemsRef.current.length;
+        noteAction("clear");
         setItems([]);
         setSelectedId(null);
         const terrain = terrainRef.current;

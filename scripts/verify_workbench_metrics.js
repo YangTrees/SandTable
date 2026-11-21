@@ -46,8 +46,19 @@ if (shaped.terrain_edited !== true) throw new Error('shaped case not edited');
 if (!(shaped.water_area_pct > 0) || !(shaped.mound_area_pct > 0)) {
   throw new Error('shaped percentages invalid: ' + JSON.stringify(shaped));
 }
-if (!shaped.terrain_summary.includes('挖出水域约占') || !shaped.terrain_summary.includes('中心区')) {
+if (!shaped.terrain_summary.includes('水域约占') || !shaped.terrain_summary.includes('中心区')) {
   throw new Error('summary format invalid: ' + shaped.terrain_summary);
+}
+
+const lightDepression = [];
+for (let r = 0; r < rows; r += 1) {
+  for (let c = 0; c < cols; c += 1) {
+    lightDepression.push((r >= 4 && r <= 5 && c >= 4 && c <= 5) ? -4 : 0);
+  }
+}
+const light = buildTerrainMetrics(mockTerrain(cols, rows, (c, r) => lightDepression[r * cols + c], xAt, zAt));
+if (!light.terrain_summary.includes('局部凹陷') || light.terrain_summary.includes('未见明显水域或沙丘聚集')) {
+  throw new Error('light shaping summary invalid: ' + JSON.stringify(light));
 }
 
 console.log('WORKBENCH_METRICS_OK');

@@ -11,6 +11,7 @@ from app.demo_report import build_demo_report  # noqa: E402
 from app.report_engine import (  # noqa: E402
     _EXPLORATION_DISCLAIMER,
     _EXPLORATION_BLOCKERS,
+    _EXPLORATION_SUFFIX_MARKERS,
     _third_person_text,
     normalize_meta,
     validate_report,
@@ -70,14 +71,35 @@ def build(payload):
 
 
 def assert_no_second_person(report):
-    blob = "\n".join(
-        str(value)
-        for key, value in report.items()
-        if key.startswith("chapter_") and key != "chapter_6_interview"
-        for value in (value.values() if isinstance(value, dict) else [value])
-    )
-    for word in ("你们", "你家孩子", "孩子你"):
+    def walk(value, key=""):
+        if key in {"chapter_6_interview", "verification_question", "questions"}:
+            return []
+        if isinstance(value, dict):
+            return [item for child_key, child in value.items() for item in walk(child, child_key)]
+        if isinstance(value, list):
+            return [text for child in value for text in walk(child, key)]
+        return [str(value)] if value is not None else []
+
+    blob = "\n".join(walk(report))
+    for word in ("你", "您", "你们", "你家孩子", "孩子你"):
         assert word not in blob, f"发现第二人称：{word}"
+
+
+def assert_dialogue_second_person(report):
+    for theme in report["chapter_2_imagery"].get("themes") or []:
+        question = str((theme or {}).get("verification_question") or "")
+        assert "受测者" not in question and "该生" not in question, question
+        if question:
+            assert any(word in question for word in ("你", "您")), question
+    for item in report["chapter_6_interview"].get("items") or []:
+        target = str((item or {}).get("target") or "")
+        for question in (item or {}).get("questions") or []:
+            question = str(question)
+            assert "受测者" not in question and "该生" not in question, question
+            if target == "受测者":
+                assert "你" in question, question
+            elif target in ("家长", "教师"):
+                assert "您" in question or "你们" in question, question
 
 
 def main():
@@ -87,7 +109,9 @@ def main():
     assert base["chapter_3_six_dimensions"]["dimensions"], "缺少六维"
     for dim in base["chapter_3_six_dimensions"]["dimensions"]:
         assert dim["assessment_theory"] == SIX_DIMENSION_THEORIES[dim["name"]], dim["name"]
-        assert dim["conclusion"].endswith(_EXPLORATION_DISCLAIMER), dim["name"]
+        assert dim["conclusion"].endswith(_EXPLORATION_DISCLAIMER) or any(
+            dim["conclusion"].endswith(marker) for marker in _EXPLORATION_SUFFIX_MARKERS
+        ), dim["name"]
         assert not any(blocker in dim["judgement"] + dim["assessment_result"] + dim["conclusion"]
                        for blocker in _EXPLORATION_BLOCKERS), dim["judgement"]
         assert dim["confidence"] in ("中", "低"), dim["confidence"]
@@ -100,8 +124,10 @@ def main():
     for name, dim in dims.items():
         if name in active_dimensions:
             assert "优先启动" in dim["training_module_directions"][0], name
+            assert "（" in dim["training_module_directions"][0] and "）" in dim["training_module_directions"][0], dim["training_module_directions"][0]
         else:
             assert "次级观察方向" in dim["training_module_directions"][0], name
+        assert dim["conclusion"].count(_EXPLORATION_DISCLAIMER) <= 1, dim["name"]
     deferred = {m["name"] for m in base["chapter_8_training_modules"]["modules"] if not m.get("active")}
     assert deferred == set(base["chapter_8_training_modules"]["deferred_modules"]), "第八章暂不启动不一致"
     assert "职业发展优势" in base["chapter_7_career"]["title"]
@@ -159,11 +185,20 @@ def main():
     expected = {name: RISK_INSTRUMENTS[key] for key, name in [
         ("depression", "抑郁"), ("anxiety", "焦虑"), ("learning_pressure", "学习压力感"),
         ("learning_burnout", "学习倦怠"), ("obsession", "强迫"), ("paranoia", "偏执"),
-        ("hostility", "敌对"), ("interpersonal_sensitivity", "人际关系敏感"), ("self_harm", "自我伤害倾向"),
+        ("hostility", "敌对"), ("interpersonal_sensitivity", "人际关系敏感"),
     ]}
+    self_harm_dim = next(d for d in risk_dims if d["name"] == "自我伤害倾向")
+    if self_harm_dim.get("level") == "L1":
+        expected["自我伤害倾向"] = "常规情绪与安全感访谈观察（若后续出现情绪恶化再启用 C-SSRS 筛查）"
+        assert "C-SSRS" not in self_harm_dim.get("judgement", "") or "再启用 C-SSRS" in self_harm_dim.get("judgement", "")
+        assert "必须由专业人员面对面" not in self_harm_dim.get("judgement", "")
+    else:
+        expected["自我伤害倾向"] = RISK_INSTRUMENTS["self_harm"]
     assert instruments == expected, instruments
     assert_no_second_person(base)
     assert_no_second_person(l3)
+    assert_dialogue_second_person(base)
+    assert_dialogue_second_person(l3)
     rewritten = _third_person_text("你要理解孩子，你们家孩子需要支持。")
     assert "你" not in rewritten and "孩子" not in rewritten, rewritten
     assert "受测者" in rewritten, rewritten

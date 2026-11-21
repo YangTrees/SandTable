@@ -18,6 +18,13 @@ from .config import (
 )
 from .demo_report import build_demo_report
 from .prompt import SYSTEM_PROMPT, build_user_prompt
+from .process_metrics import (
+    build_process_analysis,
+    build_process_metrics,
+    has_process_data,
+    process_note,
+    process_telemetry,
+)
 from .schemas import ReportEnvelope
 from .theory import (
     CHAPTER_TITLES,
@@ -73,6 +80,9 @@ _MODULE_ALIASES: dict[str, tuple[str, ...]] = {
 }
 
 _EXPLORATION_DISCLAIMER = "以上为基于沙盘与现有线索的探索性推断，需结合后续成绩与访谈核验。"
+_EXPLORATION_SUFFIX_MARKERS = (
+    "成绩与访谈核验", "后续成绩", "访谈核验", "探索性推断",
+)
 _EXPLORATION_BLOCKERS = (
     "无法判定", "无足够线索", "缺少足够线索", "暂不对", "不能替代",
     "无法形成", "缺少成绩数据", "不足以判定", "不作强弱判定",
@@ -91,6 +101,28 @@ _DESTRUCTION_TEXT_RE = re.compile(
 )
 _DEATH_ITEM_WORDS = ("骷髅", "墓碑", "棺材", "尸体", "遗照", "坟墓")
 _HIGH_RISK_ITEM_WORDS = _DEATH_ITEM_WORDS + ("匕首", "铁牢笼", "禁闭室", "镣铐")
+
+
+def _has_exploration_disclaimer(text: str) -> bool:
+    """判断结论是否已有探索性核验后缀，避免模型改写后重复追加。"""
+    normalized = re.sub(r"\s+", "", str(text or ""))
+    if _EXPLORATION_DISCLAIMER in normalized:
+        return True
+    tail = normalized[-160:]
+    return any(marker in tail for marker in _EXPLORATION_SUFFIX_MARKERS)
+
+
+def _dedupe_exploration_disclaimer(text: str) -> str:
+    """清除连续或分散出现的重复免责声明。"""
+    value = str(text or "")
+    value = re.sub(
+        rf"(?:\s*{re.escape(_EXPLORATION_DISCLAIMER)})+",
+        _EXPLORATION_DISCLAIMER,
+        value,
+    )
+    while value.count(_EXPLORATION_DISCLAIMER) > 1:
+        value = value.replace(_EXPLORATION_DISCLAIMER, "", 1)
+    return value
 
 
 def _ordered_fixed_rows(
@@ -156,6 +188,68 @@ def _ordered_fixed_rows(
     return ordered
 
 
+def _repair_training_modules(
+    rows: list[dict[str, Any]], expected_names: list[str]
+) -> list[dict[str, Any]]:
+    """模型偶发漏项时补齐六个固定模块，避免整份报告生成失败。"""
+    expected_by_norm = {_normalize_fixed_name(name): name for name in expected_names}
+    matched: dict[str, dict[str, Any]] = {}
+    unmatched: list[dict[str, Any]] = []
+    for row in rows:
+        norm = _normalize_fixed_name(row.get("name"))
+        canonical = expected_by_norm.get(norm)
+        if canonical and canonical not in matched:
+            matched[canonical] = row
+        else:
+            unmatched.append(row)
+
+    for row in list(unmatched):
+        norm = _normalize_fixed_name(row.get("name"))
+        candidates = [
+            expected for expected in expected_names
+            if expected not in matched
+            and norm
+            and (norm in _normalize_fixed_name(expected) or _normalize_fixed_name(expected) in norm)
+        ]
+        if len(candidates) == 1:
+            matched[candidates[0]] = row
+            unmatched.remove(row)
+            continue
+        candidates = [
+            expected for expected in expected_names
+            if expected not in matched
+            and any(keyword in norm for keyword in (_MODULE_ALIASES.get(expected) or ()))
+        ]
+        if len(candidates) == 1:
+            matched[candidates[0]] = row
+            unmatched.remove(row)
+
+    module_keys = {name: key for key, name in TRAINING_MODULES}
+    for name in expected_names:
+        if name in matched:
+            continue
+        matched[name] = {
+            "key": module_keys.get(name, ""),
+            "name": name,
+            "goals": ["围绕该维度设置循序渐进的观察与练习目标。"],
+            "dimensions": [],
+            "logic": "该模块由系统按固定六模块结构补位，具体训练逻辑待访谈与补充观察后细化。",
+            "format": "待定",
+            "teacher_actions": [],
+            "parent_actions": [],
+            "student_actions": [],
+            "active": False,
+            "deferred": True,
+            "placeholder": True,
+        }
+    ordered = []
+    for name in expected_names:
+        row = matched[name]
+        row["name"] = name
+        ordered.append(row)
+    return ordered
+
+
 def validate_report(report: dict[str, Any]) -> dict[str, Any]:
     """严格校验九章节、六维、九维风险、六训练模块。"""
     if not isinstance(report, dict):
@@ -180,9 +274,7 @@ def validate_report(report: dict[str, Any]) -> dict[str, Any]:
 
     modules = _chapter_list(report, "chapter_8_training_modules", "modules")
     expected_modules = [name for _, name in TRAINING_MODULES]
-    report["chapter_8_training_modules"]["modules"] = _ordered_fixed_rows(
-        modules, expected_modules, "chapter_8_training_modules.modules", _MODULE_ALIASES
-    )
+    report["chapter_8_training_modules"]["modules"] = _repair_training_modules(modules, expected_modules)
 
     for key, title in CHAPTER_TITLES.items():
         chapter = report.get(key)
@@ -252,91 +344,16 @@ def _terrain_observation(payload: dict[str, Any]) -> str:
     return "沙面基本平整，未进行明显地形塑形。"
 
 
-def _safe_int(value: Any) -> int:
-    try:
-        return max(0, int(float(value)))
-    except (TypeError, ValueError):
-        return 0
-
-
 def _process_telemetry(payload: dict[str, Any]) -> dict[str, Any]:
-    telemetry = payload.get("process_telemetry") if isinstance(payload.get("process_telemetry"), dict) else {}
-    legacy = payload.get("interaction_summary") if isinstance(payload.get("interaction_summary"), dict) else {}
-
-    def value(*keys: str) -> Any:
-        for key in keys:
-            if key in telemetry:
-                return telemetry.get(key)
-            if key in legacy:
-                return legacy.get(key)
-        return 0
-
-    bury_actions = telemetry.get("bury_actions")
-    if not isinstance(bury_actions, list):
-        bury_actions = legacy.get("bury_actions") if isinstance(legacy.get("bury_actions"), list) else []
-        if not isinstance(bury_actions, list):
-            bury_actions = []
-    return {
-        "total_duration_sec": _safe_int(value("total_duration_sec", "duration_seconds", "elapsed_seconds", "total_seconds")),
-        "item_added_total": _safe_int(value("item_added_total", "place_count")),
-        "item_deleted_total": _safe_int(value("item_deleted_total", "delete_count", "remove_count", "removed_count")),
-        "hesitation_count": _safe_int(value("hesitation_count", "drag_count", "move_count")),
-        "terrain_stroke_count": _safe_int(value("terrain_stroke_count", "brush_strokes", "raise_sand_count")),
-        "bury_actions": [x for x in bury_actions if isinstance(x, dict)][:20],
-        "destructive_loops": _safe_int(value("destructive_loops")),
-        "undo_count": _safe_int(value("undo_count")),
-    }
+    return process_telemetry(payload)
 
 
 def _has_process_data(payload: dict[str, Any]) -> bool:
-    telemetry = _process_telemetry(payload)
-    if any(telemetry[key] for key in (
-        "total_duration_sec", "item_added_total", "item_deleted_total",
-        "hesitation_count", "terrain_stroke_count", "destructive_loops", "undo_count",
-    )) or telemetry["bury_actions"]:
-        return True
-    summary = payload.get("interaction_summary") or {}
-    if not isinstance(summary, dict):
-        return False
-    process_keys = {
-        "duration_seconds", "elapsed_seconds", "total_seconds", "total_duration_sec",
-        "drag_count", "delete_count", "item_added_total", "item_deleted_total",
-        "hesitation_count", "undo_count", "undo_steps", "brush_strokes",
-        "terrain_stroke_count", "bury_actions", "destructive_loops", "last_item_dwell_seconds",
-    }
-    return any(key in summary for key in process_keys)
-
-
-def _format_duration(seconds: int) -> str:
-    if seconds <= 0:
-        return "未记录"
-    minutes, sec = divmod(seconds, 60)
-    hours, minutes = divmod(minutes, 60)
-    if hours:
-        return f"{hours} 小时 {minutes} 分 {sec} 秒"
-    if minutes:
-        return f"{minutes} 分 {sec} 秒"
-    return f"{sec} 秒"
+    return has_process_data(payload)
 
 
 def _process_note(payload: dict[str, Any]) -> str:
-    telemetry = _process_telemetry(payload)
-    if not _has_process_data(payload):
-        return "本次未采集制作耗时、推沙/挖水、修改犹豫次数；仅记录当前交互摘要。"
-    parts = [
-        f"制作总耗时 {_format_duration(telemetry['total_duration_sec'])}",
-        f"累计放入 {telemetry['item_added_total']} 件",
-        f"删除/撤回 {telemetry['item_deleted_total']} 件",
-        f"拖拽调整 {telemetry['hesitation_count']} 次",
-        f"推沙/挖水 {telemetry['terrain_stroke_count']} 笔",
-    ]
-    if telemetry["bury_actions"]:
-        parts.append(f"掩埋人物 {len(telemetry['bury_actions'])} 次")
-    if telemetry["destructive_loops"]:
-        parts.append(f"短时反复放删 {telemetry['destructive_loops']} 次")
-    if telemetry["undo_count"]:
-        parts.append(f"撤销 {telemetry['undo_count']} 次")
-    return "；".join(parts) + "。"
+    return process_note(payload)
 
 
 def _raw_record_echo(payload: dict[str, Any]) -> dict[str, str]:
@@ -365,6 +382,8 @@ def _report_basis(payload: dict[str, Any], transcript_url: str | None) -> list[s
         basis.append("受测者自述文本")
     if str(payload.get("teacher_observation") or "").strip():
         basis.append("教师观察记录")
+    if _has_process_data(payload):
+        basis.append("制作过程操作数据")
     if transcript_url:
         basis.append("学习成绩单1张")
     return basis
@@ -403,6 +422,16 @@ def _canonical_dimension_name(value: Any, expected_names: list[str]) -> str:
 def _module_short_name(name: Any) -> str:
     text = str(name or "").strip()
     return text.split("：", 1)[0] if "：" in text else text
+
+
+def _module_display_name(name: Any) -> str:
+    """把“模块一：专注力与沉浸训练（心流模块）”收束为“模块一（专注力与沉浸训练）”。"""
+    text = str(name or "").strip()
+    match = re.match(r"(模块[一二三四五六])(?:：|:)(.+)", text)
+    if not match:
+        return _module_short_name(text)
+    detail = re.sub(r"（[^）]*）$", "", match.group(2).strip()).strip()
+    return f"{match.group(1)}（{detail}）" if detail else match.group(1)
 
 
 def _risk_dimension_levels(report: dict[str, Any]) -> dict[str, str]:
@@ -506,7 +535,7 @@ def _backfill_dimension_training(report: dict[str, Any]) -> None:
     active_modules = [m for m in modules if m.get("active") is True]
     active_by_dimension: dict[str, list[str]] = {}
     for module in active_modules:
-        short = _module_short_name(module.get("name"))
+        short = _module_display_name(module.get("name"))
         for dimension_name in module.get("dimensions") or []:
             key = str(dimension_name or "").strip()
             if key:
@@ -758,9 +787,13 @@ def _ensure_six_dimension_exploration(
                     _clean_theory_warning(dimension[field])
                 )
 
-        conclusion = _clean_theory_warning(dimension.get("conclusion"))
-        if _EXPLORATION_DISCLAIMER not in conclusion:
+        conclusion = _dedupe_exploration_disclaimer(
+            _clean_theory_warning(dimension.get("conclusion"))
+        )
+        if not _has_exploration_disclaimer(conclusion):
             conclusion = (conclusion.rstrip("。") + "。" if conclusion else "") + _EXPLORATION_DISCLAIMER
+        elif conclusion and conclusion[-1] not in "。！？":
+            conclusion += "。"
         dimension["conclusion"] = conclusion
 
         confidence = str(dimension.get("confidence") or "").strip()
@@ -810,6 +843,63 @@ def _apply_theory_guardrails(
             chapter_7["strengths"] = softened
 
 
+def _soften_self_harm_l1(text: str) -> str:
+    """L1 的自我伤害维度只做常规访谈观察，不使用高危核查措辞。"""
+    value = str(text or "")
+    replacements = (
+        ("C-SSRS（哥伦比亚自杀严重程度评定量表）", "常规情绪与安全感访谈观察"),
+        ("C-SSRS", "常规情绪与安全感访谈观察"),
+        ("必须由专业人员面对面安全核查", "建议在常规情绪与安全感访谈中持续观察"),
+        ("必须面对面安全核查", "建议在常规情绪与安全感访谈中持续观察"),
+        ("需由专业人员后续面对面安全核查确认", "建议在常规情绪与安全感访谈中持续观察"),
+        ("需由专业人员后续面对面完成安全核查", "建议在常规情绪与安全感访谈中持续观察"),
+        ("需由专业人员面对面完成安全核查", "建议在常规情绪与安全感访谈中持续观察"),
+        ("需由专业人员面对面开展安全核查", "建议在常规情绪与安全感访谈中持续观察"),
+        ("需由专业人员面对面安全核查", "建议在常规情绪与安全感访谈中持续观察"),
+        ("由专业人员面对面完成安全核查", "建议在常规情绪与安全感访谈中持续观察"),
+        ("由专业人员面对面开展安全核查", "建议在常规情绪与安全感访谈中持续观察"),
+        ("由专业人员面对面安全核查", "建议在常规情绪与安全感访谈中持续观察"),
+        ("必须立即进行安全核查", "建议结合常规访谈持续观察，若情绪恶化再启用 C-SSRS 筛查"),
+        ("需立即进行安全核查", "建议结合常规访谈持续观察，若情绪恶化再启用 C-SSRS 筛查"),
+        ("必须进行安全核查", "建议结合常规访谈持续观察"),
+        ("建议立即转介", "建议结合常规访谈持续观察，必要时再转介"),
+    )
+    for old, new in replacements:
+        value = value.replace(old, new)
+    value = re.sub(
+        r"(?:必须|需要|需|应)?(?:由)?专业人员(?:后续)?面对面(?:完成|开展)?安全核查(?:确认)?",
+        "建议在常规情绪与安全感访谈中持续观察",
+        value,
+    )
+    return value
+
+
+def _ensure_chapter9(report: dict[str, Any]) -> None:
+    """兜底第九章三段建议，避免字段为空导致小标题在打印时丢失。"""
+    chapter = report.get("chapter_9_general_advice")
+    if not isinstance(chapter, dict):
+        chapter = {}
+        report["chapter_9_general_advice"] = chapter
+    chapter.setdefault("title", "总体使用建议")
+    fallbacks = {
+        "growth_mindset": "把当前困难视为可通过练习、支持与时间逐步改善的阶段性问题，避免用一次表现给自己或受测者下固定结论。",
+        "strength_transfer": "把沙盘中已经出现的边界感、秩序感或情绪觉察线索，迁移到日常学习与家庭沟通中，并在真实情境中继续观察。",
+        "capability_not_label": "报告中的描述指向当前阶段的能力表现与支持需求，不作为稳定人格、能力高低或诊断标签使用。",
+    }
+    for key, fallback in fallbacks.items():
+        value = chapter.get(key)
+        if isinstance(value, str):
+            value = [value]
+        if not isinstance(value, list):
+            value = []
+        value = [str(item).strip() for item in value if str(item or "").strip()]
+        chapter[key] = value or [fallback]
+    chapter.setdefault(
+        "disclaimer",
+        "本报告为发展性心理评估参考，非临床诊断；所有假设以访谈与专业判断为准。",
+    )
+
+
 def _apply_risk_guardrails(report: dict[str, Any], sample_quality: dict[str, Any]) -> None:
     chapter = report.get("chapter_5_risk")
     if not isinstance(chapter, dict):
@@ -838,6 +928,16 @@ def _apply_risk_guardrails(report: dict[str, Any], sample_quality: dict[str, Any
             dimension["norm_reference"] = "需由专业人员根据该维度选择对应量表与访谈核实"
         level_match = re.search(r"L[1-4]", str(dimension.get("level") or "").upper())
         level = level_match.group(0) if level_match else ""
+        is_self_harm = key == "self_harm" or name == "自我伤害倾向"
+        if is_self_harm and level == "L1":
+            dimension["norm_reference"] = (
+                "常规情绪与安全感访谈观察（若后续出现情绪恶化再启用 C-SSRS 筛查）"
+            )
+            for field in ("judgement", "assessment_result", "conclusion", "suggestion"):
+                if str(dimension.get(field) or "").strip():
+                    dimension[field] = _soften_self_harm_l1(dimension.get(field))
+        elif is_self_harm:
+            dimension["norm_reference"] = RISK_INSTRUMENTS.get("self_harm", dimension.get("norm_reference"))
         if level == "L1" and "未见显性" not in str(dimension.get("judgement") or ""):
             judgement = str(dimension.get("judgement") or "").strip().rstrip("。")
             dimension["judgement"] = (
@@ -1104,7 +1204,10 @@ def _enforce_third_person(value: Any, *, skip: bool = False) -> Any:
         return value
     if isinstance(value, dict):
         return {
-            key: _enforce_third_person(item, skip=(key == "chapter_6_interview"))
+            key: _enforce_third_person(
+                item,
+                skip=(skip or key in {"chapter_6_interview", "verification_question", "questions"}),
+            )
             for key, item in value.items()
         }
     if isinstance(value, list):
@@ -1112,6 +1215,235 @@ def _enforce_third_person(value: Any, *, skip: bool = False) -> Any:
     if isinstance(value, str):
         return _third_person_text(value)
     return value
+
+
+def _student_question_text(value: Any) -> str:
+    text = str(value or "").strip()
+    for old in ("你们家孩子", "你家孩子", "该名学生", "该学生", "这名学生", "这个学生", "该生", "受测者", "孩子"):
+        text = text.replace(old, "你")
+    if not any(word in text for word in ("你", "您")):
+        text = f"你能具体说说，{text}"
+    return text
+
+
+def _parent_question_text(value: Any) -> str:
+    text = str(value or "").strip()
+    for old in ("该名学生", "该学生", "这名学生", "这个学生", "该生", "受测者"):
+        text = text.replace(old, "孩子")
+    if "您" not in text and "你们" not in text:
+        text = f"您能具体说说，{text}"
+    return text
+
+
+def _teacher_question_text(value: Any) -> str:
+    text = str(value or "").strip()
+    for old in ("该名学生", "该学生", "这名学生", "这个学生", "该生", "受测者"):
+        text = text.replace(old, "孩子")
+    if "您" not in text and "你们" not in text:
+        text = f"您观察到，{text}"
+    return text
+
+
+def _ensure_dialogue_second_person(report: dict[str, Any]) -> None:
+    """第二章验证提问和第六章访谈脚本保留口语第二人称，不转写为“受测者”。"""
+    for theme in _chapter_list(report, "chapter_2_imagery", "themes"):
+        if isinstance(theme, dict) and theme.get("verification_question"):
+            theme["verification_question"] = _student_question_text(theme["verification_question"])
+
+    interview = report.get("chapter_6_interview")
+    if not isinstance(interview, dict):
+        return
+    for item in interview.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        target = str(item.get("target") or "受测者").strip()
+        if target == "家长":
+            convert = _parent_question_text
+        elif target == "教师":
+            convert = _teacher_question_text
+        else:
+            convert = _student_question_text
+        questions = item.get("questions")
+        if isinstance(questions, str):
+            questions = [questions]
+        if isinstance(questions, list):
+            item["questions"] = [convert(question) for question in questions if str(question or "").strip()]
+
+
+def _soften_process_claims(text: Any) -> str:
+    value = str(text or "")
+    replacements = (
+        ("反映出", "可能提示"),
+        ("说明受测者", "可能提示受测者"),
+        ("说明其", "可能提示其"),
+        ("体现出", "可能提示"),
+        ("认可度较高", "即时接受度较高（仍需访谈核验）"),
+        ("处于放松、信任的表达状态", "可能处于相对放松、愿意表达的状态（需访谈核验）"),
+        ("明确的初始构想", "相对清晰的初始构想"),
+        ("明确的主动控制意图", "较明显的主动控制意图"),
+        ("高度契合", "存在一定呼应"),
+        ("提供了过程层面的佐证", "提供了一条过程层面的弱证据"),
+    )
+    for old, new in replacements:
+        value = value.replace(old, new)
+    return value
+
+
+def _ensure_process_analysis(report: dict[str, Any], payload: dict[str, Any]) -> None:
+    """过程数据必须进入报告分析；模型缺字段时用同一套指标兜底。"""
+    chapter_1 = report.get("chapter_1_overview")
+    if not isinstance(chapter_1, dict):
+        return
+    scene_text = " ".join(str(item) for item in (chapter_1.get("scene_imagery") or []))
+    fallback = build_process_analysis(payload, scene_text)
+    current = chapter_1.get("process_analysis")
+    if not isinstance(current, dict):
+        chapter_1["process_analysis"] = fallback
+        return
+    if not has_process_data(payload):
+        chapter_1["process_analysis"] = fallback
+        return
+    merged = dict(current)
+    merged["available"] = True
+    merged.setdefault("title", "制作过程动力学观察")
+    for key in ("pace", "revision", "terrain_control", "theory_interpretation",
+                "integrated_finding", "evidence", "confidence"):
+        value = merged.get(key)
+        if key == "evidence":
+            if not isinstance(value, list) or not [x for x in value if str(x or "").strip()]:
+                merged[key] = fallback[key]
+            elif any(("process_metrics." in str(x) or "process_telemetry." in str(x) or "=" in str(x)) for x in value):
+                merged[key] = fallback[key]
+        elif not str(value or "").strip():
+            merged[key] = fallback[key]
+    for key in ("pace", "revision", "terrain_control", "theory_interpretation", "integrated_finding"):
+        merged[key] = _soften_process_claims(merged.get(key))
+    chapter_1["process_analysis"] = merged
+
+
+def _process_integration_fallback(payload: dict[str, Any], report: dict[str, Any]) -> dict[str, Any]:
+    metrics = build_process_metrics(payload)
+    if not metrics["available"]:
+        return {
+            "available": False,
+            "summary": "本次未采集制作过程数据，六维判断不以操作时序为依据。",
+            "referenced_dimensions": [],
+            "notes": [],
+            "confidence": "低",
+        }
+    chapter_1 = report.get("chapter_1_overview") or {}
+    scene_text = " ".join(str(item) for item in (chapter_1.get("scene_imagery") or []))
+    corpus = " ".join(str(payload.get(key) or "") for key in (
+        "sandplay_description", "self_narrative", "teacher_observation",
+    ))
+    corpus += " " + " ".join(str(item.get("label") or "") for item in (payload.get("items") or []) if isinstance(item, dict))
+    corpus += " " + scene_text
+    family_hit = any(word in corpus for word in (
+        "爷爷", "奶奶", "爸爸", "妈妈", "父亲", "母亲", "父母", "家庭", "家人",
+        "亲子", "家中", "兄弟", "姐妹",
+    ))
+    second = "家庭生态协同" if family_hit else "综合动力重塑"
+
+    duration = metrics["total_duration_sec"]
+    added = metrics["item_added_total"]
+    moved = metrics["item_moved_total"]
+    deleted = metrics["item_deleted_total"]
+    undo = metrics["undo_count"]
+    strokes = metrics["terrain_stroke_count"]
+    revision = metrics["revision_actions"]
+    per_item = metrics["seconds_per_item"]
+    density = metrics["action_density_per_min"]
+    terrain_share = metrics["terrain_action_share_pct"]
+
+    cognitive_note = (
+        f"制作过程为 {duration} 秒完成 {added} 件、平均 {per_item or '未计算'} 秒/件、"
+        f"动作密度 {density or '未计算'} 次/分钟，修改类动作 {revision} 次（删除 {deleted}、"
+        f"拖拽 {moved}、撤销 {undo}）。这支持“执行节奏连贯、整体规划较强”的假设，"
+        "但快速定型且低修改也可能意味着探索深度有限，因此本维度保持中等置信度，需访谈区分“果断”与“回避深入”。"
+    )
+    if second == "家庭生态协同":
+        second_note = (
+            f"推沙/挖水 {strokes} 笔，占全部动作 {terrain_share}%；地形操作说明受测者主动塑形沙面容器。"
+            "若家庭人物集中在中心，这一过程更支持“试图安放/容纳家庭情绪”的假设；"
+            "若水域或栅栏围住中心，则同时包含边界防御，需要在家庭访谈中核验谁被保护、谁被隔开。"
+        )
+    else:
+        second_note = (
+            f"推沙/挖水 {strokes} 笔，占全部动作 {terrain_share}%；在综合动力层面，"
+            "主动塑形可理解为为情绪腾出承载空间，而低修改、快节奏则提示当前行动意图较集中。"
+            "若场景呈封闭或孤立结构，需把“主动建构”与“提前封闭探索”作为两种竞争假设带进访谈。"
+        )
+
+    return {
+        "available": True,
+        "summary": (
+            f"制作过程提供时间维度证据：总耗时 {duration} 秒、放入 {added} 件、"
+            f"地形笔触 {strokes} 笔、修改类动作 {revision} 次。"
+            f"这些数据主要参与“全学科认知诊断”与“{second}”的判断，"
+            "不替代成绩、访谈或教师观察。"
+        ),
+        "referenced_dimensions": ["全学科认知诊断", second],
+        "notes": [cognitive_note, second_note],
+        "confidence": "中" if duration and added >= 3 else "低",
+    }
+
+
+def _ensure_process_integration(report: dict[str, Any], payload: dict[str, Any]) -> None:
+    chapter_3 = report.get("chapter_3_six_dimensions")
+    if not isinstance(chapter_3, dict):
+        return
+    fallback = _process_integration_fallback(payload, report)
+    current = chapter_3.get("process_integration")
+    if not isinstance(current, dict):
+        chapter_3["process_integration"] = fallback
+        return
+    if not fallback["available"]:
+        chapter_3["process_integration"] = fallback
+        return
+    merged = dict(current)
+    merged["available"] = True
+    if not str(merged.get("summary") or "").strip():
+        merged["summary"] = fallback["summary"]
+    if not isinstance(merged.get("referenced_dimensions"), list) or not merged["referenced_dimensions"]:
+        merged["referenced_dimensions"] = fallback["referenced_dimensions"]
+    if not isinstance(merged.get("notes"), list) or not [x for x in merged["notes"] if str(x or "").strip()]:
+        merged["notes"] = fallback["notes"]
+    if not str(merged.get("confidence") or "").strip():
+        merged["confidence"] = fallback["confidence"]
+    chapter_3["process_integration"] = merged
+
+
+def _guard_process_integration(report: dict[str, Any], payload: dict[str, Any]) -> None:
+    """防止把低修改/无删除直接推断成家庭关系正向或动力未耗竭。"""
+    chapter_3 = report.get("chapter_3_six_dimensions")
+    if not isinstance(chapter_3, dict):
+        return
+    current = chapter_3.get("process_integration")
+    if not isinstance(current, dict) or not current.get("available"):
+        return
+    fallback = _process_integration_fallback(payload, report)
+    if not fallback["available"]:
+        chapter_3["process_integration"] = fallback
+        return
+    refs = [str(x).strip() for x in (current.get("referenced_dimensions") or []) if str(x).strip()]
+    notes = [str(x).strip() for x in (current.get("notes") or []) if str(x).strip()]
+    serialized = current.get("summary", "") + " " + " ".join(notes)
+    overclaims = ("整体正向", "未出现耗竭", "无选择困难", "支持了", "认可度较高", "处于放松、信任")
+    if any(marker in serialized for marker in overclaims) or len(refs) < 2:
+        chapter_3["process_integration"] = fallback
+        return
+    allowed = set(refs)
+    filtered = []
+    for note in notes:
+        prefix = note.split("维度", 1)[0].strip()
+        if prefix in allowed:
+            filtered.append(_soften_process_claims(note))
+    if len(filtered) < 2:
+        chapter_3["process_integration"] = fallback
+        return
+    current["notes"] = filtered
+    current["summary"] = _soften_process_claims(current.get("summary"))
+    chapter_3["process_integration"] = current
 
 
 def apply_report_quality_gates(
@@ -1128,6 +1460,7 @@ def apply_report_quality_gates(
     raw_record = _raw_record_echo(payload)
     meta["assessment_basis"] = _report_basis(payload, transcript_url)
     meta["sample_quality"] = sample_quality
+    meta["process_metrics"] = build_process_metrics(payload)
     meta["client_inputs"] = {
         "sandplay_description": raw_record["sandplay_description"],
         "self_narrative": raw_record["self_narrative"],
@@ -1147,11 +1480,15 @@ def apply_report_quality_gates(
             chapter_1["representative_item_name"] = representative
         chapter_1["terrain_observation"] = terrain_observation
         chapter_1["process_observation"] = process_note
+        _ensure_process_analysis(report, payload)
+    _ensure_process_integration(report, payload)
+    _guard_process_integration(report, payload)
     if sample_quality.get("low_projection"):
         _cap_low_sample_confidence(report)
     priority_level = _apply_priority_routing(report, payload, transcript_url)
     _apply_theory_guardrails(report, payload, transcript_url)
     _apply_risk_guardrails(report, sample_quality)
+    _ensure_chapter9(report)
     if priority_level != "L4_RED":
         _apply_training_gates(report, sample_quality)
         _backfill_dimension_training(report)
@@ -1159,6 +1496,7 @@ def apply_report_quality_gates(
     for chapter_key, chapter_value in report.items():
         if re.fullmatch(r"chapter_[1-9]_[a-z_]+", str(chapter_key)) and chapter_key != "chapter_6_interview":
             report[chapter_key] = _enforce_third_person(chapter_value)
+    _ensure_dialogue_second_person(report)
     return report
 
 
@@ -1220,7 +1558,7 @@ async def call_multimodal(
             {"role": "user", "content": user_content},
         ],
         "temperature": 0.2,
-        "max_tokens": 16000,
+        "max_tokens": 24000,
     }
     # 方舟的 Doubao Seed 2.0 默认开启深度思考，思考 token 会挤占报告 JSON 的输出额度。
     # 结构化九章报告不需要额外思维链，这里在方舟请求中显式关闭，避免报告被截断。
@@ -1239,6 +1577,11 @@ async def call_multimodal(
     if not isinstance(content, str) or not content.strip():
         raise ValueError("多模态模型返回为空")
     parsed = json.loads(clean_json_text(content))
+    usage = data.get("usage") if isinstance(data.get("usage"), dict) else {}
+    if isinstance(parsed, dict):
+        meta = parsed.setdefault("meta", {})
+        if isinstance(meta, dict):
+            meta["generation_usage"] = usage
     return validate_report(parsed)
 
 

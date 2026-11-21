@@ -316,9 +316,20 @@
       background: linear-gradient(90deg, var(--accent-soft), #fff); color: var(--accent-deep); font-size: 8.5pt;
     }
     .process-line { margin-top: 3mm; padding: 3mm 3.6mm; border: 1px dashed #d7cbb8; border-radius: 2.5mm; background: #fcfaf5; color: var(--ink-2); font-size: 8.2pt; line-height: 1.65; }
+    .process-analysis { margin-top: 3mm; padding: 3mm 4.5mm; border-left: 1.2mm solid #8a6a3d; border-radius: 2.5mm; background: linear-gradient(135deg, #fbf7ef, #f6f0e4); color: var(--ink-2); font-size: 7.9pt; line-height: 1.56; break-inside: avoid; page-break-inside: avoid; }
+    .process-analysis-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4mm; margin-bottom: 1.4mm; padding-bottom: 1.2mm; border-bottom: 1px solid #e4d8c5; }
+    .process-analysis-head b { color: #624a2b; font-family: var(--serif); font-size: 9.2pt; font-weight: 600; }
+    .process-analysis-head span { color: #8d7b63; font-size: 6.8pt; white-space: nowrap; }
+    .process-analysis p { margin: 1.2mm 0 0; text-align: justify; }
+    .process-analysis p b { color: #624a2b; font-weight: 600; margin-right: 1.4mm; }
+    .process-evidence { margin-top: 1.4mm; padding-top: 1.2mm; border-top: 1px dashed #ded1bd; color: #7d6a51; font-size: 7pt; line-height: 1.45; }
+    .process-integration { margin-top: 4mm; padding: 4mm 5mm; border-radius: 2.5mm; background: #f4efe5; border: 1px solid #ddd0bb; color: var(--ink-2); font-size: 8.1pt; line-height: 1.66; }
+    .process-integration p { margin: 1.6mm 0 0; text-align: justify; }
+    .process-integration-note { margin-top: 1.8mm; padding-left: 3mm; border-left: 1px solid #c9b99f; text-align: justify; }
     .raw-input {
       margin-top: 4mm; padding: 4mm 4.5mm; border: 1px solid #d8dfd9;
       border-radius: 3mm; background: #fbfdfb;
+      break-inside: avoid; page-break-inside: avoid;
     }
     .raw-input-head {
       display: flex; align-items: baseline; justify-content: space-between; gap: 3mm;
@@ -534,12 +545,14 @@
     .advice-card h3 { margin: 0 0 2mm; color: var(--accent-deep); font-family: var(--serif); font-size: 9.8pt; }
     .advice-card ul { margin: 0; padding-left: 4mm; }
     .advice-card li { margin: 1.2mm 0; color: var(--ink-2); font-size: 8.8pt; line-height: 1.65; }
+    .advice-empty { margin: 0; color: var(--ink-2); font-size: 8.8pt; line-height: 1.65; }
     .callout-warn {
       display: flex; gap: 3mm; margin-top: 4mm; padding: 4mm 5mm;
       border: 0; border-radius: 3mm;
       background: linear-gradient(135deg, #143f35, #235847);
       color: #f7efe0; font-size: 8.1pt; line-height: 1.62;
       box-shadow: 0 8px 20px rgba(17,43,35,.14);
+      break-inside: avoid; page-break-inside: avoid;
     }
     .callout-warn .icon {
       flex: 0 0 auto; width: 5mm; height: 5mm; display: grid; place-items: center;
@@ -618,6 +631,8 @@
     #toast.show { opacity: 1; }
     .hide { display: none !important; }
     .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+    .section-head, .advice-card h3 { break-after: avoid; page-break-after: avoid; }
+    .chapter9-lead { break-inside: avoid; page-break-inside: avoid; }
 
     @media (max-width: 860px) {
       .toolbar { align-items: flex-start; flex-direction: column; padding: 10px 12px; }
@@ -645,6 +660,8 @@
       .report-hero { border-radius: 0; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .priority-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid; page-break-inside: avoid; }
       .risk-card, .risk-detail { break-inside: avoid; page-break-inside: avoid; }
+      .section-head, .advice-card h3 { break-after: avoid; page-break-after: avoid; }
+      .chapter9-lead { break-inside: avoid; page-break-inside: avoid; }
       .card, .dimension-card, .risk-detail, .module-card, .advice-card, .table-wrap, .callout-warn { box-shadow: none; }
       .section::before { display: none; }
       .qr-zone.no-share { display: none !important; }
@@ -818,8 +835,14 @@
         delete data.meta.counselor_note;
         delete data.meta.review_note;
         delete data.meta.client_inputs;
+        delete data.meta.generation_usage;
       }
-      if (data.chapter_1_overview) delete data.chapter_1_overview.process_observation;
+      if (data.chapter_1_overview) {
+        delete data.chapter_1_overview.process_observation;
+        delete data.chapter_1_overview.process_analysis;
+        delete data.chapter_1_overview.process_metrics;
+      }
+      if (data.chapter_3_six_dimensions) delete data.chapter_3_six_dimensions.process_integration;
       function scrub(value) {
         if (Array.isArray(value)) return value.map(scrub);
         if (value && typeof value === "object") {
@@ -940,7 +963,6 @@
           ${narrative ? `<div class="raw-quote"><b>自述文本</b>${esc(narrative)}</div>` : ""}
           ${teacher ? `<div class="raw-quote"><b>教师观察记录</b>${esc(teacher)}</div>` : ""}
         </div>
-        ${inputs.process_note ? `<div class="raw-process">制作过程：${esc(inputs.process_note)}</div>` : ""}
       </div>`;
     }
     function renderChapter1(c1, index) {
@@ -948,6 +970,8 @@
       const inputs = (state.full && state.full.meta && state.full.meta.client_inputs) || {};
       const representativeName = text(c1.representative_item_name || inputs.representative_item_name, "");
       const processSummary = text(c1.process_observation || inputs.process_note, "");
+      const processAnalysis = c1.process_analysis || {};
+      const processAvailable = processAnalysis.available !== false && Boolean(processAnalysis.pace || processAnalysis.theory_interpretation);
       const grid = state.mode === "counselor" ? renderMiniGrid(c1.nine_grid_distribution) : `<p class="terrain-line">${esc(c1.blank_areas || "画面分区概况以整体聚集与留白描述呈现。")}</p>`;
       return `<section class="section avoid-break" data-chapter="1">
         ${sectionHead(index, c1.title || "整体结果与场景概览", "沙盘作品 1 张")}
@@ -967,10 +991,19 @@
         </div>
         <div class="scene-quote"><div class="soft-label">场景意象</div>${listMarkup(c1.scene_imagery, "plain-list")}</div>
         ${clientInputBlock()}
-        ${representativeName
+        ${state.mode !== "counselor" && representativeName
           ? `<div class="representative-line"><b>代表沙具</b>${esc(representativeName)}</div>` : ""}
-        <div class="terrain-line"><b>地形观察</b>${esc(text(c1.terrain_observation, "沙面基本平整，未进行明显地形塑形。"))}</div>
+        <div class="terrain-line"><b>地形观察</b>${c1.terrain_observation ? esc(text(c1.terrain_observation, "")) : "本次未采集地形塑形数据，地形形态以场景意象描述为准。"}</div>
         ${state.mode === "counselor" && processSummary ? `<div class="process-line"><b>制作过程</b>${esc(processSummary)}</div>` : ""}
+        ${state.mode === "counselor" && processAvailable ? `<div class="process-analysis">
+          <div class="process-analysis-head"><b>${esc(text(processAnalysis.title, "制作过程动力学观察"))}</b><span>基于操作时序与地形笔触的探索性分析</span></div>
+          ${processAnalysis.pace ? `<p><b>节奏与投入</b>${esc(text(processAnalysis.pace, ""))}</p>` : ""}
+          ${processAnalysis.revision ? `<p><b>修改与犹豫</b>${esc(text(processAnalysis.revision, ""))}</p>` : ""}
+          ${processAnalysis.terrain_control ? `<p><b>推沙与挖水</b>${esc(text(processAnalysis.terrain_control, ""))}</p>` : ""}
+          ${processAnalysis.theory_interpretation ? `<p><b>箱庭视角</b>${esc(text(processAnalysis.theory_interpretation, ""))}</p>` : ""}
+          ${processAnalysis.integrated_finding ? `<p><b>与场景互证</b>${esc(text(processAnalysis.integrated_finding, ""))}</p>` : ""}
+          ${list(processAnalysis.evidence).length ? `<div class="process-evidence">证据：${esc(list(processAnalysis.evidence).join("；"))}</div>` : ""}
+        </div>` : ""}
       </section>`;
     }
     function renderChapter2(c2, index) {
@@ -990,6 +1023,8 @@
     }
     function renderChapter3(c3, index) {
       const dimensions = list(c3.dimensions).filter(Boolean);
+      const processIntegration = c3.process_integration || {};
+      const processAvailable = processIntegration.available !== false && Boolean(processIntegration.summary);
       return `<section class="section" data-chapter="3">
         ${sectionHead(index, c3.title || "六维方向判定与训练模块指向", c3.intro || "")}
         ${dimensions.map((dimension, i) => `<article class="dimension-card avoid-break">
@@ -1007,6 +1042,11 @@
             <div class="conclusion">${esc(text(dimension.conclusion, ""))}</div>
           </div>
         </article>`).join("")}
+        ${processAvailable ? `<div class="process-integration avoid-break">
+          <div class="process-analysis-head"><b>制作过程如何参与六维判断</b><span>${esc(list(processIntegration.referenced_dimensions).filter(Boolean).join(" · ") || "过程证据")}</span></div>
+          <p>${esc(text(processIntegration.summary, ""))}</p>
+          ${list(processIntegration.notes).filter(Boolean).map((note) => `<div class="process-integration-note">${esc(note)}</div>`).join("")}
+        </div>` : ""}
       </section>`;
     }
     function renderChapter4(c4, index) {
@@ -1172,12 +1212,18 @@
       </section>`;
     }
     function renderAdviceCard(title, items) {
-      return `<div class="advice-card"><h3>${esc(title)}</h3>${listMarkup(items, "")}</div>`;
+      const rows = list(items).filter(Boolean);
+      const body = rows.length
+        ? listMarkup(rows, "")
+        : `<p class="advice-empty">本部分暂无补充建议，后续可结合访谈与观察继续完善。</p>`;
+      return `<div class="advice-card"><h3>${esc(title)}</h3>${body}</div>`;
     }
     function renderChapter9(c9, index) {
       return `<section class="section" data-chapter="9">
-        ${sectionHead(index, c9.title || "总体使用建议", "")}
-        ${renderAdviceCard("（一）成长型思维：能力训练的底层动力", c9.growth_mindset)}
+        <div class="chapter9-lead avoid-break">
+          ${sectionHead(index, c9.title || "总体使用建议", "")}
+          ${renderAdviceCard("（一）成长型思维：能力训练的底层动力", c9.growth_mindset)}
+        </div>
         ${renderAdviceCard("（二）优势能力迁移", c9.strength_transfer)}
         ${renderAdviceCard("（三）以能力发展替代特质判定（避免标签化）", c9.capability_not_label)}
         <div class="callout-warn"><span class="icon">!</span><div><b>本报告为发展性心理评估参考，非临床诊断</b>${esc(c9.disclaimer || "报告中的意象分析、六维评估均为探索性建议，仅用于制定个性化支持方案。")}</div></div>
@@ -1359,7 +1405,7 @@
             scrollY: 0
           },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["css", "legacy"], avoid: [".avoid-break", ".dimension-card", ".risk-card", ".risk-detail", ".priority-banner", ".module-card", ".table-wrap", ".figure-block"] }
+          pagebreak: { mode: ["css", "legacy"], avoid: [".avoid-break", ".chapter9-lead", ".dimension-card", ".risk-card", ".risk-detail", ".priority-banner", ".module-card", ".table-wrap", ".figure-block"] }
         };
         sheet.classList.add("pdf-exporting");
         const worker = html2pdf().set(opt).from(sheet).toPdf();
