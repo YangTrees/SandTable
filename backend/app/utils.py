@@ -65,6 +65,8 @@ def public_copy(report: dict[str, Any]) -> dict[str, Any]:
     banner = data.get("priority_banner") or {}
     level = str(banner.get("level") or "").upper()
     l4_guard = "L4" in level
+    meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
+    holistic_high = str(meta.get("holistic_screen_risk") or "").lower() == "high"
     data.pop("chapter_5_risk", None)
     data.pop("counselor_only", None)
     data.pop("risk_level", None)
@@ -72,14 +74,44 @@ def public_copy(report: dict[str, Any]) -> dict[str, Any]:
     data.pop("priority_banner", None)
     data.pop("risk_banner", None)
     data.pop("raw_record_echo", None)
-    meta = data.get("meta")
     if isinstance(meta, dict):
         meta.pop("counselor_note", None)
         meta.pop("review_note", None)
         meta.pop("client_inputs", None)
+        meta.pop("holistic_screen", None)
+        meta.pop("holistic_screen_risk", None)
+        if isinstance(meta.get("quality_flags"), list):
+            meta["quality_flags"] = [
+                item for item in meta["quality_flags"]
+                if not str(item).startswith("HOLISTIC_")
+            ]
+        if isinstance(meta.get("quality_warnings"), list):
+            meta["quality_warnings"] = [
+                item for item in meta["quality_warnings"]
+                if not str((item or {}).get("code") or "").startswith("HOLISTIC_")
+            ]
     chapter1 = data.get("chapter_1_overview")
     if isinstance(chapter1, dict):
         chapter1.pop("process_observation", None)
+        chapter1.pop("holistic_visual_check", None)
+        if holistic_high:
+            for field in ("clusters", "blank_areas", "scene_imagery"):
+                value = chapter1.get(field)
+                if isinstance(value, list):
+                    chapter1[field] = [
+                        "整体构图出现需专业核查的高危文字/符号" if any(
+                            term in str(item) for term in ("死", "自杀", "诀别", "永别", "SOS", "求救", "救命")
+                        ) else item
+                        for item in value
+                    ]
+                elif isinstance(value, str) and any(
+                    term in value for term in ("死", "自杀", "诀别", "永别", "SOS", "求救", "救命")
+                ):
+                    chapter1[field] = "整体构图出现需专业核查的高危文字/符号"
+    if l4_guard:
+        chapter8 = data.get("chapter_8_training_modules")
+        if isinstance(chapter8, dict):
+            chapter8["intro"] = "本阶段训练模块暂缓，具体安排以心理老师的沟通为准。"
     data = _public_scrub(data)
     if l4_guard:
         data["share_guard"] = {

@@ -332,6 +332,13 @@
       background: linear-gradient(90deg, var(--accent-soft), #fff); color: var(--accent-deep); font-size: 8.5pt;
     }
     .process-line { margin-top: 3mm; padding: 3mm 3.6mm; border: 1px dashed #d7cbb8; border-radius: 2.5mm; background: #fcfaf5; color: var(--ink-2); font-size: 8.2pt; line-height: 1.65; }
+    .holistic-card { margin-top: 3mm; padding: 3.2mm 4mm; border: 1px solid var(--line); border-left: 3px solid #7b8794; border-radius: 0 2.5mm 2.5mm 0; background: #fbfbfa; color: var(--ink-2); font-size: 8.1pt; line-height: 1.6; break-inside: avoid; }
+    .holistic-card.high { border-color: #d9a49c; border-left-color: #a8554e; background: #fdf2f0; }
+    .holistic-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 4mm; margin-bottom: 1.2mm; }
+    .holistic-card-head b { color: var(--ink); font-family: var(--serif); font-size: 9pt; }
+    .holistic-card-head span { color: #a8554e; font-size: 7.6pt; font-weight: 600; }
+    .holistic-card p { margin: 1mm 0 0; }
+    .holistic-card p b { color: var(--muted); font-weight: 600; margin-right: 1.5mm; }
     .process-analysis { margin-top: 3mm; padding: 3mm 4.5mm; border-left: 1.2mm solid #8a6a3d; border-radius: 2.5mm; background: linear-gradient(135deg, #fbf7ef, #f6f0e4); color: var(--ink-2); font-size: 7.9pt; line-height: 1.56; break-inside: avoid; page-break-inside: avoid; }
     .process-analysis-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4mm; margin-bottom: 1.4mm; padding-bottom: 1.2mm; border-bottom: 1px solid #e4d8c5; }
     .process-analysis-head b { color: #624a2b; font-family: var(--serif); font-size: 9.2pt; font-weight: 600; }
@@ -867,6 +874,7 @@
       const banner = data.priority_banner || {};
       const guardLevel = String(banner.level || "").toUpperCase();
       const l4Guard = guardLevel.indexOf("L4") >= 0;
+      const holisticHigh = Boolean(data.meta && String(data.meta.holistic_screen_risk || "").toLowerCase() === "high");
       delete data.priority_banner;
       delete data.risk_banner;
       delete data.chapter_5_risk;
@@ -879,7 +887,9 @@
         delete data.meta.review_note;
         delete data.meta.client_inputs;
         delete data.meta.generation_usage;
-        const riskCodes = ["RISK_LEVEL_CONFLICT", "TRAINING_INTENSITY_CONFLICT"];
+        delete data.meta.holistic_screen;
+        delete data.meta.holistic_screen_risk;
+        const riskCodes = ["RISK_LEVEL_CONFLICT", "TRAINING_INTENSITY_CONFLICT", "HOLISTIC_RISK_SYMBOL", "HOLISTIC_SCREEN_UNAVAILABLE"];
         data.meta.quality_warnings = list(data.meta.quality_warnings).filter((item) => item && !riskCodes.includes(String(item.code || "")));
         data.meta.quality_flags = list(data.meta.quality_flags).filter((code) => !riskCodes.includes(String(code || "")));
         if (data.meta.sample_quality && typeof data.meta.sample_quality === "object") {
@@ -891,6 +901,20 @@
         delete data.chapter_1_overview.process_observation;
         delete data.chapter_1_overview.process_analysis;
         delete data.chapter_1_overview.process_metrics;
+        delete data.chapter_1_overview.holistic_visual_check;
+        if (holisticHigh) {
+          ["clusters", "blank_areas", "scene_imagery"].forEach((field) => {
+            const value = data.chapter_1_overview[field];
+            if (Array.isArray(value)) {
+              data.chapter_1_overview[field] = value.map((item) => /死|自杀|诀别|永别|SOS|求救|救命/.test(String(item)) ? "整体构图出现需专业核查的高危文字/符号" : item);
+            } else if (typeof value === "string" && /死|自杀|诀别|永别|SOS|求救|救命/.test(value)) {
+              data.chapter_1_overview[field] = "整体构图出现需专业核查的高危文字/符号";
+            }
+          });
+        }
+      }
+      if (l4Guard && data.chapter_8_training_modules && typeof data.chapter_8_training_modules === "object") {
+        data.chapter_8_training_modules.intro = "本阶段训练模块暂缓，具体安排以心理老师的沟通为准。";
       }
       if (data.chapter_3_six_dimensions) delete data.chapter_3_six_dimensions.process_integration;
       function scrub(value) {
@@ -1034,6 +1058,18 @@
       const processSummary = text(c1.process_observation || inputs.process_note, "");
       const processAnalysis = c1.process_analysis || {};
       const processAvailable = processAnalysis.available !== false && Boolean(processAnalysis.pace || processAnalysis.theory_interpretation);
+      const holistic = c1.holistic_visual_check || {};
+      const holisticText = list(holistic.readable_text).filter(Boolean);
+      const holisticForms = list(holistic.overall_forms).filter(Boolean);
+      const holisticHigh = String(holistic.risk_level || "").toLowerCase() === "high";
+      const holisticHtml = (holisticText.length || holisticForms.length || holistic.risk_level) ? `
+        <div class="holistic-card ${holisticHigh ? "high" : ""}">
+          <div class="holistic-card-head"><b>整体构图判读</b><span>${holisticHigh ? "高危文字/符号 · 已触发预警" : "整体筛查"}</span></div>
+          ${holisticText.length ? `<p><b>可读文字</b>${esc(holisticText.join("、"))}</p>` : ""}
+          ${holisticForms.length ? `<p><b>整体形态</b>${esc(holisticForms.join("；"))}</p>` : ""}
+          ${holistic.symbol_meaning ? `<p><b>语义假设</b>${esc(text(holistic.symbol_meaning, ""))}</p>` : ""}
+          ${holistic.risk_evidence ? `<p><b>判定依据</b>${esc(text(holistic.risk_evidence, ""))}</p>` : ""}
+        </div>` : "";
       const grid = state.mode === "counselor" ? renderMiniGrid(c1.nine_grid_distribution) : `<p class="terrain-line">${esc(c1.blank_areas || "画面分区概况以整体聚集与留白描述呈现。")}</p>`;
       return `<section class="section avoid-break" data-chapter="1">
         ${sectionHead(index, c1.title || "整体结果与场景概览", "沙盘作品 1 张")}
@@ -1052,6 +1088,7 @@
           <div class="card"><div class="card-title">${state.mode === "counselor" ? "画面分区分布" : "画面分区概况"}</div>${grid}</div>
         </div>
         <div class="scene-quote"><div class="soft-label">场景意象</div>${listMarkup(c1.scene_imagery, "plain-list")}</div>
+        ${state.mode === "counselor" ? holisticHtml : ""}
         ${clientInputBlock()}
         ${state.mode !== "counselor" && representativeName
           ? `<div class="representative-line"><b>代表沙具</b>${esc(representativeName)}</div>` : ""}

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import base64
 import json
 import re
@@ -17,6 +18,12 @@ from .config import (
     MULTIMODAL_TIMEOUT_SECONDS,
 )
 from .demo_report import build_demo_report
+from .holistic import (
+    HOLISTIC_SCREEN_PROMPT,
+    is_high_risk,
+    normalize_screen,
+    screen_triggers,
+)
 from .prompt import SYSTEM_PROMPT, build_user_prompt
 from .quality import (
     QUALITY_FLAG_META,
@@ -921,7 +928,7 @@ def _set_risk_dimension_floor(
         if judgement:
             dimension["judgement"] = judgement
         if evidence:
-            existing = str(dimension.get("evidence") or "").strip()
+            existing = str(dimension.get("evidence") or "").strip().rstrip("。；; ")
             dimension["evidence"] = f"{existing}；{evidence}" if existing else evidence
         if key == "self_harm":
             dimension["norm_reference"] = RISK_INSTRUMENTS.get("self_harm", dimension.get("norm_reference"))
@@ -944,14 +951,24 @@ def _apply_risk_consistency(report: dict[str, Any], priority_level: str) -> None
 
     if banner_rank >= 4:
         trigger_blob = " ".join(triggers)
-        if any(word in trigger_blob for word in ("自伤", "绝望", "不想活", "活着没意思", "自杀")):
+        holistic_trigger = any(str(item).startswith("整体构图") for item in triggers)
+        if holistic_trigger:
+            note = (
+                "本次沙盘整体构图形成明确的高危文字/符号，属于重大风险线索；"
+                "其优先级高于单个沙具的常规含义，需立即核查死亡、自伤与危机相关表达，"
+                "并完成 24 小时安全核查与专业转介评估。"
+            )
+            self_harm_floor = "L4"
+        elif any(word in trigger_blob for word in ("自伤", "绝望", "不想活", "活着没意思", "自杀")):
             note = "本次出现 L4 自伤/绝望文本触发线索，需优先核查自伤与死亡相关表达；该分级来自触发线索，需访谈与 C-SSRS 核实。"
+            self_harm_floor = "L3"
         else:
             note = "本次出现 L4 高危画面触发线索，需优先核查死亡、自伤与危机相关表达；该分级来自触发线索，需访谈与 C-SSRS 核实。"
+            self_harm_floor = "L3"
         _set_risk_dimension_floor(
             report,
             "self_harm",
-            "L3",
+            self_harm_floor,
             judgement=note,
             evidence="；".join(triggers[:4]) or "L4 优先级触发",
         )
@@ -1069,6 +1086,67 @@ def _priority_text_blob(payload: dict[str, Any]) -> str:
     ))
 
 
+def _merge_holistic_screen(report: dict[str, Any], screen: dict[str, Any] | None) -> dict[str, Any]:
+    """把独立整体构图筛查结果写入第一章；模型漏写时由服务端补位。"""
+    chapter_1 = report.get("chapter_1_overview")
+    if not isinstance(chapter_1, dict):
+        return {}
+    existing = chapter_1.get("holistic_visual_check")
+    merged = dict(existing) if isinstance(existing, dict) else {}
+    if isinstance(screen, dict) and screen.get("status") == "ok":
+        for key in ("overall_forms", "readable_text"):
+            value = screen.get(key)
+            if isinstance(value, list) and value:
+                merged[key] = value
+        for key in ("symbol_meaning", "risk_evidence"):
+            value = str(screen.get(key) or "").strip()
+            if value:
+                previous = str(merged.get(key) or "").strip().rstrip("。；; ")
+                if previous:
+                    previous_norm = re.sub(r"[\s，。；、：“”\"']", "", previous)
+                    value_norm = re.sub(r"[\s，。；、：“”\"']", "", value)
+                    if previous_norm and (previous_norm in value_norm or value_norm in previous_norm):
+                        merged[key] = previous if len(previous) >= len(value) else value
+                    else:
+                        merged[key] = f"{previous}；{value}"
+                else:
+                    merged[key] = value
+        screen_level = str(screen.get("risk_level") or "").strip().lower()
+        if screen_level == "high" or is_high_risk(screen):
+            merged["risk_level"] = "high"
+        elif not str(merged.get("risk_level") or "").strip():
+            merged["risk_level"] = screen_level or "none"
+        if not str(merged.get("confidence") or "").strip():
+            merged["confidence"] = str(screen.get("confidence") or "unknown")
+    if isinstance(screen, dict):
+        merged["screen_status"] = str(screen.get("status") or "unknown")
+    if merged:
+        chapter_1["holistic_visual_check"] = merged
+    return merged
+
+
+def _holistic_priority(report: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any] | None:
+    chapter_1 = report.get("chapter_1_overview") if isinstance(report.get("chapter_1_overview"), dict) else {}
+    check = chapter_1.get("holistic_visual_check") if isinstance(chapter_1.get("holistic_visual_check"), dict) else {}
+    screen = payload.get("_holistic_screen") if isinstance(payload.get("_holistic_screen"), dict) else {}
+
+    triggers: list[str] = []
+    if is_high_risk(check):
+        triggers.extend(screen_triggers(check))
+    if is_high_risk(screen):
+        triggers.extend(screen_triggers(screen))
+    triggers = list(dict.fromkeys(item for item in triggers if item))
+    if triggers:
+        return {"level": "L4_RED", "triggers": triggers}
+
+    if screen.get("status") == "failed":
+        return {
+            "level": "L3_ORANGE",
+            "triggers": ["整体构图安全筛查未完成：需人工复核整体画面"],
+        }
+    return None
+
+
 def _detect_priority(
     report: dict[str, Any],
     payload: dict[str, Any],
@@ -1076,6 +1154,9 @@ def _detect_priority(
 ) -> dict[str, Any] | None:
     triggers: list[str] = []
     text_blob = _priority_text_blob(payload)
+    holistic = _holistic_priority(report, payload)
+    if holistic and holistic["level"] == "L4_RED":
+        return holistic
 
     high_risk_items = [
         item for item in (payload.get("items") or [])
@@ -1139,6 +1220,8 @@ def _detect_priority(
         triggers.extend(f"九维风险达 L3：{name}" for name in l3_dimensions)
     for match in _L3_TEXT_RE.finditer(text_blob):
         triggers.append(f"自述/教师观察关键词：{match.group(1)}")
+    if holistic and holistic["level"] == "L3_ORANGE":
+        triggers.extend(holistic.get("triggers") or [])
 
     if triggers:
         return {"level": "L3_ORANGE", "triggers": list(dict.fromkeys(triggers))}
@@ -1602,6 +1685,18 @@ def _collect_quality_report(
         add("SCORE_BASIS_MISMATCH", "报告职业章节引用了成绩依据，但本次没有可读成绩；已要求改为不结合成绩排序。")
 
     meta = report.get("meta") if isinstance(report.get("meta"), dict) else {}
+    screen = meta.get("holistic_screen") if isinstance(meta.get("holistic_screen"), dict) else {}
+    if is_high_risk(screen):
+        labels = "、".join(str(item) for item in (screen.get("readable_text") or [])[:4]).strip()
+        add(
+            "HOLISTIC_RISK_SYMBOL",
+            f"沙盘整体构图形成明确的高危文字/符号{f'（{labels}）' if labels else ''}，已按 L4 重大风险处理，需立即人工安全核查。",
+        )
+    elif screen.get("status") == "failed":
+        add(
+            "HOLISTIC_SCREEN_UNAVAILABLE",
+            "整体构图安全筛查未完成，当前报告不能据此排除整体画面高危语义；需由咨询师直接查看原图并人工复核。",
+        )
     if str(meta.get("engine") or "").strip().lower() == "demo":
         add("DEMO_ENGINE", "当前为本地示例报告，未接入多模态模型；内容用于流程演示，不能直接作为真实评估结论交付。")
 
@@ -1640,6 +1735,12 @@ def apply_report_quality_gates(
         "process_note": process_note,
     }
     report["raw_record_echo"] = raw_record
+    holistic_screen = payload.get("_holistic_screen") if isinstance(payload.get("_holistic_screen"), dict) else {}
+    if holistic_screen:
+        meta["holistic_screen"] = holistic_screen
+        meta["holistic_screen_risk"] = (
+            "high" if is_high_risk(holistic_screen) else str(holistic_screen.get("risk_level") or "unknown")
+        )
     chapter_1 = report.get("chapter_1_overview")
     if isinstance(chapter_1, dict):
         representative = str(payload.get("representative_item_name") or chapter_1.get("representative_item_name") or "").strip()
@@ -1647,6 +1748,7 @@ def apply_report_quality_gates(
             chapter_1["representative_item_name"] = representative
         chapter_1["terrain_observation"] = terrain_text
         chapter_1["process_observation"] = process_note
+        _merge_holistic_screen(report, holistic_screen)
         _ensure_process_analysis(report, payload)
     _ensure_process_integration(report, payload)
     _guard_process_integration(report, payload)
@@ -1713,6 +1815,65 @@ def normalize_meta(
     return report
 
 
+async def screen_holistic_image(sandplay_image: bytes) -> dict[str, Any]:
+    """独立于九维风险表的整体构图安全筛查。
+
+    必需性：九维模型容易被“单个沙具正常”牵制，漏掉由水域/沙丘/留白共同
+    构成的“死”“亡”等高危文字。这里先只看整体构图，结果由服务端强制
+    接入 priority_banner，不能由主报告自行降级。
+    """
+    if not MULTIMODAL_API_KEY:
+        return normalize_screen(
+            {"risk_level": "unknown", "risk_evidence": "未配置多模态模型"},
+            status="not_configured",
+        )
+
+    body = {
+        "model": MULTIMODAL_MODEL,
+        "messages": [{
+            "role": "user",
+            "content": [
+                {"type": "text", "text": HOLISTIC_SCREEN_PROMPT},
+                {"type": "image_url", "image_url": {"url": _data_uri(sandplay_image, "sandplay.png"), "detail": "high"}},
+            ],
+        }],
+        "temperature": 0,
+        "max_tokens": 1200,
+    }
+    if "volces.com" in MULTIMODAL_BASE_URL:
+        body["thinking"] = {"type": "disabled"}
+    headers = {"Authorization": f"Bearer {MULTIMODAL_API_KEY}", "Content-Type": "application/json"}
+    timeout = min(max(MULTIMODAL_TIMEOUT_SECONDS, 30), 120)
+    last_error = ""
+    for attempt in range(2):
+        if attempt:
+            await asyncio.sleep(2)
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                response = await client.post(f"{MULTIMODAL_BASE_URL}/chat/completions", headers=headers, json=body)
+                response.raise_for_status()
+                data = response.json()
+            message = (data.get("choices") or [{}])[0].get("message") or {}
+            content = message.get("content")
+            if isinstance(content, list):
+                content = "\n".join(part.get("text", "") for part in content if isinstance(part, dict))
+            if not isinstance(content, str) or not content.strip():
+                raise ValueError("整体构图筛查返回为空")
+            parsed = json.loads(clean_json_text(content))
+            if not isinstance(parsed, dict):
+                raise ValueError("整体构图筛查不是 JSON 对象")
+            result = normalize_screen(parsed, status="ok")
+            result["model"] = MULTIMODAL_MODEL
+            result["usage"] = data.get("usage") if isinstance(data.get("usage"), dict) else {}
+            result["attempts"] = attempt + 1
+            return result
+        except Exception as exc:  # 筛查失败不静默放行，交给上层转 L3 人工复核
+            last_error = type(exc).__name__
+    result = normalize_screen({}, status="failed")
+    result["error"] = last_error or "UNKNOWN"
+    return result
+
+
 async def call_multimodal(
     payload: dict[str, Any],
     sandplay_image: bytes,
@@ -1773,6 +1934,8 @@ async def generate_report(
 ) -> tuple[dict[str, Any], str]:
     allow_demo = ALLOW_DEMO_REPORT if allow_demo_fallback is None else allow_demo_fallback
     if MULTIMODAL_API_KEY:
+        payload = dict(payload)
+        payload["_holistic_screen"] = await screen_holistic_image(sandplay_image)
         try:
             report = await call_multimodal(payload, sandplay_image, transcript_image, image_url, transcript_url)
             report = normalize_meta(

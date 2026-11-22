@@ -5,6 +5,7 @@ from typing import Any
 
 from .process_metrics import build_process_metrics, process_telemetry
 from .quality import build_sample_quality
+from .holistic import prompt_context as holistic_prompt_context
 from .theory import (
     CHAPTER_TITLES,
     PROTECTIVE_CHAPTER_TITLE,
@@ -30,6 +31,7 @@ SYSTEM_PROMPT = """你是一名学校心理评估咨询师与沙盘分析师。�
 10. 缺少成绩单或访谈材料时，仍须依据沙盘空间结构、地形塑形、沙具意象、受测者自述和教师观察，对六个维度全部给出探索性学习推理；不得用“无足够线索”“无法判定”代替分析。此时置信度只能写“中”或“低”，并在每条结论末尾写“以上为基于沙盘与现有线索的探索性推断，需结合后续成绩与访谈核验”。但 `low_projection=true` 或 `evidence_level` 为 `minimal`/`limited` 时，第七章不得写职业优势排序，标题应切“内在心理资源与保护性因素（发展性视角）”，并写 `career_postponed=true`。
 11. 咨询师完整版的所有叙述、判断、建议和第九章统一使用第三人称“受测者/该生”，不得写“你”“你们”“孩子”“你家孩子”。但第二章 `verification_question` 与第六章 `items[].questions` 是咨询师直接开口的对话脚本，必须使用口语化第二人称：对受测者用“你”，对家长或教师用“您/你们”；提问句中不得出现“受测者把……”“该生把……”。
 12. 制作过程数据（耗时、放入/删除、拖拽、撤销、长停顿、推沙/挖水、掩埋人物、短时反复放删）是报告的一手分析依据，不是附录：只要 `process_metrics.available=true`，必须写 chapter_1 `process_analysis`，并在 chapter_3 至少两个相关维度引用过程指标。只用于过程动力学探索：讨论投入节奏、犹豫与修改、控制感和破坏—修复循环，但不得把单次动作直接等同于病理或稳定人格；若出现掩埋人物或反复放删，应提高风险核查优先级。无过程数据时不得编造数值。
+13. 必须把“整体构图”作为独立的安全判读层：先看沙面、水域、沙丘、沙具排列和留白共同构成的字形/符号，再看单个沙具。整体构图形成“死”“亡”“自杀”“绝”“杀”“丧”“葬”“墓”“SOS”“求救”等高风险字词时，属于重大风险线索，必须写入 `holistic_visual_check` 并判 high；单个沙具正常不能抵消整体高危文字，不得因此写成 L1/L2。
 """
 
 
@@ -91,6 +93,14 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
             "item_theme_stats": [{"theme": "string", "name": "string", "count": 0}],
             "nine_grid_distribution": grid,
             "scene_imagery": ["string"],
+            "holistic_visual_check": {
+                "overall_forms": ["string：整体构图形成的图形/文字/符号轮廓"],
+                "readable_text": ["string：逐字转录整体构图可读出的汉字/字母/数字/符号；没有则空数组"],
+                "symbol_meaning": "string：上述整体符号可能表达的语义",
+                "risk_level": "none|watch|high",
+                "risk_evidence": "string：为什么该整体构图属于/不属于高风险",
+                "confidence": "high|medium|low",
+            },
             "process_analysis": {
                 "available": True,
                 "title": "制作过程动力学观察",
@@ -319,6 +329,7 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
             "quality_flags": sample_quality["quality_flags"],
             "quality_warnings": sample_quality["quality_warnings"],
         },
+        "holistic_screen": holistic_prompt_context(payload.get("_holistic_screen")),
         "heightmap_shape": {
             "width": heightmap.get("width"), "depth": heightmap.get("depth"),
             "cols": heightmap.get("cols"), "rows": heightmap.get("rows"),
@@ -345,6 +356,9 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
 - 主题标签是检索与形成假设的轴，不是诊断：先看 `theme_counts` 与 `subcategory_counts`，再结合具体位置、组合、朝向和访谈；不得把单个主题标签直接写成结论。
 - 每个沙具结论必须至少有一条来自沙盘描述、代表沙具、九宫格、地形高度或成绩单的佐证；没有对应输入时不得写“有该数据”。
 - chapter_1 `scene_imagery` 必须以沙盘实拍图和 `terrain_observation`/`heightmap_*` 为准：先描述实际可见的沙面、沙丘、凹陷或水域，再写受测者赋予的含义。`terrain_text_mismatch=true` 时，客户端 `terrain_metrics.terrain_summary` 只能写成“受测者将沙面局部起伏定义为水域/地形”，不得写成画面中已出现大面积水域、湖泊或深谷；不得脑补实拍与地形指标中不存在的元素。同一段内不得同时出现“明显水域塑形”和“轻度塑形”两种互相矛盾的定性。
+- 必须先做整体构图判读，再看单个沙具：`chapter_1.holistic_visual_check` 是必填字段。如果沙面、水域、沙丘、沙具排列或留白共同构成可读文字/符号（尤其“死”“亡”“自杀”“绝”“杀”“丧”“葬”“墓”“SOS”“求救”），必须在 `readable_text` 中原样转录，`risk_level` 写 `high`。不能因为单个沙具都是正常家庭人物，就把整体高危文字降为 L1/L2。服务端给出的 `holistic_screen` 是同一张图的独立安全筛查；`holistic_screen.risk_level=high` 或 `readable_text` 含高危字词时，以它为准，不得覆盖为 none/watch。
+- 整体构图高危文字的原文只写入 `chapter_1.holistic_visual_check` 和 `chapter_5_risk`；`scene_imagery`、第二章、第七至九章如需提及，只能写“整体构图出现需专业核查的高危文字/符号”，不得把具体字词复制到家长/学生可见的叙述段落。
+- 当整体构图命中高危文字/符号时，`chapter_5_risk` 的“自我伤害倾向”维度至少写 L3，并在 `judgement` 与 `evidence` 中写明整体构图证据；若服务端将其抬升为 L4，以服务端 `priority_banner` 和第五章总等级为准。
 - chapter_1 `process_analysis` 必须读取 `process_metrics` 和 `process_telemetry` 的原始值：pace 必须引用总耗时、放入件数、每件秒数或动作密度；revision 必须引用删除/撤回、拖拽、撤销；terrain_control 必须引用推沙/挖水笔数及占比。不得只复述数字，必须用箱庭理论解释制作节奏、修改犹豫、主动塑形与控制感，并在 integrated_finding 中与场景意象、核心主题和六维假设相互校验。`process_metrics.available=false` 时 available 写 false，不得编造耗时或动作。若 `bury_count` 或 `destructive_loops` 非 0，必须写明优先风险核查。
 - 若 `process_metrics.available=true`，chapter_3 必须写 `process_integration`：summary 点名至少两个与当前线索最相关的维度，referenced_dimensions 必须使用给定六维名称，notes 每个维度一条，写明过程指标支持、削弱或待核验了哪一部分；同时至少两个维度的 judgement 或 assessment_result 要引用过程指标。不得把过程数据只放在第一章。
 - 过程发现只能写成“过程层面的弱证据/待核验”，不得写“说明家庭关系整体正向、动力未耗竭、无选择困难、认可度高”等结论；低修改既可能是果断，也可能是回避深入，必须保留竞争假设。

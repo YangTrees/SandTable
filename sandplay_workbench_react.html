@@ -342,47 +342,6 @@
       border-color: var(--ink);
       color: #f8f3e9;
     }
-    .theme-taxonomy {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex-wrap: wrap;
-      margin: 0 0 9px;
-      padding-bottom: 9px;
-      border-bottom: 1px solid var(--line);
-    }
-    .theme-axis-label {
-      font-family: var(--mono);
-      font-size: 8px;
-      line-height: 1;
-      letter-spacing: .1em;
-      color: var(--ink-soft);
-      margin-right: 2px;
-      white-space: nowrap;
-    }
-    .taxon-chip.theme-chip {
-      height: 22px;
-      padding: 0 6px;
-      background: rgba(162,114,72,.08);
-      border-color: rgba(162,114,72,.24);
-      color: rgba(92,65,44,.88);
-    }
-    .taxon-chip.theme-chip:hover {
-      border-color: rgba(162,114,72,.58);
-      color: var(--ink);
-    }
-    .taxon-chip.theme-chip.active {
-      background: #8d5d39;
-      border-color: #8d5d39;
-      color: #fff8ef;
-    }
-    .chip-count {
-      margin-left: 3px;
-      font-size: 7px;
-      line-height: 1;
-      opacity: .62;
-    }
-    .taxon-chip.active .chip-count { opacity: .88; }
     .taxon-chip .taxon-icon {
       display: block;
       width: 15px;
@@ -1341,11 +1300,6 @@
       border-color: rgba(255, 255, 255, .28);
       background: rgba(255, 255, 255, .1);
     }
-    .studio-app.night-mode .taxon-chip.theme-chip:not(.active) {
-      color: rgba(255, 235, 214, .8);
-      border-color: rgba(255, 228, 204, .24);
-      background: rgba(255, 255, 255, .08);
-    }
     .studio-app.night-mode .taxon-chip:not(.active):hover {
       color: #fff;
       border-color: rgba(255, 255, 255, .62);
@@ -1510,13 +1464,6 @@
       { key: "学习与生活道具", short: "学习", iconImage: "assets/ui_icons/study.png" },
       { key: "神秘与象征符号", short: "神秘", iconImage: "assets/ui_icons/mystery.png" },
       { key: "饮食与丰饶意象", short: "饮食", iconImage: "assets/ui_icons/food.png" }
-    ];
-    const SANDPLAY_THEME_DEFS = window.SANDPLAY_THEME_DEFS || [
-      { code: "conflict", name: "冲突" },
-      { code: "pressure", name: "压力" },
-      { code: "crisis", name: "危机" },
-      { code: "shadow", name: "阴影" },
-      { code: "transformation", name: "转化" }
     ];
     const SAND_COLOR = new THREE.Color("#ead8a6");
     const WATER_COLOR = new THREE.Color("#43c6f5");
@@ -2766,7 +2713,6 @@
       const [toast, setToast] = useState("");
       const [sceneReady, setSceneReady] = useState(false);
       const [assetCategory, setAssetCategory] = useState("全部");
-      const [assetTheme, setAssetTheme] = useState("all");
       const specimenGridRef = useRef(null);
       const hasCategoryData = useMemo(
         () => SANDPLAY_CATEGORY_DEFS.some((entry) => TEST_ICONS.some((item) => item.category === entry.key)),
@@ -2779,34 +2725,19 @@
         });
         return counts;
       }, []);
-      const themeCounts = useMemo(() => {
-        const counts = { all: 0 };
-        SANDPLAY_THEME_DEFS.forEach((entry) => { counts[entry.code] = 0; });
-        TEST_ICONS.forEach((item) => {
-          const themes = item.themes || [];
-          if (themes.length) counts.all += 1;
-          themes.forEach((code) => {
-            if (code in counts) counts[code] += 1;
-          });
-        });
-        return counts;
-      }, []);
       const visibleIcons = useMemo(() => {
         let base = TEST_ICONS;
         if (hasCategoryData && assetCategory !== "全部") {
           base = base.filter((item) => item.category === assetCategory);
         }
-        if (assetTheme !== "all") {
-          base = base.filter((item) => (item.themes || []).includes(assetTheme));
-        }
         return base;
-      }, [assetCategory, assetTheme, hasCategoryData]);
+      }, [assetCategory, hasCategoryData]);
       useEffect(() => {
         const node = specimenGridRef.current;
         if (!node) return undefined;
         const frame = requestAnimationFrame(() => { node.scrollTop = 1; });
         return () => cancelAnimationFrame(frame);
-      }, [assetCategory, assetTheme, visibleIcons.length]);
+      }, [assetCategory, visibleIcons.length]);
 
       const itemsRef = useRef(items);
       const selectedIdRef = useRef(selectedId);
@@ -4061,7 +3992,7 @@
               ),
               h("div", { className: "count-mark" }, String(visibleIcons.length), h("small", null, "件"))
             ),
-            h("p", { className: "panel-note" }, `8 类器物 · 5 个临床主题 · 标注 ${themeCounts.all} 件`),
+            h("p", { className: "panel-note" }, `8 类器物 · 共 ${TEST_ICONS.length} 件`),
             h("div", { className: "specimen-taxonomy", role: "tablist", "aria-label": "沙具器物分类" },
               h("button", {
                 key: "all",
@@ -4083,28 +4014,6 @@
                   ? h("img", { src: entry.iconImage, alt: "", draggable: false, className: "taxon-icon", "aria-hidden": "true" })
                   : null,
                 h("span", null, entry.short)
-              ))
-            ),
-            h("div", { className: "theme-taxonomy", role: "tablist", "aria-label": "临床主题标签" },
-              h("span", { className: "theme-axis-label" }, "临床主题"),
-              h("button", {
-                key: "theme-all",
-                type: "button",
-                role: "tab",
-                "aria-selected": assetTheme === "all",
-                onClick: () => setAssetTheme("all"),
-                className: `taxon-chip theme-chip${assetTheme === "all" ? " active" : ""}`
-              }, h("span", null, "全部")),
-              SANDPLAY_THEME_DEFS.map((entry) => h("button", {
-                key: entry.code,
-                type: "button",
-                role: "tab",
-                "aria-selected": assetTheme === entry.code,
-                onClick: () => setAssetTheme(entry.code),
-                className: `taxon-chip theme-chip${assetTheme === entry.code ? " active" : ""}`
-              },
-                h("span", null, entry.name || entry.short),
-                h("span", { className: "chip-count" }, themeCounts[entry.code] || 0)
               ))
             ),
             h("div", { className: "specimen-grid scroll-soft", ref: specimenGridRef },

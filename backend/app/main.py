@@ -37,6 +37,7 @@ MAX_IMAGE_BYTES = 24 * 1024 * 1024
 REPORT_VIEWER_PATH = Path(__file__).resolve().parents[2] / "report_viewer_v2.html"
 ADMIN_DASHBOARD_PATH = Path(__file__).resolve().parents[2] / "admin_dashboard.html"
 WORKBENCH_PATH = Path(__file__).resolve().parents[2] / "sandplay_workbench_react.html"
+ASSETS_DIR = Path(__file__).resolve().parents[2] / "assets"
 
 
 @asynccontextmanager
@@ -57,6 +58,8 @@ app.add_middleware(
 )
 app.include_router(admin_router)
 app.mount("/media", StaticFiles(directory=UPLOAD_DIR), name="media")
+if ASSETS_DIR.is_dir():
+    app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
 
 def _trace(request: Request) -> str:

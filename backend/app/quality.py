@@ -34,6 +34,8 @@ QUALITY_FLAG_META = {
     "EVIDENCE_MISSING": ("warning", "访谈/成绩/过程证据缺失"),
     "EVIDENCE_LIMITED": ("info", "证据有限"),
     "RISK_LEVEL_CONFLICT": ("critical", "顶部预警与风险表不一致"),
+    "HOLISTIC_RISK_SYMBOL": ("critical", "整体构图高危文字/符号"),
+    "HOLISTIC_SCREEN_UNAVAILABLE": ("critical", "整体构图安全筛查未完成"),
     "TRAINING_INTENSITY_CONFLICT": ("warning", "优先期训练强度不一致"),
     "SCORE_BASIS_MISMATCH": ("warning", "报告引用了不存在的成绩依据"),
     "DEMO_ENGINE": ("info", "示例报告"),
