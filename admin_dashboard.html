@@ -152,6 +152,7 @@
     text-align: left; transition: .18s ease;
   }
   .nav-item:hover { color: #fffaf0; background: rgba(255, 255, 255, .055); }
+  a.nav-item { text-decoration: none; }
   .nav-item.active {
     color: #20352a;
     background: linear-gradient(135deg, #f7f1e4, #e8dfcf);
@@ -694,6 +695,84 @@
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
   .toast.err { background: rgba(116, 55, 48, .94); }
 
+  .top-actions { display: flex; align-items: center; gap: 6px; }
+  .ghost-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    height: 30px; padding: 0 10px; border-radius: 999px;
+    border: 1px solid var(--line); background: rgba(255, 255, 255, .44);
+    color: var(--ink-soft); font-size: 10px; white-space: nowrap;
+    transition: .16s ease;
+  }
+  .ghost-btn:hover { background: rgba(255, 253, 248, .9); border-color: var(--line-strong); }
+  .ghost-btn svg { width: 13px; height: 13px; }
+
+  .auth-screen {
+    position: fixed; inset: 0; z-index: 60;
+    display: grid; place-items: center; padding: 24px;
+    background:
+      radial-gradient(circle at 16% 12%, rgba(107, 137, 112, .30), transparent 32%),
+      radial-gradient(circle at 84% 8%, rgba(191, 140, 88, .22), transparent 30%),
+      linear-gradient(155deg, rgba(240, 233, 220, .92), rgba(226, 216, 199, .94));
+    backdrop-filter: blur(16px);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity .24s ease, visibility .24s;
+  }
+  .auth-screen.show { opacity: 1; visibility: visible; pointer-events: auto; }
+  body.auth-locked .shell { opacity: 0; visibility: hidden; pointer-events: none; user-select: none; }
+  .auth-card {
+    position: relative; width: min(432px, 100%); padding: 34px 34px 28px;
+    border: 1px solid rgba(255, 255, 255, .78); border-radius: 30px;
+    background: linear-gradient(158deg, rgba(255, 253, 248, .98), rgba(246, 240, 230, .96));
+    box-shadow: 0 36px 100px rgba(27, 42, 32, .24), inset 0 0 0 1px rgba(255,255,255,.35);
+    overflow: hidden;
+  }
+  .auth-card::after {
+    content: ""; position: absolute; right: -55px; top: -55px; width: 160px; height: 160px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(120, 148, 123, .18), transparent 68%);
+    pointer-events: none;
+  }
+  .auth-brand { display: flex; align-items: center; gap: 12px; }
+  .auth-brand .brand-mark { width: 46px; height: 46px; font-size: 21px; }
+  .auth-brand small { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; letter-spacing: .15em; }
+  .auth-kicker { margin-top: 26px; color: var(--gold); font-size: 9px; letter-spacing: .2em; }
+  .auth-card h2 { margin: 7px 0 0; font-family: var(--serif); font-size: 25px; font-weight: 600; letter-spacing: -.03em; }
+  .auth-card > p { margin: 9px 0 0; color: var(--muted); font-size: 10.5px; line-height: 1.7; }
+  .auth-form { display: grid; gap: 13px; margin-top: 24px; }
+  .auth-form label { display: grid; gap: 6px; color: var(--ink-soft); font-size: 10px; }
+  .auth-form input {
+    width: 100%; height: 44px; padding: 0 13px; border: 1px solid var(--line); border-radius: 12px;
+    background: rgba(255, 253, 248, .75); color: var(--ink); outline: none;
+    font-size: 12px; letter-spacing: .01em; transition: .16s ease;
+  }
+  .auth-form input:focus { border-color: rgba(64, 93, 76, .48); background: #fffdf8; box-shadow: 0 0 0 4px rgba(97, 125, 105, .10); }
+  .auth-error {
+    display: none; padding: 9px 11px; border-radius: 10px;
+    background: rgba(168, 88, 77, .10); border: 1px solid rgba(168, 88, 77, .2);
+    color: #8e4b42; font-size: 10px; line-height: 1.55;
+  }
+  .auth-error.show { display: block; }
+  .auth-submit {
+    height: 46px; margin-top: 3px; border: 0; border-radius: 13px;
+    color: #f8f3e7; background: linear-gradient(140deg, #567563, #284437);
+    font-size: 12px; font-weight: 500; letter-spacing: .04em;
+    box-shadow: 0 12px 28px rgba(34, 57, 44, .22); transition: .18s ease;
+  }
+  .auth-submit:hover { transform: translateY(-1px); box-shadow: 0 16px 34px rgba(34, 57, 44, .26); }
+  .auth-submit:disabled { transform: none; }
+  .auth-foot { display: flex; align-items: flex-start; gap: 8px; margin-top: 19px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; line-height: 1.65; }
+  .auth-foot svg { width: 14px; height: 14px; flex: none; color: var(--sage); margin-top: 1px; }
+
+  .password-modal { width: min(410px, calc(100vw - 34px)); text-align: left; }
+  .password-form { display: grid; gap: 11px; margin-top: 17px; }
+  .password-form label { display: grid; gap: 6px; color: var(--ink-soft); font-size: 10px; }
+  .password-form input {
+    width: 100%; height: 40px; padding: 0 11px; border: 1px solid var(--line); border-radius: 10px;
+    background: rgba(255, 253, 248, .78); color: var(--ink); outline: none; font-size: 11px;
+  }
+  .password-form input:focus { border-color: rgba(64, 93, 76, .42); background: #fffdf8; }
+  .password-form .form-hint { margin-top: -2px; }
+  .password-modal-actions { display: flex; gap: 7px; justify-content: flex-end; margin-top: 17px; }
+
   .skeleton { position: relative; overflow: hidden; background: rgba(255, 253, 248, .45); }
   .skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .45), transparent); animation: shimmer 1.5s infinite; }
   @keyframes shimmer { 100% { transform: translateX(100%); } }
@@ -738,7 +817,35 @@
   }
 </style>
 </head>
-<body>
+<body class="auth-locked">
+<div class="auth-screen show" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="brand-mark">心</div>
+      <div>
+        <b style="font-size:16px;font-weight:600">心理沙盘 · 咨询师控制台</b>
+        <small>COUNSELOR CONSOLE</small>
+      </div>
+    </div>
+    <div class="auth-kicker">IDENTITY VERIFICATION</div>
+    <h2>先确认身份，再读取每一份成长。</h2>
+    <p>请使用学校心理服务账号登录。账号由超级管理员创建并设置密码，登录状态将在当前浏览器内保持。</p>
+    <form class="auth-form" id="loginForm" autocomplete="on">
+      <label for="loginAccount">登录账号
+        <input id="loginAccount" name="username" placeholder="如：lin.zhiyuan" autocomplete="username" required>
+      </label>
+      <label for="loginPassword">登录密码
+        <input id="loginPassword" name="password" type="password" placeholder="请输入密码" autocomplete="current-password" required>
+      </label>
+      <div class="auth-error" id="loginError"></div>
+      <button class="auth-submit" id="loginSubmit" type="submit">登录控制台</button>
+    </form>
+    <div class="auth-foot">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3.8 19 7v5.2c0 4.3-2.8 7.1-7 8-4.2-.9-7-3.7-7-8V7z"/><path d="M9 12.3l2 2 4-4.2"/></svg>
+      <span>本控制台仅限教职员工账号。连续 5 次密码错误将锁定账号 15 分钟。学生请从“学生心理沙盘测评”入口登录；家长 / 学生分享页无需登录。</span>
+    </div>
+  </div>
+</div>
 <div class="shell">
   <header class="topbar">
     <div class="brand">
@@ -752,8 +859,18 @@
       <div class="sync-pill" id="syncStatus"><i></i><span>正在同步数据</span></div>
       <div class="top-divider"></div>
       <div class="operator">
-        <div class="avatar">林</div>
-        <div><b>林知远</b><small>超级管理员</small></div>
+        <div class="avatar" id="operatorAvatar">—</div>
+        <div><b id="operatorName">未登录</b><small id="operatorRole">等待身份验证</small></div>
+      </div>
+      <div class="top-actions">
+        <button class="ghost-btn" id="changePasswordBtn" title="修改当前账号密码">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8.5 10V7.8a3.5 3.5 0 0 1 7 0V10"/></svg>
+          修改密码
+        </button>
+        <button class="ghost-btn" id="logoutBtn" title="退出当前账号">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 6H6v12h4"/><path d="M13 8.5 17 12l-4 3.5M9 12h8"/></svg>
+          退出
+        </button>
       </div>
     </div>
   </header>
@@ -778,14 +895,18 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 19V10M10 19V5M15 19v-7M20 19v-4"/><path d="M3.5 19h17"/></svg>
         <span>数据看板</span>
       </button>
+      <a class="nav-item" href="/manual/" target="_blank" rel="noopener" title="打开账户管理与全系统操作手册">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 4.5h9l4 4v11H5z"/><path d="M14 4.5v4.5h4"/><path d="M8 12h7M8 15h5"/></svg>
+        <span>操作手册</span>
+      </a>
     </nav>
     <div class="rail-spacer"></div>
     <div class="rail-note">
       <b>隐私提示</b>
-      后台仅限授权咨询师使用。家长 / 学生分享页会自动隐藏风险研判章节。
+      后台仅限教职员工使用。学生请从学生心理沙盘测评入口登录；家长 / 学生分享页会自动隐藏风险研判章节。
     </div>
-    <a class="rail-link" href="sandplay_workbench_react.html" id="backToWorkbench">
-      <span>返回沙盘工作台</span>
+    <a class="rail-link" href="sandplay_workbench_react.html" id="backToWorkbench" target="_blank" rel="noopener">
+      <span>学生测评入口</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 17 17 7M9 7h8v8"/></svg>
     </a>
   </aside>
@@ -925,7 +1046,7 @@
         <div>
           <div class="eyebrow">PEOPLE & ROLES</div>
           <h2 class="view-title">用户与角色</h2>
-          <p class="view-desc">管理学校心理服务团队的账号与权限。角色决定可见范围：学生只看个人报告，咨询师负责审核与分享。</p>
+          <p class="view-desc">管理学校心理服务团队的账号与权限。学生账号只用于学生测评入口，不能进入后台；咨询师负责审核与分享。</p>
         </div>
         <div class="head-actions">
           <button class="btn primary" id="addUserBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>新增用户</button>
@@ -1009,8 +1130,9 @@
       <div class="form-field"><label for="userGrade">年级</label><input id="userGrade" name="grade_level" placeholder="如：初二"></div>
       <div class="form-field"><label for="userClass">班级</label><input id="userClass" name="class_name" placeholder="如：3 班"></div>
       <div class="form-field full"><label for="userStudentNo">学生编号</label><input id="userStudentNo" name="student_no" placeholder="学生角色填写，如：PS-2026-018"><span class="form-hint">编号用于关联测评档案，可留空。</span></div>
+      <div class="form-field full"><label for="userPassword">登录密码</label><input id="userPassword" name="password" type="password" autocomplete="new-password" placeholder="留空则不修改或暂不设置"><span class="form-hint" id="userPasswordHint">新增用户可在此设置初始密码；编辑用户时填写新密码会立即重置并踢出该账号的其他登录。</span></div>
       <div class="form-divider"></div>
-      <div class="form-field full"><span class="form-hint">角色变更后，该账号下一次刷新页面时生效。学生与班主任看不到风险研判章节。</span></div>
+      <div class="form-field full"><span class="form-hint">角色变更后，该账号下一次刷新页面时生效。学生账号只能进入学生心理沙盘测评入口；班主任可进入后台，但看不到风险研判章节。密码需至少 8 位并同时包含字母和数字。</span></div>
     </form>
   </div>
   <div class="drawer-foot">
@@ -1031,6 +1153,29 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="passwordOverlay"></div>
+<div class="qr-modal password-modal" id="passwordModal" aria-hidden="true">
+  <h3 id="passwordTitle">修改登录密码</h3>
+  <p id="passwordDesc">修改后当前会话保持登录，其他设备会被退出。</p>
+  <form class="password-form" id="passwordForm" autocomplete="off">
+    <label id="currentPasswordField" for="currentPassword">当前密码
+      <input id="currentPassword" type="password" autocomplete="current-password" placeholder="请输入当前密码">
+    </label>
+    <label for="newPassword">新密码
+      <input id="newPassword" type="password" autocomplete="new-password" placeholder="至少 8 位，包含字母和数字">
+    </label>
+    <label for="confirmPassword">确认新密码
+      <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="再次输入新密码">
+    </label>
+    <span class="form-hint" id="passwordHint">密码至少 8 位，需同时包含字母和数字。</span>
+    <div class="auth-error" id="passwordError"></div>
+  </form>
+  <div class="password-modal-actions">
+    <button class="btn" id="cancelPasswordBtn">取消</button>
+    <button class="btn primary" id="savePasswordBtn">确认保存</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1044,11 +1189,15 @@
   const WORKBENCH_URL = (location.protocol === "http:" || location.protocol === "https:")
     ? `${location.origin}/workbench`
     : "sandplay_workbench_react.html";
-  const COUNSELOR_TOKEN = localStorage.getItem("sandplay_counselor_token") || "dev-counselor-token";
+  const AUTH_TOKEN_KEY = "sandplay_admin_token";
 
   const state = {
     view: "overview",
     bootstrap: null,
+    currentUser: null,
+    authType: "",
+    passwordMode: "self",
+    passwordUserId: null,
     users: [],
     roles: [],
     reports: [],
@@ -1120,6 +1269,7 @@
     admin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3.8 19 7v5.2c0 4.3-2.8 7.1-7 8-4.2-.9-7-3.7-7-8V7z"/><circle cx="12" cy="10" r="2.2"/><path d="M8.7 16c.4-1.8 1.5-2.8 3.3-2.8s2.9 1 3.3 2.8"/></svg>',
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M14 7l5 5-5 5"/></svg>',
     edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m5 19 1-4 9.8-9.8 3 3L8 18z"/><path d="m13.8 6.2 3 3"/></svg>',
+    key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="8" cy="12" r="3.2"/><path d="M11.2 12h9M16 12v3M19 12v2"/></svg>',
     trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13"/><path d="M10 11v5M14 11v5"/></svg>',
     qr: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="5" height="5"/><rect x="15" y="4" width="5" height="5"/><rect x="4" y="15" width="5" height="5"/><path d="M15 15h2v2h-2zM19 15h1M15 19h1M19 19h1"/></svg>',
   };
@@ -1135,19 +1285,55 @@
     toast.timer = setTimeout(() => node.classList.remove("show"), 2600);
   }
 
+  const getAuthToken = () => sessionStorage.getItem(AUTH_TOKEN_KEY) || "";
+  const setAuthToken = (token) => {
+    if (token) sessionStorage.setItem(AUTH_TOKEN_KEY, token);
+    else sessionStorage.removeItem(AUTH_TOKEN_KEY);
+  };
+  const clearAuth = () => {
+    setAuthToken("");
+    state.currentUser = null;
+    state.authType = "";
+    state.users = [];
+    state.reports = [];
+    state.stats = null;
+  };
+  const setLoginError = (message = "") => {
+    const node = el("loginError");
+    node.textContent = message;
+    node.classList.toggle("show", Boolean(message));
+  };
+  function showLogin(message = "") {
+    document.body.classList.add("auth-locked");
+    el("authScreen").classList.add("show");
+    setLoginError(message);
+    setTimeout(() => el("loginAccount").focus(), 120);
+  }
+  function hideLogin() {
+    document.body.classList.remove("auth-locked");
+    el("authScreen").classList.remove("show");
+    setLoginError("");
+  }
+
   async function api(path, options = {}) {
-    const response = await fetch(`${API_BASE}${path}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        "X-Counselor-Token": COUNSELOR_TOKEN,
-        ...(options.headers || {}),
-      },
-    });
+    const { allowAnonymous = false, ...init } = options;
+    const token = getAuthToken();
+    const headers = {
+      "Content-Type": "application/json",
+      ...(init.headers || {}),
+    };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    const response = await fetch(`${API_BASE}${path}`, { ...init, headers });
     let body = {};
     try { body = await response.json(); } catch (e) { body = {}; }
+    if (response.status === 401 && !allowAnonymous) {
+      clearAuth();
+      showLogin(body.message || "登录状态已失效，请重新登录");
+    }
     if (!response.ok || body.code !== "OK") {
-      throw new Error(body.message || `请求失败（${response.status}）`);
+      const error = new Error(body.message || `请求失败（${response.status}）`);
+      error.status = response.status;
+      throw error;
     }
     return body.data;
   }
@@ -1191,6 +1377,28 @@
     }
   }
 
+  function renderOperator() {
+    const user = state.currentUser;
+    if (!user) {
+      el("operatorName").textContent = "未登录";
+      el("operatorRole").textContent = "等待身份验证";
+      el("operatorAvatar").textContent = "—";
+      return;
+    }
+    el("operatorName").textContent = user.name || user.account || "当前账号";
+    el("operatorRole").textContent = `${user.role_name || roleName(user.role_key)} · ${user.department || "未设置部门"}`;
+    el("operatorAvatar").textContent = initials(user.name || user.account);
+  }
+
+  function passwordError(value) {
+    const textValue = String(value || "");
+    if (!textValue) return "请输入密码";
+    if (textValue.length < 8) return "密码至少需要 8 位";
+    if (textValue.length > 128) return "密码不能超过 128 位";
+    if (!/[a-zA-Z]/.test(textValue) || !/\d/.test(textValue)) return "密码需同时包含字母和数字";
+    return "";
+  }
+
   async function loadDashboard() {
     const query = buildFilterQuery();
     const [bootstrap, reports, stats] = await Promise.all([
@@ -1201,10 +1409,12 @@
     state.bootstrap = bootstrap;
     state.roles = bootstrap.roles || [];
     state.users = bootstrap.users || [];
+    state.currentUser = bootstrap.current_user || state.currentUser;
     state.reports = reports.reports || [];
     state.facets = reports.facets || state.facets;
     state.stats = stats;
     fillFilterControls();
+    renderOperator();
   }
 
   async function applyReportFilters(reset = false) {
@@ -1235,30 +1445,200 @@
     }
   }
 
+  async function restoreSession() {
+    const me = await api("/admin/me");
+    state.currentUser = me.user;
+    state.authType = me.auth_type || "";
+    hideLogin();
+    renderOperator();
+  }
+
+  async function performLogin() {
+    const account = el("loginAccount").value.trim();
+    const password = el("loginPassword").value;
+    if (!account || !password) {
+      setLoginError("请输入账号和密码");
+      return;
+    }
+    const button = el("loginSubmit");
+    button.disabled = true;
+    button.textContent = "正在验证…";
+    setLoginError("");
+    try {
+      const response = await fetch(`${API_BASE}/admin/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ account, password }),
+      });
+      let body = {};
+      try { body = await response.json(); } catch (e) { body = {}; }
+      if (!response.ok || body.code !== "OK") {
+        throw new Error(body.message || `登录失败（${response.status}）`);
+      }
+      setAuthToken(body.data.token);
+      state.currentUser = body.data.user;
+      state.authType = "session";
+      hideLogin();
+      renderOperator();
+      el("loginPassword").value = "";
+      state.loading = true;
+      state.apiError = "";
+      try {
+        await loadDashboard();
+        state.loading = false;
+        renderAll();
+        setSync(true, `已同步 · ${fmtTime(new Date().toISOString())}`);
+        if (state.view === "review") ensureDetail();
+        toast(`欢迎回来，${state.currentUser.name}`);
+      } catch (error) {
+        state.loading = false;
+        state.apiError = error.message || String(error);
+        renderAll();
+        if (getAuthToken()) toast(`数据加载失败：${state.apiError}`, true);
+      }
+    } catch (error) {
+      clearAuth();
+      setLoginError(error.message || "登录失败");
+      el("loginPassword").value = "";
+      el("loginPassword").focus();
+    } finally {
+      button.disabled = false;
+      button.textContent = "登录控制台";
+    }
+  }
+
+  async function logout() {
+    try {
+      await api("/admin/logout", { method: "POST" });
+    } catch (error) {
+      // 会话可能已失效，仍然清理本地状态。
+    } finally {
+      clearAuth();
+      location.reload();
+    }
+  }
+
+  function setPasswordError(message = "") {
+    const node = el("passwordError");
+    node.textContent = message;
+    node.classList.toggle("show", Boolean(message));
+  }
+
+  function openPasswordModal(mode = "self", userId = null) {
+    state.passwordMode = mode;
+    state.passwordUserId = userId;
+    const user = userId ? state.users.find((item) => item.user_id === userId) : null;
+    el("currentPasswordField").style.display = mode === "self" ? "" : "none";
+    el("currentPassword").value = "";
+    el("newPassword").value = "";
+    el("confirmPassword").value = "";
+    el("passwordTitle").textContent = mode === "self" ? "修改登录密码" : "设置登录密码";
+    el("passwordDesc").textContent = mode === "self"
+      ? "修改后当前会话保持登录，其他设备会被退出。"
+      : `为“${user ? user.name : "该用户"}”设置新密码，保存后该账号原有登录会话将失效。`;
+    el("passwordHint").textContent = mode === "self"
+      ? "密码至少 8 位，需同时包含字母和数字。"
+      : "设置后请通过安全渠道告知用户，并提醒其首次登录后修改。";
+    setPasswordError("");
+    el("passwordOverlay").classList.add("show");
+    el("passwordModal").classList.add("show");
+    el("passwordModal").setAttribute("aria-hidden", "false");
+    setTimeout(() => (mode === "self" ? el("currentPassword") : el("newPassword")).focus(), 80);
+  }
+
+  function closePasswordModal() {
+    el("passwordOverlay").classList.remove("show");
+    el("passwordModal").classList.remove("show");
+    el("passwordModal").setAttribute("aria-hidden", "true");
+    state.passwordUserId = null;
+  }
+
+  async function savePassword() {
+    const current = el("currentPassword").value;
+    const next = el("newPassword").value;
+    const confirm = el("confirmPassword").value;
+    const error = passwordError(next);
+    if (error) { setPasswordError(error); return; }
+    if (next !== confirm) { setPasswordError("两次输入的新密码不一致"); return; }
+    if (state.passwordMode === "self" && !current) {
+      setPasswordError("请输入当前密码");
+      el("currentPassword").focus();
+      return;
+    }
+    const button = el("savePasswordBtn");
+    const old = button.textContent;
+    button.disabled = true;
+    button.textContent = "保存中…";
+    setPasswordError("");
+    try {
+      if (state.passwordMode === "self") {
+        await api("/admin/me/password", {
+          method: "POST",
+          body: JSON.stringify({ current_password: current, new_password: next }),
+        });
+        toast("登录密码已更新");
+      } else {
+        const result = await api(`/admin/users/${encodeURIComponent(state.passwordUserId)}/password`, {
+          method: "POST",
+          body: JSON.stringify({ password: next }),
+        });
+        if (state.passwordUserId && result.user) {
+          const local = state.users.find((item) => item.user_id === state.passwordUserId);
+          if (local) Object.assign(local, result.user);
+        }
+        await refreshUsers();
+        toast("登录密码已设置");
+      }
+      closePasswordModal();
+    } catch (error) {
+      setPasswordError(error.message || "密码保存失败");
+    } finally {
+      button.disabled = false;
+      button.textContent = old;
+    }
+  }
+
   async function boot() {
     const now = new Date();
     const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
     el("todayLabel").textContent = `${now.getMonth() + 1} 月 ${now.getDate()} 日`;
     el("todayWeek").textContent = weekdays[now.getDay()];
     el("backToWorkbench").href = WORKBENCH_URL;
+    renderOperator();
+
+    if (!getAuthToken()) {
+      showLogin();
+      return;
+    }
+
+    try {
+      await restoreSession();
+    } catch (error) {
+      showLogin(error.status === 401 ? "" : "登录状态校验失败，请重新登录");
+      return;
+    }
 
     try {
       await loadDashboard();
       state.loading = false;
       renderRoleOptions("student");
+      renderAll();
       setSync(true, `已同步 · ${fmtTime(new Date().toISOString())}`);
     } catch (error) {
       state.loading = false;
       state.apiError = error.message || String(error);
+      if (error.status === 401) return;
       setSync(false, "数据连接失败");
       toast(`后台数据加载失败：${state.apiError}`, true);
+      renderAll();
+      return;
     }
-    renderAll();
     if (state.view === "review") ensureDetail();
   }
 
   function renderAll() {
     fillFilterControls();
+    renderOperator();
     renderKPIs();
     renderOverview();
     renderReportList();
@@ -1269,6 +1649,9 @@
   }
 
   function renderNav() {
+    const isSuperAdmin = Boolean(state.currentUser && state.currentUser.role_key === "super_admin");
+    const userNav = document.querySelector('.nav-item[data-view="users"]');
+    if (userNav) userNav.style.display = isSuperAdmin ? "" : "none";
     document.querySelectorAll(".nav-item[data-view]").forEach((button) => {
       button.classList.toggle("active", button.dataset.view === state.view);
     });
@@ -1282,6 +1665,9 @@
   }
 
   function setView(view) {
+    if (view === "users" && !(state.currentUser && state.currentUser.role_key === "super_admin")) {
+      view = "overview";
+    }
     state.view = view;
     renderNav();
     if (view === "review") {
@@ -1688,7 +2074,7 @@
     const main = el("reviewMain");
     const brief = state.reports.find((item) => item.assessment_id === state.selectedId) || null;
     if (!brief) {
-      main.innerHTML = `<div class="review-toolbar"><div class="review-toolbar-left"><b>还没有可审核的报告</b><small>完成一次沙盘测评后，报告会自动进入队列</small></div></div><div class="paper-scroll"><div class="paper empty-paper">当前没有报告。<br>可以先回到沙盘工作台完成一次测评。</div></div>`;
+      main.innerHTML = `<div class="review-toolbar"><div class="review-toolbar-left"><b>还没有可审核的报告</b><small>完成一次沙盘测评后，报告会自动进入队列</small></div></div><div class="paper-scroll"><div class="paper empty-paper">当前没有报告。<br>请学生从“学生心理沙盘测评”入口完成并提交一次测评。</div></div>`;
       return;
     }
     if (state.detailLoading) {
@@ -2060,16 +2446,20 @@
     }
     table.innerHTML = users.length ? `
       <table class="user-table">
-        <thead><tr><th>用户</th><th>角色</th><th>所属 / 学段</th><th>编号</th><th>状态</th><th>操作</th></tr></thead>
+        <thead><tr><th>用户</th><th>角色</th><th>所属 / 学段</th><th>登录状态</th><th>编号</th><th>状态</th><th>操作</th></tr></thead>
         <tbody>${users.map((user) => {
           const scope = [user.department, user.grade_level, user.class_name].filter(Boolean).join(" · ") || "—";
+          const loginMeta = user.password_set
+            ? (user.last_login_at ? `最近 ${esc(fmtTime(user.last_login_at, true))}` : "密码已设置 · 未登录")
+            : "未设置密码";
           return `<tr data-user-id="${esc(user.user_id)}">
             <td><div class="user-cell"><span class="avatar">${esc(initials(user.name))}</span><div><b>${esc(user.name)}</b><small>${esc(user.account)} · ${esc(fmtDate(user.created_at))}</small></div></div></td>
             <td><span class="role-pill ${esc(user.role_key)}">${roleIcon(user.role_key)}${esc(roleShort(user.role_key))}</span></td>
             <td><div class="user-meta">${esc(scope)}</div></td>
+            <td><div class="user-meta">${user.login_locked ? "密码错误已锁定" : loginMeta}</div></td>
             <td><div class="user-meta">${esc(user.student_no || "—")}</div></td>
             <td><button class="switch ${user.status === "active" ? "on" : ""}" data-status-toggle="${esc(user.user_id)}" aria-label="切换用户状态"></button></td>
-            <td><div class="row-actions"><button class="icon-btn" data-edit-user="${esc(user.user_id)}" title="编辑用户">${ICONS.edit}</button><button class="icon-btn" data-delete-user="${esc(user.user_id)}" title="删除用户">${ICONS.trash}</button></div></td>
+            <td><div class="row-actions"><button class="icon-btn" data-reset-user="${esc(user.user_id)}" title="设置登录密码">${ICONS.key}</button><button class="icon-btn" data-edit-user="${esc(user.user_id)}" title="编辑用户">${ICONS.edit}</button><button class="icon-btn" data-delete-user="${esc(user.user_id)}" title="删除用户">${ICONS.trash}</button></div></td>
           </tr>`;
         }).join("")}</tbody>
       </table>` : '<div class="empty-table">没有符合筛选条件的用户</div>';
@@ -2095,6 +2485,12 @@
     el("userGrade").value = user ? user.grade_level : "";
     el("userClass").value = user ? user.class_name : "";
     el("userStudentNo").value = user ? user.student_no : "";
+    el("userPassword").value = "";
+    el("userPasswordHint").textContent = user
+      ? (user.password_set
+          ? "该账号已设置密码。填写新密码会立即重置，并使其其他登录会话失效。"
+          : "该账号尚未设置密码，填写后即可登录控制台。")
+      : "填写初始密码后，该账号可立即登录；也可以留空，稍后在列表中单独设置。";
     el("drawerOverlay").classList.add("show");
     el("userDrawer").classList.add("show");
     el("userDrawer").setAttribute("aria-hidden", "false");
@@ -2119,6 +2515,11 @@
       class_name: el("userClass").value.trim(),
       student_no: el("userStudentNo").value.trim(),
     };
+    const newPassword = el("userPassword").value.trim();
+    if (newPassword) {
+      const error = passwordError(newPassword);
+      if (error) { toast(error, true); el("userPassword").focus(); return; }
+    }
     if (!form.name || !form.account) {
       toast("请填写姓名和账号", true);
       if (!form.name) el("userName").focus(); else el("userAccount").focus();
@@ -2131,10 +2532,16 @@
     try {
       if (state.editingUserId) {
         await api(`/admin/users/${encodeURIComponent(state.editingUserId)}`, { method: "PATCH", body: JSON.stringify(form) });
-        toast("用户信息已更新");
+        if (newPassword) {
+          await api(`/admin/users/${encodeURIComponent(state.editingUserId)}/password`, {
+            method: "POST",
+            body: JSON.stringify({ password: newPassword }),
+          });
+        }
+        toast(newPassword ? "用户信息与登录密码已更新" : "用户信息已更新");
       } else {
-        await api("/admin/users", { method: "POST", body: JSON.stringify(form) });
-        toast("用户已新增");
+        await api("/admin/users", { method: "POST", body: JSON.stringify({ ...form, password: newPassword }) });
+        toast(newPassword ? "用户已新增并设置登录密码" : "用户已新增，尚未设置登录密码");
       }
       await refreshUsers();
       closeUserDrawer();
@@ -2376,6 +2783,21 @@
       toast(`刷新失败：${error.message || error}`, true);
     }
   });
+  el("loginForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    performLogin();
+  });
+  el("changePasswordBtn").addEventListener("click", () => openPasswordModal("self"));
+  el("logoutBtn").addEventListener("click", () => {
+    if (window.confirm("确定退出当前账号？")) logout();
+  });
+  el("passwordOverlay").addEventListener("click", closePasswordModal);
+  el("cancelPasswordBtn").addEventListener("click", closePasswordModal);
+  el("savePasswordBtn").addEventListener("click", savePassword);
+  el("passwordForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    savePassword();
+  });
   el("addUserBtn").addEventListener("click", () => openUserDrawer());
   el("drawerOverlay").addEventListener("click", closeUserDrawer);
   el("closeDrawer").addEventListener("click", closeUserDrawer);
@@ -2392,6 +2814,8 @@
     renderUsers();
   });
   el("userTableWrap").addEventListener("click", (event) => {
+    const reset = event.target.closest("[data-reset-user]");
+    if (reset) { openPasswordModal("user", reset.dataset.resetUser); return; }
     const edit = event.target.closest("[data-edit-user]");
     if (edit) { openUserDrawer(edit.dataset.editUser); return; }
     const remove = event.target.closest("[data-delete-user]");

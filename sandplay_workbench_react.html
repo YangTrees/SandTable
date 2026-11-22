@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>心理沙盘 3D 核心操作台</title>
+  <title>学生心理沙盘测评</title>
   <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap">
   <script src="https://fastly.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://fastly.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
@@ -1705,6 +1705,11 @@
     .profile-body { padding: 14px 20px 8px; }
     .profile-hint { margin: 6px 0 4px; color: rgba(30, 30, 32, .5); font-size: 9.5px; }
     .student-fields { margin-top: 4px; }
+    .identity-panel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .identity-item { padding: 10px 12px; border: 1px solid rgba(55, 71, 62, .14); border-radius: 8px; background: rgba(246, 242, 233, .8); }
+    .identity-item small { display: block; margin-bottom: 4px; color: rgba(30, 30, 32, .48); font-size: 9px; letter-spacing: .05em; }
+    .identity-item strong { display: block; color: #27362f; font-size: 12px; font-weight: 600; line-height: 1.45; }
+    .identity-note { margin-top: 8px; color: rgba(30, 30, 32, .52); font-size: 9.5px; line-height: 1.7; }
     .score-panel {
       margin-top: 13px;
       padding: 10px;
@@ -1832,10 +1837,571 @@
         z-index: 40;
       }
     }
+
+    /* ===== 工作台账号登录层 ===== */
+    body.auth-locked { overflow: hidden; }
+    body.auth-locked #root { display: none; }
+    .workbench-auth {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      overflow: auto;
+      background:
+        radial-gradient(1100px 680px at 12% -6%, rgba(255, 249, 235, .98), transparent 68%),
+        radial-gradient(900px 640px at 104% 108%, rgba(103, 139, 122, .26), transparent 66%),
+        linear-gradient(148deg, #efe6d6 0%, #e6d9c3 52%, #d8c8b0 100%);
+    }
+    .workbench-auth[hidden] { display: none; }
+    .workbench-auth::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .32;
+      background-image:
+        linear-gradient(rgba(118, 94, 67, .16) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(118, 94, 67, .12) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: radial-gradient(circle at 50% 45%, #000 0%, rgba(0,0,0,.55) 58%, transparent 88%);
+    }
+    .wb-auth-card {
+      position: relative;
+      width: min(900px, 100%);
+      display: grid;
+      grid-template-columns: minmax(292px, .88fr) minmax(380px, 1.12fr);
+      overflow: hidden;
+      border-radius: 18px;
+      background: #fbf7ee;
+      box-shadow:
+        0 32px 92px rgba(70, 49, 31, .28),
+        0 2px 0 rgba(255, 255, 255, .7) inset,
+        0 0 0 1px rgba(120, 94, 67, .18);
+      animation: wbAuthIn .55s cubic-bezier(.2,.8,.2,1) both;
+    }
+    @keyframes wbAuthIn {
+      from { opacity: 0; transform: translateY(16px) scale(.985); }
+      to { opacity: 1; transform: none; }
+    }
+    .wb-auth-aside {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 34px;
+      padding: 44px 40px 34px;
+      overflow: hidden;
+      color: #f7f0e2;
+      background: linear-gradient(158deg, #315a50 0%, #29483f 56%, #203a34 100%);
+    }
+    .wb-auth-aside::after {
+      content: "";
+      position: absolute;
+      width: 340px;
+      height: 340px;
+      right: -150px;
+      bottom: -130px;
+      border: 1px solid rgba(247, 240, 226, .18);
+      border-radius: 50%;
+      box-shadow: 0 0 0 28px rgba(247, 240, 226, .045), 0 0 0 72px rgba(247, 240, 226, .028);
+      pointer-events: none;
+    }
+    .wb-auth-aside::before {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      right: 38px;
+      top: 34px;
+      border: 1px dashed rgba(247, 240, 226, .18);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .wb-auth-mark { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+    .wb-auth-seal {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      flex: none;
+      border-radius: 3px;
+      border: 1px solid rgba(247, 240, 226, .55);
+      background: rgba(247, 240, 226, .11);
+      font-family: var(--serif, "Songti SC", serif);
+      font-size: 21px;
+      line-height: 1;
+      color: #fbf3e4;
+    }
+    .wb-auth-mark small {
+      display: block;
+      font-family: var(--mono, ui-monospace, monospace);
+      font-size: 8px;
+      letter-spacing: .24em;
+      color: rgba(247, 240, 226, .68);
+      text-transform: uppercase;
+    }
+    .wb-auth-mark strong {
+      display: block;
+      margin-top: 3px;
+      font-family: var(--serif, "Songti SC", serif);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      color: #fbf3e4;
+    }
+    .wb-auth-intro { position: relative; z-index: 1; }
+    .wb-auth-kicker {
+      font-family: var(--mono, ui-monospace, monospace);
+      font-size: 8px;
+      letter-spacing: .24em;
+      color: rgba(247, 240, 226, .64);
+      text-transform: uppercase;
+    }
+    .wb-auth-intro h2 {
+      margin: 12px 0 12px;
+      font-family: var(--serif, "Songti SC", serif);
+      font-size: clamp(30px, 3.2vw, 38px);
+      font-weight: 500;
+      line-height: 1.28;
+      letter-spacing: .06em;
+      color: #fff8ea;
+    }
+    .wb-auth-intro h2 em { font-style: normal; color: #e7c79b; }
+    .wb-auth-intro p {
+      margin: 0;
+      max-width: 22em;
+      font-size: 12px;
+      line-height: 1.9;
+      color: rgba(247, 240, 226, .76);
+    }
+    .wb-auth-points {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 9px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(247, 240, 226, .16);
+    }
+    .wb-auth-points span {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 11px;
+      color: rgba(247, 240, 226, .72);
+    }
+    .wb-auth-points span::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      flex: none;
+      border-radius: 50%;
+      background: #d6b183;
+      box-shadow: 0 0 0 3px rgba(214, 177, 131, .16);
+    }
+    .wb-auth-form-wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 46px 40px;
+      background:
+        radial-gradient(520px 300px at 100% 0%, rgba(198, 170, 132, .12), transparent 70%),
+        #fbf7ee;
+    }
+    .wb-auth-form-head { margin-bottom: 24px; }
+    .wb-auth-form-head h3 {
+      margin: 0;
+      font-family: var(--serif, "Songti SC", serif);
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      color: #28322c;
+    }
+    .wb-auth-form-head p {
+      margin: 9px 0 0;
+      font-size: 12px;
+      line-height: 1.8;
+      color: #786c5c;
+    }
+    .wb-auth-form { display: grid; gap: 16px; }
+    .wb-field { display: grid; gap: 7px; }
+    .wb-field > span {
+      font-size: 11px;
+      letter-spacing: .08em;
+      color: #5f5649;
+    }
+    .wb-field input {
+      width: 100%;
+      height: 50px;
+      padding: 0 14px;
+      border: 1px solid #d8c6aa;
+      border-radius: 8px;
+      background: #fffdf7;
+      color: #26302a;
+      font-size: 14px;
+      letter-spacing: .02em;
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+    .wb-field input::placeholder { color: #a99b88; }
+    .wb-field input:focus {
+      outline: none;
+      border-color: #96623f;
+      background: #fffefb;
+      box-shadow: 0 0 0 3px rgba(150, 98, 63, .13);
+    }
+    .wb-auth-error {
+      display: none;
+      padding: 10px 12px;
+      border-left: 3px solid #a95033;
+      border-radius: 6px;
+      background: #f8e7e0;
+      color: #7c3826;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+    .wb-auth-error.show { display: block; }
+    .wb-auth-submit {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      height: 50px;
+      margin-top: 2px;
+      border: 0;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #9b6647, #855035);
+      color: #fff8ec;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .14em;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(122, 77, 49, .24), 0 1px 0 rgba(255,255,255,.22) inset;
+      transition: transform .14s ease, box-shadow .14s ease, filter .14s ease;
+    }
+    .wb-auth-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(122, 77, 49, .28); }
+    .wb-auth-submit:active:not(:disabled) { transform: translateY(0); }
+    .wb-auth-submit:disabled { cursor: wait; filter: saturate(.8) brightness(.95); }
+    .wb-auth-submit .spin {
+      display: none;
+      width: 13px;
+      height: 13px;
+      border: 1.5px solid rgba(255,248,236,.5);
+      border-top-color: #fff8ec;
+      border-radius: 50%;
+      animation: wbSpin .8s linear infinite;
+    }
+    .wb-auth-submit[data-busy="true"] .spin { display: inline-block; }
+    @keyframes wbSpin { to { transform: rotate(360deg); } }
+    .wb-auth-status {
+      min-height: 16px;
+      margin-top: 1px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #8a7c69;
+    }
+    .wb-auth-status[data-tone="ok"] { color: #3f6b58; }
+    .wb-auth-foot {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px dashed #d8c6aa;
+      font-size: 11px;
+      line-height: 1.8;
+      color: #8a7c69;
+    }
+    .wb-auth-foot b { color: #5f5649; font-weight: 600; }
+    .wb-auth-foot::before {
+      content: "i";
+      display: grid;
+      place-items: center;
+      width: 16px;
+      height: 16px;
+      flex: none;
+      margin-top: 1px;
+      border: 1px solid #b6a48c;
+      border-radius: 50%;
+      font-family: var(--mono, ui-monospace, monospace);
+      font-size: 9px;
+      color: #8a7c69;
+    }
+
+    @media (max-width: 760px) {
+      .workbench-auth { padding: 16px; place-items: start center; }
+      .wb-auth-card { grid-template-columns: 1fr; width: 100%; max-width: 480px; margin: 16px 0; }
+      .wb-auth-aside { padding: 26px 24px 24px; gap: 20px; }
+      .wb-auth-aside::before { width: 110px; height: 110px; right: 18px; top: 18px; }
+      .wb-auth-intro h2 { font-size: 28px; margin: 8px 0 8px; }
+      .wb-auth-intro p { max-width: none; font-size: 11.5px; }
+      .wb-auth-points { display: none; }
+      .wb-auth-form-wrap { padding: 28px 24px 26px; }
+      .wb-auth-form-head h3 { font-size: 22px; }
+    }
 </style>
 </head>
-<body>
+<body class="auth-locked">
   <div id="root"></div>
+
+  <div class="workbench-auth" id="workbenchAuth" role="dialog" aria-modal="true" aria-labelledby="wbAuthTitle" aria-describedby="wbAuthDesc">
+    <div class="wb-auth-card">
+      <aside class="wb-auth-aside">
+        <div class="wb-auth-mark">
+          <div class="wb-auth-seal">沙</div>
+          <div>
+            <small>Sandplay Studio</small>
+            <strong>学生心理沙盘</strong>
+          </div>
+        </div>
+        <div class="wb-auth-intro">
+          <div class="wb-auth-kicker">Student Sandplay</div>
+          <h2>让心里的<br><em>风景</em>被看见</h2>
+          <p id="wbAuthDesc">这是学生沙盘测评入口。登录后按自己的节奏摆放沙具、完成作品，并提交给心理老师。</p>
+        </div>
+        <div class="wb-auth-points">
+          <span>学生账号由学校统一发放</span>
+          <span>作品仅用于本次心理测评</span>
+          <span>完成或离开前请主动退出</span>
+        </div>
+      </aside>
+      <div class="wb-auth-form-wrap">
+        <div class="wb-auth-form-head">
+          <div class="wb-auth-kicker">Student Sign In</div>
+          <h3 id="wbAuthTitle">登录学生测评入口</h3>
+          <p>请使用学校发放的学生账号和密码。教师与咨询师请从管理后台进入。</p>
+        </div>
+        <form class="wb-auth-form" id="wbAuthForm" novalidate>
+          <label class="wb-field">
+            <span>学生账号</span>
+            <input id="wbAuthAccount" type="text" name="account" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="请输入学生账号，如 li.yao" maxlength="32" required>
+          </label>
+          <label class="wb-field">
+            <span>密码</span>
+            <input id="wbAuthPassword" type="password" name="password" autocomplete="current-password" placeholder="请输入登录密码" maxlength="128" required>
+          </label>
+          <div class="wb-auth-error" id="wbAuthError" role="alert"></div>
+          <button type="submit" class="wb-auth-submit" id="wbAuthSubmit" data-busy="false">
+            <span class="spin" aria-hidden="true"></span>
+            <span id="wbAuthSubmitLabel">开始测评</span>
+          </button>
+          <div class="wb-auth-status" id="wbAuthStatus">请使用学生账号登录</div>
+        </form>
+        <div class="wb-auth-foot">
+          <span>账号未开通或忘记密码？请联系学校心理老师或系统管理员。学生账号只能由<b>超级管理员</b>在管理后台创建。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.SandplayAuth = (() => {
+      const TOKEN_KEY = "sandplay_student_token";
+      const LEGACY_TOKEN_KEY = "sandplay_counselor_token";
+      const ADMIN_TOKEN_KEY = "sandplay_admin_token";
+      const API_BASE = (
+        window.localStorage.getItem("sandplay_report_api") ||
+        (location.protocol.indexOf("http") === 0
+          ? `${location.origin}/api/v1`
+          : "http://127.0.0.1:8011/api/v1")
+      ).replace(/\/$/, "");
+
+      let token = "";
+      let user = null;
+      let resolveReady;
+      const ready = new Promise((resolve) => { resolveReady = resolve; });
+
+      const overlay = document.getElementById("workbenchAuth");
+      const form = document.getElementById("wbAuthForm");
+      const accountInput = document.getElementById("wbAuthAccount");
+      const passwordInput = document.getElementById("wbAuthPassword");
+      const submitButton = document.getElementById("wbAuthSubmit");
+      const submitLabel = document.getElementById("wbAuthSubmitLabel");
+      const errorBox = document.getElementById("wbAuthError");
+      const statusBox = document.getElementById("wbAuthStatus");
+
+      const readSession = () => {
+        try { return window.sessionStorage.getItem(TOKEN_KEY) || ""; }
+        catch (error) { return ""; }
+      };
+      const writeSession = (value) => {
+        try { window.sessionStorage.setItem(TOKEN_KEY, value); }
+        catch (error) {}
+      };
+      const clearSession = () => {
+        try { window.sessionStorage.removeItem(TOKEN_KEY); }
+        catch (error) {}
+      };
+      const clearLegacyToken = () => {
+        try { window.localStorage.removeItem(LEGACY_TOKEN_KEY); }
+        catch (error) {}
+        try { window.sessionStorage.removeItem(ADMIN_TOKEN_KEY); }
+        catch (error) {}
+      };
+      const setBusy = (busy, label) => {
+        submitButton.disabled = !!busy;
+        submitButton.dataset.busy = busy ? "true" : "false";
+        if (label) submitLabel.textContent = label;
+      };
+      const setStatus = (text, tone) => {
+        statusBox.textContent = text || "";
+        statusBox.dataset.tone = tone || "";
+      };
+      const showError = (message) => {
+        errorBox.textContent = message || "";
+        errorBox.classList.toggle("show", !!message);
+      };
+      const showOverlay = () => {
+        overlay.hidden = false;
+        document.body.classList.add("auth-locked");
+      };
+      const hideOverlay = () => {
+        overlay.hidden = true;
+        document.body.classList.remove("auth-locked");
+      };
+      const focusAccount = () => {
+        window.setTimeout(() => {
+          try {
+            if (accountInput.value.trim()) passwordInput.focus();
+            else accountInput.focus();
+          } catch (error) {}
+        }, 60);
+      };
+      const messageFrom = (body, status) => {
+        let detail = body && (body.message || body.detail);
+        if (Array.isArray(detail)) {
+          detail = detail.map((item) => item && (item.msg || item.reason)).filter(Boolean).join("；");
+        }
+        if (detail) return String(detail);
+        if (status === 401) return "账号或密码错误，请重新输入";
+        if (status === 403) return "沙盘工作台仅面向受测学生开放";
+        if (status === 423) return "账号已临时锁定，请稍后再试";
+        if (status === 429) return "操作过于频繁，请稍后再试";
+        return `登录失败（HTTP ${status}）`;
+      };
+      const fetchMe = async (sessionToken) => {
+        const response = await fetch(`${API_BASE}/workbench/me`, {
+          method: "GET",
+          headers: { "Authorization": `Bearer ${sessionToken}`, "Accept": "application/json" },
+          cache: "no-store"
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok || body.code !== "OK" || !body.data || !body.data.user) {
+          throw new Error(messageFrom(body, response.status));
+        }
+        return body.data;
+      };
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        showError("");
+        const account = accountInput.value.trim();
+        const password = passwordInput.value;
+        if (!account || !password) {
+          showError("请输入账号和密码");
+          if (!account) accountInput.focus(); else passwordInput.focus();
+          return;
+        }
+        setBusy(true, "正在登录…");
+        setStatus("正在验证账号与密码…");
+        try {
+          const response = await fetch(`${API_BASE}/workbench/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({ account, password })
+          });
+          const body = await response.json().catch(() => ({}));
+          if (!response.ok || body.code !== "OK" || !body.data || !body.data.token) {
+            throw new Error(messageFrom(body, response.status));
+          }
+          if (!body.data.user || body.data.user.role_key !== "student") {
+            throw new Error("沙盘工作台仅面向受测学生开放，请使用学生账号登录");
+          }
+          token = body.data.token;
+          user = body.data.user;
+          writeSession(token);
+          clearLegacyToken();
+          setStatus("验证通过，正在进入测评…", "ok");
+          passwordInput.value = "";
+          window.setTimeout(() => location.reload(), 120);
+        } catch (error) {
+          clearSession();
+          token = "";
+          user = null;
+          showError(error && error.message ? error.message : "登录失败，请稍后重试");
+          setStatus("登录未完成");
+          setBusy(false, "重新登录");
+          passwordInput.select();
+        }
+      });
+
+      const logout = async () => {
+        const activeToken = token || readSession();
+        clearSession();
+        clearLegacyToken();
+        token = "";
+        user = null;
+        try {
+          if (activeToken) {
+            await fetch(`${API_BASE}/workbench/logout`, {
+              method: "POST",
+              headers: { "Authorization": `Bearer ${activeToken}` }
+            });
+          }
+        } catch (error) {}
+        location.reload();
+      };
+
+      const boot = async () => {
+        const saved = readSession();
+        if (!saved) {
+          showOverlay();
+          setBusy(false, "开始测评");
+          setStatus("请使用学生账号登录");
+          resolveReady(null);
+          focusAccount();
+          return;
+        }
+        showOverlay();
+        setBusy(true, "正在验证…");
+        setStatus("正在恢复登录状态…");
+        try {
+          const session = await fetchMe(saved);
+          if (!session.user || session.user.role_key !== "student") {
+            throw new Error("沙盘工作台仅面向受测学生开放");
+          }
+          token = saved;
+          user = session.user;
+          clearLegacyToken();
+          setStatus("登录状态有效", "ok");
+          hideOverlay();
+          setBusy(false);
+          resolveReady({ token, user });
+        } catch (error) {
+          clearSession();
+          token = "";
+          user = null;
+          showOverlay();
+          setBusy(false, "重新登录");
+          setStatus("登录状态已失效，请重新登录");
+          showError(error && error.message ? error.message : "请重新登录");
+          resolveReady(null);
+          focusAccount();
+        }
+      };
+
+      boot();
+
+      return {
+        ready,
+        getToken: () => token || readSession(),
+        getUser: () => user,
+        logout
+      };
+    })();
+  </script>
 
   <script>
     const { useCallback, useEffect, useMemo, useRef, useState } = React;
@@ -1951,7 +2517,7 @@
     }
     function profileSummary(profile) {
       const value = normaliseProfile(profile);
-      return [value.school_name, value.class_name, value.seat_no].filter(Boolean).join(" · ") || "学校 / 班级 / 座位待填写";
+      return [value.grade_level, value.class_name].filter(Boolean).join(" · ") || "班级待设置";
     }
 
     function uid(prefix) {
@@ -2873,52 +3439,16 @@
     }
 
     const SCORE_SUBJECTS = ["语文", "数学", "英语", "科学", "综合"];
-    function StudentFields({ student, onChange }) {
-      const value = normaliseProfile({ ...student, academic_scores: student && student.academic_scores });
-      const scores = value.academic_scores || {};
-      const subjects = scores.subjects || {};
-      const setField = (key, fieldValue) => onChange({ ...value, [key]: fieldValue });
-      const setScore = (key, fieldValue) => onChange({
-        ...value,
-        academic_scores: { ...scores, [key]: fieldValue }
-      });
-      const setSubject = (subject, fieldValue) => onChange({
-        ...value,
-        academic_scores: { ...scores, subjects: { ...subjects, [subject]: fieldValue } }
-      });
+    function StudentFields({ student }) {
+      const value = normaliseProfile(student);
+      const classLine = [value.school_name, value.grade_level, value.class_name].filter(Boolean).join(" · ") || "未设置班级";
       return h("div", { className: "student-fields" },
-        h("div", { className: "student-grid" },
-          h("div", { className: "finish-field" }, h("label", null, "学校"), h("input", { value: value.school_name, maxLength: 60, onChange: (event) => setField("school_name", event.target.value), placeholder: "如 中科青行实验学校" })),
-          h("div", { className: "finish-field" }, h("label", null, "班级"), h("input", { value: value.class_name, maxLength: 30, onChange: (event) => setField("class_name", event.target.value), placeholder: "如 三年二班" })),
-          h("div", { className: "finish-field" }, h("label", null, "座位"), h("input", { value: value.seat_no, maxLength: 20, onChange: (event) => setField("seat_no", event.target.value), placeholder: "如 3排2座" })),
-          h("div", { className: "finish-field" }, h("label", null, "联系方式"), h("input", { value: value.contact_phone, maxLength: 40, onChange: (event) => setField("contact_phone", event.target.value), placeholder: "家长或班主任电话（可选）" })),
-          h("div", { className: "finish-field" }, h("label", null, "姓名（可选）"), h("input", { value: value.name, maxLength: 24, onChange: (event) => setField("name", event.target.value), placeholder: "匿名也可以" })),
-          h("div", { className: "finish-field" }, h("label", null, "学号（可选）"), h("input", { value: value.student_no, maxLength: 32, onChange: (event) => setField("student_no", event.target.value), placeholder: "如 T001" })),
-          h("div", { className: "finish-field" }, h("label", null, "年级段"), h("select", { value: value.grade_level, onChange: (event) => setField("grade_level", event.target.value) },
-            ["小学低年级", "小学高年级", "初中", "高中", "大学", "其他"].map((item) => h("option", { key: item, value: item }, item))
-          )),
-          h("div", { className: "finish-field" }, h("label", null, "性别"), h("select", { value: value.gender, onChange: (event) => setField("gender", event.target.value) },
-            ["不透露", "男", "女"].map((item) => h("option", { key: item, value: item }, item))
-          ))
+        h("div", { className: "identity-panel" },
+          h("div", { className: "identity-item" }, h("small", null, "姓名"), h("strong", null, value.name || "学生")),
+          h("div", { className: "identity-item" }, h("small", null, "学号"), h("strong", null, value.student_no || "未设置")),
+          h("div", { className: "identity-item" }, h("small", null, "学部 / 年级 / 班级"), h("strong", null, classLine))
         ),
-        h("div", { className: "score-panel" },
-          h("div", { className: "score-panel-head" },
-            h("span", null, "结构化成绩"),
-            h("small", null, "只填已知项；缺项会在报告中标注待补充")
-          ),
-          h("div", { className: "score-meta-grid" },
-            h("div", { className: "finish-field" }, h("label", null, "考试名称"), h("input", { value: scores.exam_name || "", onChange: (event) => setScore("exam_name", event.target.value), placeholder: "如 期中考试" })),
-            h("div", { className: "finish-field" }, h("label", null, "考试日期"), h("input", { value: scores.exam_date || "", onChange: (event) => setScore("exam_date", event.target.value), placeholder: "YYYY-MM-DD" })),
-            h("div", { className: "finish-field" }, h("label", null, "总分"), h("input", { value: scores.total_score || "", onChange: (event) => setScore("total_score", event.target.value), placeholder: "如 286" })),
-            h("div", { className: "finish-field" }, h("label", null, "班级排名"), h("input", { value: scores.class_rank || "", onChange: (event) => setScore("class_rank", event.target.value), placeholder: "如 12/45" }))
-          ),
-          h("div", { className: "score-subject-grid" },
-            SCORE_SUBJECTS.map((subject) => h("div", { key: subject, className: "score-subject" },
-              h("label", null, subject),
-              h("input", { value: subjects[subject] || "", onChange: (event) => setSubject(subject, event.target.value), placeholder: "分数" })
-            ))
-          )
-        )
+        h("div", { className: "identity-note" }, "以上信息由学校账号统一维护。如果姓名、班级有误，请联系心理老师或管理员修改，不需要在测评里自行填写。")
       );
     }
 
@@ -2928,29 +3458,28 @@
         h("div", { className: "profile-panel" },
           h("div", { className: "finish-head" },
             h("div", null,
-              h("div", { className: "finish-kicker" }, "TESTEE PROFILE / 受测者档案"),
-              h("h2", { className: "finish-title" }, "先建立受测者卡片"),
-              h("p", { className: "finish-sub" }, "这张卡片会显示在沙盘顶部，并随报告一起进入统计与访谈。姓名、学号可留空。")
+              h("div", { className: "finish-kicker" }, "MY SESSION / 我的测评"),
+              h("h2", { className: "finish-title" }, "确认本次测评信息"),
+              h("p", { className: "finish-sub" }, "姓名、学号和班级由学校账号带入。你可以补充一点今天的心情，也可以留空。")
             ),
             h("button", { type: "button", className: "export-close", onClick: onClose }, "关闭")
           ),
           h("div", { className: "profile-body" },
-            h(StudentFields, { student: draft, onChange: setDraft }),
+            h(StudentFields, { student: draft }),
             h("div", { className: "finish-field" },
-              h("label", null, "受测者自述（可选）"),
+              h("label", null, "今天想说的话（可选）"),
               h("textarea", {
                 value: draft.self_narrative || "", maxLength: 800,
                 onChange: (event) => setDraft({ ...draft, self_narrative: event.target.value }),
-                placeholder: "最近的学习状态、家里发生的事、来做沙盘时的心情……"
+                placeholder: "今天的心情、最近在意的事，或你想让老师知道的情况……"
               })
-            ),
-            h("div", { className: "profile-hint" }, draft.transcript_name ? `成绩单：${draft.transcript_name}（将在生成报告时上传）` : "成绩单可在完成收尾时上传图片。")
+            )
           ),
           h("div", { className: "finish-footer" },
-            h("div", { className: "finish-footer-note" }, "档案只保存在本次会话与报告中，不会进入公开分享页。"),
+            h("div", { className: "finish-footer-note" }, "这些内容只随本次测评提交给学校心理老师，不会出现在公开分享页。"),
             h("div", { className: "finish-actions" },
               h("button", { type: "button", className: "finish-btn", onClick: onClose }, "取消"),
-              h("button", { type: "button", className: "finish-btn dark", onClick: () => { onSave(normaliseProfile(draft)); onClose(); } }, "保存档案")
+              h("button", { type: "button", className: "finish-btn dark", onClick: () => { onSave(normaliseProfile(draft)); onClose(); } }, "保存")
             )
           )
         )
@@ -2960,25 +3489,25 @@
     function TesteeCard({ profile, elapsed, itemCount, photoCount, onOpen }) {
       const value = normaliseProfile(profile);
       const initial = (value.name || "受").trim().slice(0, 1) || "受";
-      return h("button", { type: "button", className: "testee-card", onClick: onOpen, title: "编辑受测者档案" },
+      return h("button", { type: "button", className: "testee-card", onClick: onOpen, title: "查看我的测评信息" },
         h("span", { className: "testee-avatar" }, initial),
         h("span", { className: "testee-copy" },
-          h("strong", null, value.name || "匿名受测者"),
+          h("strong", null, value.name || "学生"),
           h("small", null, profileSummary(value)),
-          h("em", null, `已制作 ${formatDuration(elapsed)} · ${itemCount} 件沙具${photoCount ? ` · ${photoCount} 张快照` : ""}`)
+          h("em", null, `已创作 ${formatDuration(elapsed)} · ${itemCount} 件沙具${photoCount ? ` · ${photoCount} 张过程记录` : ""}`)
         ),
-        h("span", { className: "testee-edit" }, "编辑")
+        h("span", { className: "testee-edit" }, "查看")
       );
     }
 
     function HelpModal({ onClose }) {
       const rows = [
-        ["放置沙具", "从左侧沙具库点击卡片，或拖入沙盘；选中后可旋转、缩放、水平镜像。"],
+        ["放置沙具", "从右侧沙具库点击卡片，或拖入沙盘；选中后可旋转、缩放、水平镜像。"],
         ["地形塑形", "右侧选择堆沙 / 挖沙 / 注水 / 抚平，拖拽绘制；笔刷直径与力度可调。"],
         ["观察视角", "右键拖拽环绕；滚轮缩放；Shift + 滚轮旋转沙具。"],
         ["过程记录", "顶部可拍过程快照，最多 6 张；白噪音 / 轻音乐可随时开关。"],
         ["撤销与重做", "Ctrl+Z 撤销，Ctrl+Shift+Z 或 Ctrl+Y 重做；清空需要二次确认。"],
-        ["结束制作", "点击顶部「结束制作」，选择代表沙具并填写描述后生成报告。"]
+        ["提交作品", "点击顶部「完成并提交」，选择代表沙具并写下描述，作品就会交给心理老师。"]
       ];
       return h("div", { className: "finish-overlay" },
         h("div", { className: "help-panel" },
@@ -2995,7 +3524,7 @@
               h("b", null, title),
               h("span", null, text)
             )),
-            h("div", { className: "help-note" }, "隐私提示：分享页只展示脱敏后的家长 / 学生版；咨询师完整版需要后台令牌。")
+            h("div", { className: "help-note" }, "提交说明：作品与描述只交给学校心理老师，用于辅导参考；工作台不会向学生展示风险判断或临床结论。")
           )
         )
       );
@@ -3014,15 +3543,13 @@
         )
       );
     }
-    function CompleteModal({ items, profile, onClose, onSubmit, onSkip, busy, error }) {
+    function CompleteModal({ items, profile, onClose, onSubmit, busy, error }) {
       const [stage, setStage] = React.useState("representative");
       const [representativeId, setRepresentativeId] = React.useState(items[0] ? items[0].id : "");
       const [description, setDescription] = React.useState("");
       const [selfImage, setSelfImage] = React.useState(() => (profile && profile.self_image) || "");
       const [selfNarrative, setSelfNarrative] = React.useState(() => (profile && profile.self_narrative) || "");
-      const [teacherObservation, setTeacherObservation] = React.useState(() => (profile && profile.teacher_observation) || "");
       const [student, setStudent] = React.useState(() => normaliseProfile(profile));
-      const [transcriptFile, setTranscriptFile] = React.useState(null);
       const [consent, setConsent] = React.useState(true);
       const [localError, setLocalError] = React.useState("");
 
@@ -3042,7 +3569,7 @@
       };
       const submit = () => {
         if (!representative) { setLocalError("请先选择代表沙具。"); return; }
-        if (description.trim().length < 10) { setLocalError("请至少写 10 个字，让咨询师理解你的沙盘。"); return; }
+        if (description.trim().length < 10) { setLocalError("请至少写 10 个字，让老师理解你的沙盘。"); return; }
         if (!consent) { setLocalError("请确认知情同意后继续。"); return; }
         setLocalError("");
         onSubmit({
@@ -3052,23 +3579,8 @@
           description: description.trim(),
           selfImage: selfImage.trim(),
           selfNarrative: selfNarrative.trim(),
-          teacherObservation: teacherObservation.trim(),
           student: normaliseProfile(student),
-          transcriptFile,
           consent
-        });
-      };
-      const skipText = () => {
-        onSkip({
-          representativeId: representative ? representative.id : (items[0] ? items[0].id : ""),
-          representativeName: representative ? representative.label : (items[0] ? items[0].label : ""),
-          representativeCategory: representative ? representative.category : "未分类",
-          description: description.trim(),
-          selfImage: selfImage.trim(),
-          selfNarrative: selfNarrative.trim(),
-          teacherObservation: teacherObservation.trim(),
-          student: normaliseProfile(student),
-          transcriptFile, consent
         });
       };
 
@@ -3076,9 +3588,9 @@
         h("div", { className: "finish-panel" },
           h("div", { className: "finish-head" },
             h("div", null,
-              h("div", { className: "finish-kicker" }, "SESSION DEBRIEF / 作品收尾"),
+              h("div", { className: "finish-kicker" }, "SUBMIT WORK / 作品提交"),
               h("h2", { className: "finish-title" }, stage === "representative" ? "哪一件沙具，最能代表此刻的你？" : "为你的沙盘，留下一段话"),
-              h("p", { className: "finish-sub" }, stage === "representative" ? "不是挑选最漂亮的一件，而是选择与你最有连接的一件。" : "这段描述会和沙盘图一起进入发展性评估，帮助咨询师理解你的摆放意图。")
+              h("p", { className: "finish-sub" }, stage === "representative" ? "不是挑选最漂亮的一件，而是选择与你最有连接的一件。" : "这段描述会和沙盘图一起交给心理老师，帮助老师理解你的摆放。")
             ),
             h("button", { type: "button", className: "export-close", onClick: busy ? null : onClose, disabled: busy }, "关闭")
           ),
@@ -3092,7 +3604,7 @@
               h("div", { className: "finish-section-head" },
                 h("div", null,
                   h("h3", { className: "finish-section-title" }, "从你放入的作品中选择一件"),
-                  h("p", { className: "finish-section-note" }, "点击卡片即可选中。之后仍可返回沙盘调整，但代表沙具会用于报告的核心意象分析。")
+                  h("p", { className: "finish-section-note" }, "点击卡片即可选中。之后仍可返回沙盘调整，代表沙具会随作品一起提交给心理老师。")
                 ),
                 h("div", { className: "finish-count" }, `${items.length} 件沙具`)
               ),
@@ -3120,13 +3632,13 @@
                 h("button", { type: "button", className: "mini-btn", onClick: () => setStage("representative") }, "重选")
               ) : null,
               h("div", { className: "finish-field" },
-                h("label", null, "自我像（可选）"),
+                h("label", null, "哪一件沙具最像你（可选）"),
                 h("input", {
                   type: "text", value: selfImage, maxLength: 60,
                   onChange: (event) => setSelfImage(event.target.value),
                   placeholder: "例如：一棵树、一个蹲着的人、一盏灯……"
                 }),
-                h("span", { className: "counter" }, `${selfImage.length} / 60 · 仅用于访谈假设，不直接决定风险等级`)
+                h("span", { className: "counter" }, `${selfImage.length} / 60`)
               ),
               h("div", { className: "finish-field" },
                 h("label", null, "沙盘描述（必填，不少于 10 字）"),
@@ -3145,49 +3657,33 @@
                 )
               ),
               h("div", { className: "finish-field" },
-                h("label", null, "想补充的背景（可选）"),
+                h("label", null, "想补充的话（可选）"),
                 h("textarea", {
                   value: selfNarrative, maxLength: 800,
                   onChange: (event) => setSelfNarrative(event.target.value),
-                  placeholder: "最近的学习状态、家里发生的事、你来做沙盘时的心情……任何你愿意说的都可以。"
+                  placeholder: "最近的心情、学习或生活里发生的事……任何你愿意说的都可以。"
                 }),
                 h("span", { className: "counter" }, `${selfNarrative.length} / 800`)
               ),
-              h("div", { className: "finish-field" },
-                h("label", null, "教师观察（可选，建议填写）"),
-                h("textarea", {
-                  value: teacherObservation, maxLength: 400,
-                  onChange: (event) => setTeacherObservation(event.target.value),
-                  placeholder: "例如：近一个月课堂专注、作业完成、同伴互动、考试表现的变化；只写可观察事实，不下诊断结论。"
-                }),
-                h("span", { className: "counter" }, `${teacherObservation.length} / 400`)
-              ),
-              h(StudentFields, { student, onChange: setStudent }),
-              h("label", { className: "file-drop" },
-                h("div", null,
-                  h("strong", null, transcriptFile ? transcriptFile.name : "上传成绩单图片（可选）"),
-                  h("small", null, transcriptFile ? "已选择，将用于学业部分分析" : "支持 JPG / PNG / WebP，可选")
-                ),
-                h("span", { className: "finish-count" }, transcriptFile ? "更换" : "选择文件"),
-                h("input", { type: "file", accept: "image/*", onChange: (event) => setTranscriptFile(event.target.files && event.target.files[0] ? event.target.files[0] : null) })
+              h("div", { className: "profile-hint" },
+                `本次测评账号：${student.name || "学生"}${student.class_name ? " · " + student.class_name : ""}${student.student_no ? " · 学号 " + student.student_no : ""}`
               ),
               h("div", { className: "finish-consent" },
                 h("input", { type: "checkbox", checked: consent, onChange: (event) => setConsent(event.target.checked) }),
-                h("span", null, "我已知情并同意：本作品与文字将用于生成发展性心理评估参考报告；报告不用于临床诊断、分班或评优。")
+                h("span", null, "我同意本次作品与文字提交给学校心理老师，用于心理辅导参考；不用于分班、评优或临床诊断。")
               )
             )
           ),
           h("div", { className: "finish-footer" },
             h("div", null,
-              (localError || error) ? h("div", { className: "finish-error" }, localError || error) : h("div", { className: "finish-footer-note" }, "生成后可分享给家长 / 学生，敏感内容会自动隐藏。"),
-              h("button", { type: "button", className: "mini-btn", onClick: skipText, disabled: busy, style: { marginTop: 7 } }, "暂不生成报告，只保存作品")
+              (localError || error) ? h("div", { className: "finish-error" }, localError || error) : h("div", { className: "finish-footer-note" }, "提交后由心理老师在后台查看，你不需要在这里等待结果。")
             ),
             h("div", { className: "finish-actions" },
               h("button", { type: "button", className: "finish-btn", onClick: onClose, disabled: busy }, "返回沙盘"),
               stage === "representative"
                 ? h("button", { type: "button", className: "finish-btn dark", onClick: goNext, disabled: !items.length || busy }, "下一步 · 描述沙盘")
                 : h("button", { type: "button", className: "finish-btn dark", onClick: submit, disabled: !canSubmit },
-                    busy ? h("span", null, h("span", { className: "submit-spinner" }), "正在生成报告…") : "生成评估报告"
+                    busy ? h("span", null, h("span", { className: "submit-spinner" }), "正在提交…") : "提交本次作品"
                   )
             )
           )
@@ -3195,202 +3691,74 @@
       );
     }
 
-    function ExportModal({ payload, onClose, onToast }) {
-      const [share, setShare] = React.useState(null);
-      const [sharing, setSharing] = React.useState(false);
-      const [shareError, setShareError] = React.useState("");
-      const [counselorToken, setCounselorToken] = React.useState(() => window.localStorage.getItem("sandplay_counselor_token") || "dev-counselor-token");
+    function StudentSubmitModal({ payload, onClose, onToast }) {
       if (!payload) return null;
-
-      const report = payload.report || null;
-      const meta = report && report.meta ? report.meta : {};
-      const chapter1 = report && report.chapter_1_overview ? report.chapter_1_overview : {};
-      const chapter3 = report && report.chapter_3_six_dimensions ? report.chapter_3_six_dimensions : {};
-      const academic = report && report.chapter_4_academic ? report.chapter_4_academic : {};
-      const advice = report && report.chapter_9_general_advice ? report.chapter_9_general_advice : {};
-      const dimensions = Array.isArray(chapter3.dimensions) ? chapter3.dimensions : [];
-      const subjects = Array.isArray(academic.subjects) ? academic.subjects : [];
-      const sceneLines = Array.isArray(chapter1.scene_imagery) ? chapter1.scene_imagery : [];
-      const scenePoints = [chapter1.clusters, chapter1.blank_areas, chapter1.terrain_observation].filter(Boolean);
-      const adviceItems = Array.isArray(advice.growth_mindset) ? advice.growth_mindset : [];
-      const total = academic.total || {};
       const summary = payload.grid_distribution && payload.grid_distribution.summary ? payload.grid_distribution.summary : {};
-      const sample = meta.sample_quality && typeof meta.sample_quality === "object" ? meta.sample_quality : {};
-      const sampleCount = sample.item_count != null ? sample.item_count : (summary.total_items || 0);
-      const sampleOccupied = sample.occupied_cells != null ? sample.occupied_cells : (summary.occupied_cells || 0);
-      const sampleCenter = sample.center_count != null ? sample.center_count : (summary.center_count || 0);
-      const qualityWarnings = Array.isArray(meta.quality_warnings)
-        ? meta.quality_warnings.filter((item) => item && (item.message || item.code) && String(item.code || "") !== "DEMO_ENGINE")
-        : [];
-      const reportNo = meta.report_no || "—";
-      const isDemo = payload.report_engine === "demo" || String(meta.engine || "").toLowerCase() === "demo";
-      const generatedAt = (() => {
-        if (!meta.generated_at) return "";
-        const date = new Date(meta.generated_at);
-        return Number.isNaN(date.getTime()) ? "" : date.toLocaleString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
-      })();
-      const trim = (value, max) => {
-        const text = String(value || "").replace(/\s+/g, " ").trim();
-        return text.length > max ? text.slice(0, max) + "…" : text;
-      };
-      const friendlyAcademic = (value) => String(value || "")
-        .replace(/可读成绩单数据/g, "成绩数据")
-        .replace(/成绩单/g, "成绩数据")
-        .replace(/识别结果/g, "成绩数据")
-        .replace(/补测/g, "补充成绩");
-      const friendlyScene = (value) => String(value || "")
-        .replace(/九宫格/g, "画面分区")
-        .replace(/宫格/g, "区域");
-      const friendlyGeneral = (value) => friendlyScene(value)
-        .replace(/成绩单/g, "成绩数据")
-        .replace(/补测/g, "补充成绩")
-        .replace(/可读成绩/g, "成绩数据");
-      const academicText = subjects.length
-        ? trim(friendlyAcademic(academic.overall_interpretation || "已读取本次成绩数据。"), 150)
-        : "本次报告暂未包含成绩数据，学业部分以沙盘与自述为参考，建议后续补充成绩后再评估。";
-
-      const copy = async (text, message) => {
-        try { await navigator.clipboard.writeText(text); onToast(message); }
-        catch (error) { onToast("当前浏览器不允许直接复制，请手动选择复制"); }
-      };
-      const saveToken = (value) => {
-        setCounselorToken(value);
-        try { window.localStorage.setItem("sandplay_counselor_token", value); } catch (error) {}
-      };
-      const generateShare = async () => {
-        if (!payload.report_id) { setShareError("报告还在准备中，暂时无法生成分享二维码。"); return; }
-        setSharing(true); setShareError("");
-        try {
-          const response = await fetch(`${REPORT_API_BASE}/reports/${payload.report_id}/share`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-Counselor-Token": counselorToken },
-            body: JSON.stringify({})
-          });
-          const result = await response.json();
-          if (!response.ok || result.code !== "OK") throw new Error(result.message || "生成分享链接失败");
-          setShare(result.data);
-          onToast("分享二维码已生成，家长 / 学生版为简化内容");
-        } catch (error) {
-          setShareError("分享二维码生成失败，请稍后重试；如反复失败，请检查分享设置。");
-        } finally { setSharing(false); }
-      };
-      const openReport = (mode) => {
-        if (!payload.report_id) { onToast("报告还在准备中，暂时无法打开完整报告"); return; }
-        const url = `${REPORT_VIEWER_PAGE}?report_id=${encodeURIComponent(payload.report_id)}&mode=${mode === "public" ? "public" : "counselor"}`;
-        window.open(url, "_blank", "noopener");
-      };
-
+      const sampleCount = summary.total_items || 0;
+      const sampleOccupied = summary.occupied_cells || 0;
+      const sampleCenter = summary.center_count || 0;
+      const submitted = payload.report_status === "completed";
+      const failed = Boolean(payload.server_error);
+      const assessmentId = payload.report_id || "";
+      const submittedAt = payload.report_created_at ? new Date(payload.report_created_at).toLocaleString("zh-CN", {
+        year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"
+      }) : "";
       return h("div", { className: "export-overlay" },
         h("div", { className: "export-panel" },
           h("div", { className: "export-head" },
             h("div", null,
-              h("div", { className: "panel-kicker" }, "心理沙盘 · 发展性评估"),
-              h("h2", { className: "export-title" }, report ? "本次沙盘评估报告" : "本次沙盘作品"),
-              h("p", { className: "export-sub" }, report ? "报告结果一目了然 · 家长 / 学生版可扫码查看 · 作品图可单独保存" : "保留本次作品的高清图片与空间统计")
+              h("div", { className: "panel-kicker" }, "SUBMISSION / 作品提交"),
+              h("h2", { className: "export-title" }, failed ? "本次作品尚未提交" : (submitted ? "作品已提交" : "本次沙盘作品")),
+              h("p", { className: "export-sub" }, failed
+                ? "作品图仍可保存。请先保存图片，再联系心理老师处理提交问题。"
+                : "心理老师会在后台查看本次作品。你不需要在这里等待报告。")
             ),
             h("button", { type: "button", onClick: onClose, className: "export-close" }, "关闭")
           ),
           h("div", { className: "export-body" },
             h("div", { className: "space-y-3" },
-              payload.server_error ? h("div", { className: "finish-error" }, "报告暂未生成，作品图仅保留在当前页面。请先保存作品图，再重试。") : null,
-              h("img", { src: payload.canvas_image_base64, alt: "沙盘作品高清图", className: "export-image" }),
+              failed ? h("div", { className: "finish-error" }, `提交失败：${payload.server_error}。请先保存作品图，再联系心理老师。`) : null,
+              h("img", { src: payload.canvas_image_base64, alt: "我的沙盘作品", className: "export-image" }),
               h("div", { className: "stat-grid" },
                 h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleCount), h("div", { className: "stat-label" }, "沙具数")),
                 h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleOccupied), h("div", { className: "stat-label" }, "占用区域")),
                 h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleCenter), h("div", { className: "stat-label" }, "中心区域沙具"))
               ),
-              report ? h("div", { className: "report-card" },
+              h("div", { className: "report-card" },
                 h("div", { className: "report-card-head" },
-                  h("strong", null, "发展性评估报告"),
-                  h("span", null, isDemo ? "示例报告" : "报告已生成")
+                  h("strong", null, submitted ? "提交完成" : "作品仍在当前页面"),
+                  h("span", null, submitted ? "已交给老师" : "未提交")
                 ),
-                h("p", null, `报告编号 ${reportNo}。完整报告包含整体解读、六维分析、学业建议与训练方向；家长 / 学生版会自动隐藏咨询师内部内容。`),
-                qualityWarnings.length ? h("div", { className: "report-quality" },
-                  h("strong", null, "报告质量提示"),
-                  qualityWarnings.map((item, index) => h("div", { key: `${item.code || "notice"}-${index}` },
-                    h("code", null, item.code || "NOTICE"),
-                    item.message || ""
-                  ))
-                ) : null,
-                h("div", { className: "report-actions" },
-                  h("button", { type: "button", className: "mini-btn dark", onClick: () => openReport("counselor") }, "查看完整报告"),
-                  h("button", { type: "button", className: "mini-btn", onClick: () => openReport("public") }, "家长 / 学生版"),
-                  h("button", { type: "button", className: "mini-btn", onClick: generateShare, disabled: sharing }, sharing ? "生成中…" : "生成分享二维码")
-                ),
-                shareError ? h("p", { style: { color: "#78402f" } }, shareError) : null,
-                share ? h("div", { className: "share-box" },
-                  h("img", { src: share.qr_png_base64, alt: "家长学生查看二维码" }),
-                  h("div", null,
-                    h("strong", { style: { fontSize: 10.5 } }, "家长 / 学生扫码查看"),
-                    h("small", null, "分享版已自动隐藏咨询师内部内容"),
-                    h("button", { type: "button", className: "mini-btn", onClick: () => copy(share.share_url, "分享链接已复制") }, "复制分享链接")
-                  )
-                ) : null,
-                h("details", { className: "share-advanced" },
-                  h("summary", null, "分享设置"),
-                  h("div", { className: "share-input-row" },
-                    h("input", { value: counselorToken, onChange: (event) => saveToken(event.target.value), placeholder: "咨询师访问码", "aria-label": "咨询师访问码" })
-                  )
-                )
-              ) : h("div", { className: "report-placeholder" },
-                h("strong", null, "本次未生成评估报告"),
-                h("p", null, "作品图仅保留在当前页面，刷新或关闭页面后会丢失。请先保存作品图，再重试。"),
-                h("small", null, "作品图片与空间统计已保留")
+                h("p", null, submitted
+                  ? `本次作品已提交${submittedAt ? "，时间 " + submittedAt : ""}${assessmentId ? "，提交编号 " + assessmentId.slice(0, 8).toUpperCase() : ""}。`
+                  : "刷新或关闭页面后，本次作品可能丢失。请先保存高清作品图。"),
+                submitted ? h("p", { style: { fontSize: 10.5, color: "#5c6a60", margin: "6px 0 0", lineHeight: 1.8 } },
+                  "工作台不向学生展示风险判断或临床结论。需要进一步沟通时，心理老师会另行联系你。") : null
               ),
               h("div", { className: "export-actions" },
-                h("button", { type: "button", onClick: () => downloadDataUrl("sandplay_3d_hd.png", payload.canvas_image_base64), className: "export-action primary" }, h("span", null, "保存高清作品图"), h("span", null, "↓"))
+                h("button", { type: "button", onClick: () => downloadDataUrl("我的沙盘作品.png", payload.canvas_image_base64), className: "export-action primary" }, h("span", null, "保存高清作品图"), h("span", null, "↓"))
               )
             ),
             h("div", { className: "report-overview" },
               h("div", { className: "report-overview-head" },
                 h("div", null,
-                  h("div", { className: "report-overview-kicker" }, "评估结果概览"),
-                  h("h3", null, report ? "沙盘评估结果概览" : "尚未生成评估报告"),
-                  h("p", { className: "report-overview-meta" }, report ? `报告编号 ${reportNo}${generatedAt ? " · " + generatedAt : ""}` : "完成沙盘与描述后生成")
+                  h("div", { className: "report-overview-kicker" }, "接下来"),
+                  h("h3", null, "把作品交给老师就好"),
+                  h("p", { className: "report-overview-meta" }, "不需要自己解读，也不需要等待结果")
                 ),
-                h("span", { className: "report-overview-state" }, report ? (isDemo ? "示例报告" : "报告已生成") : "未生成")
+                h("span", { className: "report-overview-state" }, submitted ? "已提交" : "待提交")
               ),
-              report ? [
-                h("div", { key: "summary", className: "report-section" },
-                  h("div", { className: "report-section-head" }, h("h4", null, "整体印象"), h("span", null, "结合沙盘布局与描述")),
-                  h("div", { className: "report-highlight" }, h("p", null, trim(friendlyScene(sceneLines[0] || chapter1.clusters || "本次沙盘已完成记录。"), 138))),
-                  scenePoints.length ? h("ul", { className: "report-scene-lines" }, scenePoints.map((line, index) => h("li", { key: index }, trim(friendlyScene(line), 88))) ) : null
-                ),
-                h("div", { key: "dimensions", className: "report-section" },
-                  h("div", { className: "report-section-head" }, h("h4", null, "六维发展方向"), h("span", null, "综合判断，非标签化结论")),
-                  dimensions.length ? h("div", { className: "report-dimension-grid" }, dimensions.map((item, index) =>
-                    h("div", { key: index, className: "report-dimension-card" },
-                      h("strong", null, item.name),
-                      h("p", null, trim(friendlyGeneral(item.judgement), 92)),
-                      h("span", null, `参考程度 ${item.confidence || "中"}`)
-                    )
-                  )) : h("div", { className: "report-highlight" }, h("p", null, "本次报告暂未形成六维判断。"))
-                ),
-                h("div", { key: "academic", className: "report-section" },
-                  h("div", { className: "report-section-head" }, h("h4", null, "学业表现"), h("span", null, "成绩与学业方向")),
-                  h("div", { className: "report-academic" },
-                    h("p", null, academicText),
-                    subjects.length ? h("div", { className: "report-subject-grid" },
-                      subjects.slice(0, 8).map((row, index) => h("div", { key: index, className: "report-subject-row" },
-                        h("span", null, row.subject || "未命名科目"),
-                        h("span", null, `${row.score} / ${row.full_score}`)
-                      )),
-                      total.rate != null ? h("div", { className: "report-subject-row" }, h("span", null, "总得分率"), h("span", null, `${(Number(total.rate) * 100).toFixed(1)}%`)) : null
-                    ) : h("small", null, "如后续补充成绩，报告会在这里呈现各科表现与相对优势。")
-                  )
-                ),
-                h("div", { key: "advice", className: "report-section" },
-                  h("div", { className: "report-section-head" }, h("h4", null, "下一步建议"), h("span", null, "可从一件小事开始")),
-                  adviceItems.length ? h("ul", { className: "report-advice-list" }, adviceItems.slice(0, 3).map((line, index) => h("li", { key: index }, trim(line, 96))) ) : h("div", { className: "report-highlight" }, h("p", null, "建议结合咨询访谈，从一个小目标开始。"))
-                ),
-                h("div", { key: "privacy", className: "report-privacy-note" },
-                  h("strong", null, "使用说明"),
-                  h("p", null, meta.disclaimer || "本报告为发展性评估参考，不替代临床诊断。")
+              h("div", { className: "report-section" },
+                h("div", { className: "report-section-head" }, h("h4", null, "老师会看到什么"), h("span", null, "仅用于本次辅导")),
+                h("div", { className: "report-highlight" }, h("p", null, "沙盘整体画面、你选择的代表沙具、沙盘描述，以及你愿意补充的话。")),
+                h("ul", { className: "report-advice-list" },
+                  h("li", null, "作品只提交给学校心理老师，不进入公开分享页。"),
+                  h("li", null, "报告用于辅导参考，不用于分班、评优或临床诊断。"),
+                  h("li", null, "如果老师需要进一步了解，会另行和你约时间沟通。")
                 )
-              ] : h("div", { className: "report-placeholder" },
-                h("strong", null, "还没有可展示的报告"),
-                h("p", null, "完成沙盘、选择代表沙具并写下描述后，这里会显示整体印象、六维方向、学业表现和下一步建议。"),
-                h("small", null, "你仍然可以保存本次作品图。")
+              ),
+              h("div", { className: "export-actions" },
+                h("button", { type: "button", onClick: onClose, className: "export-action" }, h("span", null, "返回工作台"), h("span", null, "→"))
               )
             )
           )
@@ -3466,7 +3834,17 @@
       const [sceneReady, setSceneReady] = useState(false);
       const [assetCategory, setAssetCategory] = useState("全部");
       const [assetQuery, setAssetQuery] = useState("");
-      const [profile, setProfile] = useState(createDefaultProfile);
+      const [profile, setProfile] = useState(() => {
+        const authUser = (window.SandplayAuth && window.SandplayAuth.getUser && window.SandplayAuth.getUser()) || {};
+        return normaliseProfile({
+          ...createDefaultProfile(),
+          name: authUser.name || "",
+          student_no: authUser.student_no || authUser.account || "",
+          school_name: authUser.department || "",
+          grade_level: authUser.grade_level || "初中",
+          class_name: authUser.class_name || ""
+        });
+      });
       const [profileOpen, setProfileOpen] = useState(false);
       const [helpOpen, setHelpOpen] = useState(false);
       const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
@@ -4716,10 +5094,8 @@
           self_image: completionData.selfImage || "",
           sandplay_description: completionData.description || "",
           self_narrative: completionData.selfNarrative || baseProfile.self_narrative || "",
-          teacher_observation: completionData.teacherObservation || baseProfile.teacher_observation || "",
           student,
           consent: Boolean(completionData.consent),
-          transcript_file_name: completionData.transcriptFile ? completionData.transcriptFile.name : (baseProfile.transcript_name || null),
           process_telemetry: processTelemetry,
           process_snapshots: processPhotos.map((photo) => ({
             id: photo.id,
@@ -4753,7 +5129,7 @@
       }, [ambientMode, buildProcessTelemetry, heightAt, processPhotos, profile, redoStack.length, renderExportImage, undoStack.length]);
 
       const finishMaking = useCallback(() => {
-        if (!itemsRef.current.length) { showToast("请先放入至少一件沙具，再结束制作"); return; }
+        if (!itemsRef.current.length) { showToast("请先放入至少一件沙具，再提交作品"); return; }
         setCompletionError("");
         setCompletionOpen(true);
       }, [showToast]);
@@ -4769,9 +5145,7 @@
             ...((completion.student || {}).academic_scores || {})
           },
           self_narrative: completion.selfNarrative || current.self_narrative,
-          self_image: completion.selfImage || current.self_image,
-          teacher_observation: completion.teacherObservation || current.teacher_observation,
-          transcript_name: completion.transcriptFile ? completion.transcriptFile.name : current.transcript_name
+          self_image: completion.selfImage || current.self_image
         }));
         let basePayload = null;
         try {
@@ -4786,62 +5160,37 @@
           form.append("payload", JSON.stringify(serverPayload));
           const sandBlob = await dataUrlToBlob(basePayload.canvas_image_base64);
           form.append("sandplay_image", sandBlob, "sandplay.png");
-          if (completion.transcriptFile) form.append("transcript_image", completion.transcriptFile, completion.transcriptFile.name);
-          const response = await fetch(`${REPORT_API_BASE}/assessments`, { method: "POST", body: form });
+          const authToken = window.SandplayAuth ? window.SandplayAuth.getToken() : "";
+          const response = await fetch(`${REPORT_API_BASE}/assessments`, {
+            method: "POST",
+            headers: authToken ? { "Authorization": `Bearer ${authToken}` } : {},
+            body: form
+          });
           const result = await response.json();
-          if (!response.ok || result.code !== "OK") throw new Error(result.message || `报告服务返回 ${response.status}`);
+          if (response.status === 401) throw new Error("登录状态已失效，请刷新页面重新登录");
+          if (!response.ok || result.code !== "OK") throw new Error(result.message || `测评服务返回 ${response.status}`);
           const server = result.data;
           const enriched = {
             ...basePayload,
-            report: server.report,
             report_id: server.assessment_id,
-            report_engine: server.report_engine,
             report_status: "completed",
             report_created_at: server.created_at,
-            sandplay_image_url: server.report && server.report.chapter_1_overview ? server.report.chapter_1_overview.sandplay_image_url : null
+            sandplay_image_url: server.sandplay_image_url
           };
           setExportPayload(enriched);
-          try {
-            window.localStorage.setItem("sandplay_last_report", JSON.stringify({
-              report: server.report,
-              report_id: server.assessment_id,
-              report_engine: server.report_engine
-            }));
-          } catch (cacheError) {}
           setCompletionOpen(false);
           setExportModalOpen(true);
-          showToast(server.report_engine === "demo" ? "报告已生成（示例版）" : "评估报告已生成");
+          showToast("作品已提交给心理老师");
         } catch (error) {
           const message = String(error && error.message ? error.message : error);
-          console.error("提交沙盘报告失败", error);
-          setCompletionError(`报告生成失败：${message}。请勿刷新页面；请先保存作品图后再重试。`);
+          console.error("提交沙盘作品失败", error);
+          setCompletionError(`提交失败：${message}。请勿刷新页面；请先保存作品图后再重试。`);
           setExportPayload(basePayload ? { ...basePayload, server_error: message, report_status: "failed" } : { server_error: message, report_status: "failed" });
           if (basePayload) setExportModalOpen(true);
-          showToast("报告未生成，请先保存作品图");
+          showToast("作品未提交，请先保存作品图");
         } finally {
           setSubmitting(false);
         }
-      }, [buildExportPayload, showToast]);
-
-      const skipCompletion = useCallback((completion) => {
-        setProfile((current) => normaliseProfile({
-          ...current,
-          ...(completion.student || {}),
-          academic_scores: {
-            ...current.academic_scores,
-            ...((completion.student || {}).academic_scores || {})
-          },
-          self_narrative: completion.selfNarrative || current.self_narrative,
-          self_image: completion.selfImage || current.self_image,
-          teacher_observation: completion.teacherObservation || current.teacher_observation,
-          transcript_name: completion.transcriptFile ? completion.transcriptFile.name : current.transcript_name
-        }));
-        const payload = buildExportPayload(completion);
-        setExportPayload({ ...payload, report_status: "skipped" });
-        setCompletionOpen(false);
-        setCompletionError("");
-        setExportModalOpen(true);
-        showToast("已保存本次作品，未生成报告");
       }, [buildExportPayload, showToast]);
 
       useEffect(() => {
@@ -4876,7 +5225,7 @@
               h("div", { className: "brand-eyebrow" }, "SANDBOX ATELIER · 01"),
               h("div", { className: "brand-title-row" },
                 h("h1", { className: "brand-title" }, "心理沙盘"),
-                h("p", { className: "brand-sub" }, "学习动力发展性评估 · 3D 箱庭操作台")
+                h("p", { className: "brand-sub" }, "学生心理沙盘 · 3D 箱庭创作空间")
               )
             )
           ),
@@ -4995,7 +5344,8 @@
                 h("button", { type: "button", className: `utility-btn${ambientMode === "music" ? " active" : ""}`, onClick: () => setAmbient(ambientMode === "music" ? "off" : "music") }, "轻音乐"),
                 h("button", { type: "button", className: "utility-btn photo", onClick: captureProcessPhoto }, `拍照 ${processPhotos.length}/6`),
                 h("button", { type: "button", className: "utility-btn", onClick: () => setHelpOpen(true) }, "说明"),
-                h("button", { type: "button", className: "finish-top", onClick: finishMaking }, "结束制作")
+                h("button", { type: "button", className: "utility-btn", onClick: () => { if (window.SandplayAuth) window.SandplayAuth.logout(); } }, "退出"),
+                h("button", { type: "button", className: "finish-top", onClick: finishMaking }, "完成并提交")
               )
             ),
             h("div", { className: "wood-shell" },
@@ -5088,10 +5438,9 @@
           busy: submitting,
           error: completionError,
           onClose: () => { if (!submitting) { setCompletionOpen(false); setCompletionError(""); } },
-          onSubmit: submitCompletion,
-          onSkip: skipCompletion
+          onSubmit: submitCompletion
         }) : null,
-        exportModalOpen && exportPayload ? h(ExportModal, {
+        exportModalOpen && exportPayload ? h(StudentSubmitModal, {
           payload: exportPayload,
           onClose: () => { setExportModalOpen(false); setExportPayload(null); },
           onToast: showToast
@@ -5099,7 +5448,16 @@
       );
     }
 
-    ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+    const mountWorkbench = () => {
+      ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+    };
+    if (window.SandplayAuth && window.SandplayAuth.ready) {
+      window.SandplayAuth.ready.then((session) => {
+        if (session) mountWorkbench();
+      });
+    } else {
+      mountWorkbench();
+    }
   </script>
 </body>
 </html>

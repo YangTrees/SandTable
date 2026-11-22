@@ -60,6 +60,12 @@ def _migrate_legacy_schema() -> None:
             ("draft_updated_at", "TIMESTAMP"),
             ("review_applied_at", "TIMESTAMP"),
         ],
+        "admin_users": [
+            ("password_hash", "VARCHAR(255) DEFAULT ''"),
+            ("last_login_at", "TIMESTAMP"),
+            ("login_failed_count", "INTEGER DEFAULT 0"),
+            ("locked_until", "TIMESTAMP"),
+        ],
     }
     inspector = inspect(engine)
     existing_tables = set(inspector.get_table_names())

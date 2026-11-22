@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import copy
+import hmac
 import json
 import re
 from collections import Counter, defaultdict
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -11,12 +13,27 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from .config import COUNSELOR_TOKEN
+from .auth import (
+    hash_password,
+    hash_session_token,
+    new_session_token,
+    normalise_account,
+    validate_password,
+    verify_password,
+)
+from .config import (
+    ADMIN_INITIAL_PASSWORD,
+    ADMIN_LOCK_MINUTES,
+    ADMIN_MAX_LOGIN_FAILURES,
+    ADMIN_SESSION_HOURS,
+    COUNSELOR_TOKEN,
+)
 from .db import get_db
-from .models import AdminUser, Assessment, ReportReview, ShareLink
+from .models import AdminSession, AdminUser, Assessment, ReportReview, ShareLink
 from .utils import iso_utc, new_id
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
+workbench_router = APIRouter(prefix="/api/v1/workbench", tags=["workbench"])
 
 ROLE_DEFINITIONS = [
     {
@@ -44,8 +61,8 @@ ROLE_DEFINITIONS = [
         "key": "student",
         "name": "受测学生",
         "short": "学生",
-        "description": "参与沙盘测评并查看自己的发展性报告",
-        "permissions": ["沙盘测评", "个人报告", "训练任务"],
+        "description": "使用学生账号进入沙盘工作台，完成并提交本次沙盘测评",
+        "permissions": ["沙盘测评", "作品提交"],
     },
 ]
 
@@ -135,35 +152,145 @@ SEED_USERS = [
 ]
 
 
+@dataclass
+class AdminPrincipal:
+    user: AdminUser | None
+    role_key: str
+    is_super_admin: bool
+    auth_type: str
+    session_id: str = ""
+
+
+def _extract_auth_token(
+    x_counselor_token: str | None,
+    authorization: str | None,
+) -> str:
+    token = str(x_counselor_token or "").strip()
+    if not token and authorization and authorization.lower().startswith("bearer "):
+        token = authorization[7:].strip()
+    return token
+
+
 def require_admin(
     x_counselor_token: str | None = Header(default=None),
     authorization: str | None = Header(default=None),
-) -> None:
-    token = x_counselor_token or ""
-    if not token and authorization and authorization.lower().startswith("bearer "):
-        token = authorization[7:].strip()
-    if not token or token != COUNSELOR_TOKEN:
-        raise HTTPException(status_code=401, detail="咨询师后台令牌无效")
+    db: Session = Depends(get_db),
+) -> AdminPrincipal:
+    token = _extract_auth_token(x_counselor_token, authorization)
+    if not token:
+        raise HTTPException(status_code=401, detail="请先登录咨询师控制台")
+
+    # 兼容既有服务令牌（报告查看器、运维脚本），但它不携带账号会话。
+    if hmac.compare_digest(token, COUNSELOR_TOKEN):
+        return AdminPrincipal(
+            user=None,
+            role_key="super_admin",
+            is_super_admin=True,
+            auth_type="service_token",
+        )
+
+    now = datetime.utcnow()
+    session = (
+        db.query(AdminSession)
+        .filter(AdminSession.token_hash == hash_session_token(token))
+        .first()
+    )
+    if not session or session.revoked_at is not None or session.expires_at <= now:
+        raise HTTPException(status_code=401, detail="登录状态已失效，请重新登录")
+    user = db.get(AdminUser, session.user_id)
+    if not user or user.status != "active":
+        raise HTTPException(status_code=401, detail="账号已停用或不存在")
+    if user.role_key == "student":
+        raise HTTPException(
+            status_code=403,
+            detail="学生账号请从沙盘工作台进入，不能登录咨询师控制台",
+        )
+    if not session.last_seen_at or now - session.last_seen_at > timedelta(minutes=5):
+        session.last_seen_at = now
+        db.commit()
+    return AdminPrincipal(
+        user=user,
+        role_key=user.role_key,
+        is_super_admin=user.role_key == "super_admin",
+        auth_type="session",
+        session_id=session.id,
+    )
+
+
+def require_student(
+    authorization: str | None = Header(default=None),
+    x_counselor_token: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> AdminPrincipal:
+    """沙盘工作台只接受受测学生账号。"""
+    token = _extract_auth_token(x_counselor_token, authorization)
+    if not token:
+        raise HTTPException(status_code=401, detail="请先登录学生测评入口")
+    if hmac.compare_digest(token, COUNSELOR_TOKEN):
+        raise HTTPException(
+            status_code=403, detail="沙盘工作台仅面向受测学生开放，请使用学生账号登录"
+        )
+    now = datetime.utcnow()
+    session = (
+        db.query(AdminSession)
+        .filter(AdminSession.token_hash == hash_session_token(token))
+        .first()
+    )
+    if not session or session.revoked_at is not None or session.expires_at <= now:
+        raise HTTPException(status_code=401, detail="登录状态已失效，请重新登录")
+    user = db.get(AdminUser, session.user_id)
+    if not user or user.status != "active":
+        raise HTTPException(status_code=401, detail="账号已停用或不存在")
+    if user.role_key != "student":
+        raise HTTPException(
+            status_code=403, detail="沙盘工作台仅面向受测学生开放，请使用学生账号登录"
+        )
+    if not session.last_seen_at or now - session.last_seen_at > timedelta(minutes=5):
+        session.last_seen_at = now
+        db.commit()
+    return AdminPrincipal(
+        user=user,
+        role_key=user.role_key,
+        is_super_admin=False,
+        auth_type="session",
+        session_id=session.id,
+    )
+
+
+def require_super_admin(principal: AdminPrincipal = Depends(require_admin)) -> AdminPrincipal:
+    if not principal.is_super_admin:
+        raise HTTPException(status_code=403, detail="仅超级管理员可管理账号与角色")
+    return principal
 
 
 def ensure_admin_seed(db: Session) -> None:
-    if db.query(AdminUser).count():
-        return
-    for item in SEED_USERS:
-        db.add(
-            AdminUser(
-                id=new_id(),
-                name=item["name"],
-                account=item["account"],
-                role_key=item["role_key"],
-                department=item.get("department", ""),
-                grade_level=item.get("grade_level", ""),
-                class_name=item.get("class_name", ""),
-                student_no=item.get("student_no", ""),
-                status=item.get("status", "active"),
+    users = db.query(AdminUser).order_by(AdminUser.created_at.asc()).all()
+    if not users:
+        for item in SEED_USERS:
+            db.add(
+                AdminUser(
+                    id=new_id(),
+                    name=item["name"],
+                    account=item["account"],
+                    role_key=item["role_key"],
+                    department=item.get("department", ""),
+                    grade_level=item.get("grade_level", ""),
+                    class_name=item.get("class_name", ""),
+                    student_no=item.get("student_no", ""),
+                    status=item.get("status", "active"),
+                )
             )
+        db.commit()
+        users = db.query(AdminUser).order_by(AdminUser.created_at.asc()).all()
+
+    # 只为第一位超级管理员建立一次初始密码，其他既有账号需由管理员在后台设置。
+    if ADMIN_INITIAL_PASSWORD and users and not any(item.password_hash for item in users):
+        super_admin = next(
+            (item for item in users if item.role_key == "super_admin"), None
         )
-    db.commit()
+        if super_admin:
+            super_admin.password_hash = hash_password(ADMIN_INITIAL_PASSWORD)
+            db.commit()
 
 
 def _ok(request: Request, data: Any, message: str = "success") -> dict[str, Any]:
@@ -193,9 +320,224 @@ def _user_payload(user: AdminUser) -> dict[str, Any]:
         "class_name": user.class_name,
         "student_no": user.student_no,
         "status": user.status,
+        "password_set": bool(user.password_hash),
+        "last_login_at": iso_utc(user.last_login_at),
+        "login_locked": bool(user.locked_until and user.locked_until > datetime.utcnow()),
         "created_at": iso_utc(user.created_at),
         "updated_at": iso_utc(user.updated_at),
     }
+
+
+def _principal_payload(principal: AdminPrincipal) -> dict[str, Any]:
+    if principal.user is not None:
+        return _user_payload(principal.user)
+    return {
+        "user_id": "service-token",
+        "name": "系统服务账号",
+        "account": "service.token",
+        "role_key": "super_admin",
+        "role_name": "超级管理员",
+        "role_short": "管理员",
+        "department": "平台运维",
+        "grade_level": "",
+        "class_name": "",
+        "student_no": "",
+        "status": "active",
+        "password_set": True,
+        "last_login_at": None,
+        "login_locked": False,
+        "created_at": None,
+        "updated_at": None,
+    }
+
+
+async def _authenticate_login(
+    request: Request,
+    db: Session,
+    channel: str,
+) -> tuple[AdminUser, AdminSession, str]:
+    body = await request.json()
+    account = normalise_account(body.get("account"))
+    password = str(body.get("password") or "")
+    if not account or not password:
+        raise HTTPException(status_code=422, detail="请输入账号和密码")
+
+    user = db.query(AdminUser).filter(AdminUser.account == account).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="账号或密码错误")
+    if user.status != "active":
+        raise HTTPException(status_code=403, detail="账号已停用，请联系管理员")
+    if channel == "workbench" and user.role_key != "student":
+        raise HTTPException(
+            status_code=403,
+            detail="沙盘工作台仅面向受测学生开放，请使用学生账号登录",
+        )
+    if channel == "admin" and user.role_key == "student":
+        raise HTTPException(
+            status_code=403,
+            detail="学生账号请从沙盘工作台进入，不能登录咨询师控制台",
+        )
+    now = datetime.utcnow()
+    if user.locked_until and user.locked_until > now:
+        remaining = int((user.locked_until - now).total_seconds() // 60) + 1
+        raise HTTPException(
+            status_code=423,
+            detail=f"密码错误次数过多，请在 {remaining} 分钟后重试",
+        )
+    if not user.password_hash:
+        raise HTTPException(
+            status_code=403,
+            detail="该账号尚未设置登录密码，请联系超级管理员",
+        )
+
+    if not verify_password(password, user.password_hash):
+        user.login_failed_count = int(user.login_failed_count or 0) + 1
+        if user.login_failed_count >= ADMIN_MAX_LOGIN_FAILURES:
+            user.locked_until = now + timedelta(minutes=ADMIN_LOCK_MINUTES)
+            user.login_failed_count = 0
+            db.commit()
+            raise HTTPException(
+                status_code=423,
+                detail=f"密码连续错误 {ADMIN_MAX_LOGIN_FAILURES} 次，账号已锁定 {ADMIN_LOCK_MINUTES} 分钟",
+            )
+        db.commit()
+        remaining = max(ADMIN_MAX_LOGIN_FAILURES - user.login_failed_count, 0)
+        raise HTTPException(
+            status_code=401,
+            detail=f"账号或密码错误，还可尝试 {remaining} 次",
+        )
+
+    user.login_failed_count = 0
+    user.locked_until = None
+    user.last_login_at = now
+    raw_token = new_session_token()
+    session = AdminSession(
+        id=new_id(),
+        user_id=user.id,
+        token_hash=hash_session_token(raw_token),
+        created_at=now,
+        expires_at=now + timedelta(hours=ADMIN_SESSION_HOURS),
+        last_seen_at=now,
+        ip_address=str(request.client.host if request.client else "")[:80],
+        user_agent=str(request.headers.get("user-agent") or "")[:255],
+    )
+    db.add(session)
+    # 清理过期超过 7 天的会话，避免表持续膨胀。
+    db.query(AdminSession).filter(
+        AdminSession.expires_at < now - timedelta(days=7)
+    ).delete(synchronize_session=False)
+    db.commit()
+    db.refresh(user)
+    return user, session, raw_token
+
+
+def _login_payload(user: AdminUser, session: AdminSession, raw_token: str) -> dict[str, Any]:
+    return {
+        "token": raw_token,
+        "expires_at": iso_utc(session.expires_at),
+        "user": _user_payload(user),
+    }
+
+
+@router.post("/login")
+async def admin_login(request: Request, db: Session = Depends(get_db)):
+    ensure_admin_seed(db)
+    user, session, raw_token = await _authenticate_login(request, db, "admin")
+    return _ok(request, _login_payload(user, session, raw_token), "登录成功")
+
+
+@router.post("/logout")
+async def admin_logout(
+    request: Request,
+    principal: AdminPrincipal = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    if principal.session_id:
+        session = db.get(AdminSession, principal.session_id)
+        if session and session.revoked_at is None:
+            session.revoked_at = datetime.utcnow()
+            db.commit()
+    return _ok(request, {"logged_out": True}, "已退出登录")
+
+
+@router.get("/me")
+async def admin_me(
+    request: Request,
+    principal: AdminPrincipal = Depends(require_admin),
+):
+    return _ok(
+        request,
+        {
+            "user": _principal_payload(principal),
+            "auth_type": principal.auth_type,
+        },
+    )
+
+
+@workbench_router.post("/login")
+async def workbench_login(request: Request, db: Session = Depends(get_db)):
+    ensure_admin_seed(db)
+    user, session, raw_token = await _authenticate_login(request, db, "workbench")
+    return _ok(request, _login_payload(user, session, raw_token), "登录成功")
+
+
+@workbench_router.get("/me")
+async def workbench_me(
+    request: Request,
+    principal: AdminPrincipal = Depends(require_student),
+):
+    return _ok(
+        request,
+        {
+            "user": _principal_payload(principal),
+            "auth_type": principal.auth_type,
+        },
+    )
+
+
+@workbench_router.post("/logout")
+async def workbench_logout(
+    request: Request,
+    principal: AdminPrincipal = Depends(require_student),
+    db: Session = Depends(get_db),
+):
+    if principal.session_id:
+        session = db.get(AdminSession, principal.session_id)
+        if session and session.revoked_at is None:
+            session.revoked_at = datetime.utcnow()
+            db.commit()
+    return _ok(request, {"logged_out": True}, "已退出测评")
+
+
+@router.post("/me/password")
+async def change_own_password(
+    request: Request,
+    principal: AdminPrincipal = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    if principal.user is None:
+        raise HTTPException(status_code=403, detail="系统服务令牌不支持修改密码")
+    body = await request.json()
+    current_password = str(body.get("current_password") or "")
+    new_password = str(body.get("new_password") or "")
+    error = validate_password(new_password)
+    if error:
+        raise HTTPException(status_code=422, detail=error)
+    if not verify_password(current_password, principal.user.password_hash):
+        raise HTTPException(status_code=400, detail="当前密码不正确")
+    principal.user.password_hash = hash_password(new_password)
+    principal.user.login_failed_count = 0
+    principal.user.locked_until = None
+    # 修改密码后让该账号的其他登录会话失效，当前会话保持可用。
+    for session in db.query(AdminSession).filter(
+        AdminSession.user_id == principal.user.id,
+        AdminSession.revoked_at.is_(None),
+    ).all():
+        if session.id != principal.session_id:
+            session.revoked_at = datetime.utcnow()
+    db.commit()
+    return _ok(request, {"changed": True}, "密码已更新")
+
 
 
 def _parse_json_object(raw: str | None) -> dict[str, Any]:
@@ -361,7 +703,11 @@ def _report_brief(row: Assessment, review: ReportReview | None, active_shares: i
 
 
 @router.get("/bootstrap")
-async def bootstrap(request: Request, db: Session = Depends(get_db), _: None = Depends(require_admin)):
+async def bootstrap(
+    request: Request,
+    db: Session = Depends(get_db),
+    principal: AdminPrincipal = Depends(require_admin),
+):
     ensure_admin_seed(db)
     rows = db.query(Assessment).filter(Assessment.report_json.isnot(None)).order_by(Assessment.created_at.desc()).all()
     pending = 0
@@ -379,7 +725,10 @@ async def bootstrap(request: Request, db: Session = Depends(get_db), _: None = D
                 "version": "2026.11",
             },
             "roles": _role_payload(),
-            "users": [_user_payload(item) for item in users],
+            "users": [_user_payload(item) for item in users]
+            if principal.is_super_admin
+            else [],
+            "current_user": _principal_payload(principal),
             "counts": {
                 "users": len(users),
                 "reports": len(rows),
@@ -395,7 +744,7 @@ async def list_users(
     q: str = "",
     role: str = "all",
     db: Session = Depends(get_db),
-    _: None = Depends(require_admin),
+    principal: AdminPrincipal = Depends(require_super_admin),
 ):
     ensure_admin_seed(db)
     query = db.query(AdminUser)
@@ -416,17 +765,31 @@ async def list_users(
 
 
 @router.post("/users")
-async def create_user(request: Request, db: Session = Depends(get_db), _: None = Depends(require_admin)):
+async def create_user(
+    request: Request,
+    db: Session = Depends(get_db),
+    principal: AdminPrincipal = Depends(require_super_admin),
+):
     body = await request.json()
     name = str(body.get("name") or "").strip()
-    account = str(body.get("account") or "").strip()
+    account = normalise_account(body.get("account"))
     role_key = str(body.get("role_key") or "").strip()
     if not name or not account:
         raise HTTPException(status_code=422, detail="姓名与账号不能为空")
+    if not re.fullmatch(r"[a-z0-9][a-z0-9._-]{2,31}", account):
+        raise HTTPException(
+            status_code=422,
+            detail="账号需为 3-32 位小写字母、数字、点、下划线或短横线",
+        )
     if role_key not in {item["key"] for item in ROLE_DEFINITIONS}:
         raise HTTPException(status_code=422, detail="角色无效")
     if db.query(AdminUser).filter(AdminUser.account == account).first():
         raise HTTPException(status_code=409, detail="该账号已存在")
+    initial_password = str(body.get("password") or "").strip()
+    if initial_password:
+        error = validate_password(initial_password)
+        if error:
+            raise HTTPException(status_code=422, detail=error)
     user = AdminUser(
         id=new_id(),
         name=name,
@@ -437,6 +800,7 @@ async def create_user(request: Request, db: Session = Depends(get_db), _: None =
         class_name=str(body.get("class_name") or "").strip(),
         student_no=str(body.get("student_no") or "").strip(),
         status=str(body.get("status") or "active").strip(),
+        password_hash=hash_password(initial_password) if initial_password else "",
     )
     db.add(user)
     db.commit()
@@ -449,7 +813,7 @@ async def update_user(
     request: Request,
     user_id: str,
     db: Session = Depends(get_db),
-    _: None = Depends(require_admin),
+    principal: AdminPrincipal = Depends(require_super_admin),
 ):
     user = db.get(AdminUser, user_id)
     if not user:
@@ -458,10 +822,16 @@ async def update_user(
     if "name" in body and str(body["name"]).strip():
         user.name = str(body["name"]).strip()
     if "account" in body:
-        account = str(body["account"]).strip()
-        if account and account != user.account and db.query(AdminUser).filter(AdminUser.account == account).first():
-            raise HTTPException(status_code=409, detail="该账号已存在")
-        user.account = account or user.account
+        account = normalise_account(body.get("account"))
+        if account and account != user.account:
+            if not re.fullmatch(r"[a-z0-9][a-z0-9._-]{2,31}", account):
+                raise HTTPException(
+                    status_code=422,
+                    detail="账号需为 3-32 位小写字母、数字、点、下划线或短横线",
+                )
+            if db.query(AdminUser).filter(AdminUser.account == account).first():
+                raise HTTPException(status_code=409, detail="该账号已存在")
+            user.account = account
     if "role_key" in body:
         role_key = str(body["role_key"]).strip()
         if role_key not in {item["key"] for item in ROLE_DEFINITIONS}:
@@ -477,11 +847,53 @@ async def update_user(
     return _ok(request, {"user": _user_payload(user)}, "用户已更新")
 
 
-@router.delete("/users/{user_id}")
-async def delete_user(user_id: str, request: Request, db: Session = Depends(get_db), _: None = Depends(require_admin)):
+@router.post("/users/{user_id}/password")
+async def reset_user_password(
+    request: Request,
+    user_id: str,
+    db: Session = Depends(get_db),
+    principal: AdminPrincipal = Depends(require_super_admin),
+):
     user = db.get(AdminUser, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="用户不存在")
+    body = await request.json()
+    password = str(body.get("password") or "").strip()
+    error = validate_password(password)
+    if error:
+        raise HTTPException(status_code=422, detail=error)
+    user.password_hash = hash_password(password)
+    user.login_failed_count = 0
+    user.locked_until = None
+    for session in db.query(AdminSession).filter(
+        AdminSession.user_id == user.id,
+        AdminSession.revoked_at.is_(None),
+    ).all():
+        if session.id != principal.session_id:
+            session.revoked_at = datetime.utcnow()
+    db.commit()
+    return _ok(
+        request,
+        {"user": _user_payload(user)},
+        "密码已设置，该账号原有登录会话已失效",
+    )
+
+
+@router.delete("/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    principal: AdminPrincipal = Depends(require_super_admin),
+):
+    user = db.get(AdminUser, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="用户不存在")
+    if principal.user is not None and principal.user.id == user.id:
+        raise HTTPException(status_code=409, detail="不能删除当前登录账号")
+    db.query(AdminSession).filter(AdminSession.user_id == user.id).delete(
+        synchronize_session=False
+    )
     db.delete(user)
     db.commit()
     return _ok(request, {"user_id": user_id, "deleted": True}, "用户已删除")

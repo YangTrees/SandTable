@@ -11,16 +11,22 @@ from pathlib import Path
 from typing import Any
 
 import qrcode
-from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Request, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
-from .admin_api import ensure_admin_seed, router as admin_router
+from .admin_api import (
+    AdminPrincipal,
+    ensure_admin_seed,
+    require_admin,
+    require_student,
+    router as admin_router,
+    workbench_router,
+)
 from .config import (
-    COUNSELOR_TOKEN,
     CORS_ORIGINS,
     MULTIMODAL_API_KEY,
     MULTIMODAL_MODEL,
@@ -37,6 +43,8 @@ MAX_IMAGE_BYTES = 24 * 1024 * 1024
 REPORT_VIEWER_PATH = Path(__file__).resolve().parents[2] / "report_viewer_v2.html"
 ADMIN_DASHBOARD_PATH = Path(__file__).resolve().parents[2] / "admin_dashboard.html"
 WORKBENCH_PATH = Path(__file__).resolve().parents[2] / "sandplay_workbench_react.html"
+MANUAL_PATH = Path(__file__).resolve().parents[2] / "manual_web" / "心理沙盘系统_账户与全系统操作手册.html"
+MANUAL_ASSETS_DIR = Path(__file__).resolve().parents[2] / "manual_web" / "assets"
 ASSETS_DIR = Path(__file__).resolve().parents[2] / "assets"
 
 
@@ -57,7 +65,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(admin_router)
+app.include_router(workbench_router)
 app.mount("/media", StaticFiles(directory=UPLOAD_DIR), name="media")
+if MANUAL_ASSETS_DIR.is_dir():
+    app.mount("/manual/assets", StaticFiles(directory=MANUAL_ASSETS_DIR), name="manual-assets")
 if ASSETS_DIR.is_dir():
     app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
@@ -89,14 +100,9 @@ async def http_handler(request: Request, exc: HTTPException):
 
 
 def require_counselor(
-    x_counselor_token: str | None = Header(default=None),
-    authorization: str | None = Header(default=None),
-) -> None:
-    token = x_counselor_token or ""
-    if not token and authorization and authorization.lower().startswith("bearer "):
-        token = authorization[7:].strip()
-    if not token or token != COUNSELOR_TOKEN:
-        raise HTTPException(status_code=401, detail="咨询师后台令牌无效")
+    principal: AdminPrincipal = Depends(require_admin),
+) -> AdminPrincipal:
+    return principal
 
 
 def _decode_base64(value: str | None) -> bytes | None:
@@ -232,6 +238,7 @@ async def create_assessment(
     transcript_image: UploadFile | None = File(default=None),
     transcript_image_base64: str | None = Form(default=None),
     db: Session = Depends(get_db),
+    principal: AdminPrincipal = Depends(require_student),
 ):
     try:
         payload_obj = AssessmentPayload.model_validate(json.loads(payload))
@@ -242,6 +249,23 @@ async def create_assessment(
     item_ids = {str(item.get("id")) for item in raw_payload.get("items") or [] if isinstance(item, dict)}
     if payload_obj.representative_item_id not in item_ids:
         return fail(request, "VALIDATION_REPRESENTATIVE_NOT_FOUND", "代表沙具必须来自已放入沙盘的沙具", 422)
+
+    # 测评身份以登录的学生账号为准，前端提交的姓名、学号、班级不可覆盖。
+    student = principal.user
+    if student is None:
+        return fail(request, "FORBIDDEN", "学生账号信息缺失，请重新登录", 403)
+    bound_student = {
+        "name": student.name or "学生",
+        "student_no": student.student_no or student.account,
+        "grade_level": student.grade_level or "未填写",
+        "class_name": student.class_name or "",
+        "school_name": student.department or "",
+        "gender": raw_payload.get("student", {}).get("gender") or "不透露",
+        "seat_no": "",
+        "contact_phone": "",
+        "academic_scores": {},
+    }
+    raw_payload["student"] = bound_student
 
     sandplay_bytes = await _read_upload(sandplay_image, sandplay_image_base64)
     transcript_bytes = await _read_optional_upload(transcript_image, transcript_image_base64)
@@ -255,15 +279,15 @@ async def create_assessment(
 
     row = Assessment(
         id=assessment_id,
-        student_no=payload_obj.student.student_no,
-        student_name=payload_obj.student.name or "匿名受测者",
-        grade_level=payload_obj.student.grade_level or "未填写",
-        gender=payload_obj.student.gender or "未填写",
-        school_name=payload_obj.student.school_name,
-        class_name=payload_obj.student.class_name,
-        seat_no=payload_obj.student.seat_no,
-        contact_phone=payload_obj.student.contact_phone,
-        academic_scores_json=json.dumps(payload_obj.student.academic_scores or {}, ensure_ascii=False),
+        student_no=bound_student["student_no"],
+        student_name=bound_student["name"],
+        grade_level=bound_student["grade_level"],
+        gender=bound_student["gender"],
+        school_name=bound_student["school_name"],
+        class_name=bound_student["class_name"],
+        seat_no="",
+        contact_phone="",
+        academic_scores_json="{}",
         representative_item_id=payload_obj.representative_item_id,
         representative_item_name=payload_obj.representative_item_name,
         self_image=str(payload_obj.self_image or "").strip(),
@@ -307,14 +331,19 @@ async def create_assessment(
     db.commit()
     db.refresh(row)
 
+    # 学生端只返回“已提交”回执，不返回临床报告正文。
     return ok(request, {
-        **_assessment_summary(row),
-        "report": report,
+        "assessment_id": row.id,
+        "status": row.status,
+        "student_name": row.student_name,
+        "student_no": row.student_no,
+        "grade_level": row.grade_level,
+        "class_name": row.class_name,
+        "representative_item_name": row.representative_item_name,
+        "created_at": iso_utc(row.created_at),
         "sandplay_image_url": image_url,
-        "transcript_image_url": transcript_url,
-        "counselor_access": {"header": "X-Counselor-Token"},
-        "share_hint": f"POST /api/v1/reports/{row.id}/share",
-    }, message="assessment completed")
+        "report_ready": True,
+    }, message="测评已提交")
 
 
 @app.get("/api/v1/assessments/{assessment_id}")
@@ -524,25 +553,56 @@ async def get_shared_report(request: Request, token: str, db: Session = Depends(
     })
 
 
+_HTML_NO_STORE = {"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"}
+
+
 @app.get("/report-viewer")
 async def report_viewer_page():
     if not REPORT_VIEWER_PATH.exists():
         raise HTTPException(status_code=404, detail="报告展示页尚未部署")
-    return FileResponse(REPORT_VIEWER_PATH, media_type="text/html; charset=utf-8")
+    return FileResponse(
+        REPORT_VIEWER_PATH,
+        media_type="text/html; charset=utf-8",
+        headers=_HTML_NO_STORE,
+    )
 
 
 @app.get("/admin")
 async def admin_page():
     if not ADMIN_DASHBOARD_PATH.exists():
         raise HTTPException(status_code=404, detail="管理后台页面尚未部署")
-    return FileResponse(ADMIN_DASHBOARD_PATH, media_type="text/html; charset=utf-8")
+    return FileResponse(
+        ADMIN_DASHBOARD_PATH,
+        media_type="text/html; charset=utf-8",
+        headers=_HTML_NO_STORE,
+    )
+
+
+@app.get("/manual")
+async def manual_page_redirect():
+    return RedirectResponse(url="/manual/", status_code=307)
+
+
+@app.get("/manual/")
+async def manual_page():
+    if not MANUAL_PATH.exists():
+        raise HTTPException(status_code=404, detail="操作手册页面尚未部署")
+    return FileResponse(
+        MANUAL_PATH,
+        media_type="text/html; charset=utf-8",
+        headers=_HTML_NO_STORE,
+    )
 
 
 @app.get("/workbench")
 async def workbench_page():
     if not WORKBENCH_PATH.exists():
         raise HTTPException(status_code=404, detail="沙盘工作台页面尚未部署")
-    return FileResponse(WORKBENCH_PATH, media_type="text/html; charset=utf-8")
+    return FileResponse(
+        WORKBENCH_PATH,
+        media_type="text/html; charset=utf-8",
+        headers=_HTML_NO_STORE,
+    )
 
 
 @app.get("/share/{token}")

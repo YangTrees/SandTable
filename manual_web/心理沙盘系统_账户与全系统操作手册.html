@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>心理沙盘系统｜账户管理与全系统操作手册</title>
+<meta name="description" content="心理沙盘系统账户管理、教职员工控制台、学生测评入口、报告查看器与家长/学生分享页操作手册。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2317362A'/%3E%3Crect x='7' y='10' width='18' height='13' fill='none' stroke='%23C7A76B' stroke-width='2'/%3E%3Cpath d='M7 17c4-4 8 4 18 0' stroke='%23C7A76B' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+:root{
+  --paper:#F0EEE5;
+  --paper-deep:#E6E1D4;
+  --card:#FAF7EF;
+  --ink:#1B2A24;
+  --muted:#5D6A61;
+  --green:#17362A;
+  --green-2:#2A4E3E;
+  --sage:#7F947F;
+  --brass:#B08A50;
+  --line:#D7D1C2;
+  --clay:#8A4F3D;
+  --white:#FFFDF7;
+  --sans:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",sans-serif;
+  --serif:"Songti SC","SimSun","STSong","Noto Serif CJK SC",serif;
+  --mono:"Cascadia Code","SFMono-Regular","Consolas","Liberation Mono",monospace;
+  --shadow:0 24px 60px rgba(23,54,42,.14);
+  --sidebar:272px;
+  --topbar:64px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:radial-gradient(rgba(23,54,42,.035) 1px,transparent 1px);
+  background-size:5px 5px;
+  font-family:var(--sans);
+  font-size:15.5px;
+  line-height:1.9;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+::selection{background:rgba(176,138,80,.28);color:var(--ink)}
+a{color:inherit}
+button,input{font:inherit}
+button{cursor:pointer}
+img{max-width:100%;display:block}
+code,.mono{font-family:var(--mono);font-size:.88em;letter-spacing:0}
+.skip-link{
+  position:fixed;left:12px;top:-80px;z-index:100;
+  padding:10px 16px;background:var(--green);color:var(--white);
+  text-decoration:none;transition:top .15s ease;
+}
+.skip-link:focus{top:12px}
+:focus-visible{outline:3px solid var(--brass);outline-offset:3px}
+
+/* ===== 顶栏 ===== */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  min-height:var(--topbar);
+  display:flex;align-items:center;gap:18px;
+  padding:10px 24px;
+  background:rgba(240,238,229,.96);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:240px;text-decoration:none}
+.brand-mark{
+  width:38px;height:38px;flex:none;border:1px solid var(--green);
+  display:grid;place-items:center;color:var(--green);
+}
+.brand-mark svg{width:24px;height:24px}
+.brand-copy{display:grid;line-height:1.2}
+.brand-copy b{font-size:13.5px;font-weight:600;letter-spacing:.02em}
+.brand-copy small{font-size:10.5px;color:var(--muted);letter-spacing:.08em}
+.top-search{position:relative;flex:1;max-width:560px;margin-left:auto}
+.top-search input{
+  width:100%;height:42px;padding:0 44px 0 14px;
+  color:var(--ink);background:var(--card);
+  border:1px solid var(--line);border-radius:0;
+  font-size:14px;outline:0;
+}
+.top-search input::placeholder{color:#7C877E}
+.top-search input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(23,54,42,.08)}
+.search-icon{position:absolute;right:13px;top:11px;width:20px;height:20px;color:var(--muted);pointer-events:none}
+.search-results{
+  position:absolute;left:0;right:0;top:48px;z-index:50;
+  max-height:360px;overflow:auto;
+  background:var(--white);border:1px solid var(--green);box-shadow:var(--shadow);
+}
+.search-results[hidden]{display:none}
+.search-head{padding:10px 14px;border-bottom:1px solid var(--line);font-size:11.5px;color:var(--muted);letter-spacing:.05em}
+.search-item{display:block;padding:11px 14px;border-bottom:1px solid var(--line);text-decoration:none}
+.search-item:last-child{border-bottom:0}
+.search-item:hover,.search-item:focus{background:var(--paper-deep)}
+.search-item b{display:block;font-size:13px;font-weight:600;line-height:1.45}
+.search-item span{display:block;margin-top:2px;font-size:12px;color:var(--muted);line-height:1.55}
+.search-empty{padding:18px 14px;font-size:12.5px;color:var(--muted)}
+.top-actions{display:flex;align-items:center;gap:8px;flex:none}
+.icon-btn,.print-btn{
+  min-height:42px;border:1px solid var(--line);background:transparent;color:var(--ink);
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 13px;
+}
+.icon-btn{width:42px;padding:0}
+.icon-btn:hover,.print-btn:hover{background:var(--green);color:var(--white);border-color:var(--green)}
+.icon-btn svg,.print-btn svg{width:18px;height:18px}
+.print-btn span{font-size:12.5px}
+.menu-btn{display:none}
+
+/* ===== 侧栏 ===== */
+.sidebar{
+  position:fixed;left:0;top:var(--topbar);bottom:0;z-index:30;
+  width:var(--sidebar);overflow:auto;
+  background:var(--green);color:var(--white);
+  border-right:1px solid rgba(255,255,255,.10);
+}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2)}
+.side-inner{padding:22px 18px 32px;min-height:100%;display:flex;flex-direction:column}
+.side-label{font-size:9.5px;letter-spacing:.18em;color:rgba(255,253,247,.46);padding:0 8px 12px}
+.side-brand{
+  margin:0 4px 18px;padding:0 0 18px;border-bottom:1px solid rgba(255,255,255,.12);
+}
+.side-brand b{display:block;font-family:var(--serif);font-size:19px;font-weight:400;letter-spacing:.04em;line-height:1.45}
+.side-brand span{display:block;margin-top:5px;font-size:10px;color:rgba(255,253,247,.52);letter-spacing:.08em}
+.side-nav{display:grid;gap:2px}
+.nav-group{border-bottom:1px solid rgba(255,255,255,.07);padding:2px 0}
+.nav-chapter{
+  display:grid;grid-template-columns:32px 1fr;align-items:center;gap:7px;
+  min-height:44px;padding:4px 8px;color:rgba(255,253,247,.78);text-decoration:none;
+}
+.nav-chapter:hover{color:var(--white);background:rgba(255,255,255,.055)}
+.nav-group.is-active .nav-chapter{color:var(--white);background:rgba(176,138,80,.17)}
+.nav-no{font-family:var(--mono);font-size:10.5px;color:var(--brass);letter-spacing:.04em}
+.nav-title{font-size:12.5px;line-height:1.4;letter-spacing:.02em}
+.nav-sub{
+  display:grid;gap:1px;padding:2px 0 8px 46px;
+  max-height:0;overflow:hidden;opacity:0;transition:max-height .25s ease,opacity .2s ease;
+}
+.nav-group.is-active .nav-sub,.nav-group:hover .nav-sub{max-height:420px;opacity:1}
+.nav-sub a{
+  display:block;padding:3px 4px;font-size:10.8px;line-height:1.5;
+  color:rgba(255,253,247,.53);text-decoration:none;
+}
+.nav-sub a:hover{color:var(--white)}
+.nav-sub a.is-current{color:var(--brass)}
+.side-foot{margin-top:auto;padding:20px 8px 0;border-top:1px solid rgba(255,255,255,.10);font-size:10px;line-height:1.7;color:rgba(255,253,247,.5)}
+.side-foot b{display:block;color:rgba(255,253,247,.8);font-weight:500;margin-bottom:2px}
+.side-foot a{color:var(--brass);text-decoration:none}
+.scrim{display:none}
+
+/* ===== 主区域 ===== */
+main{margin-left:var(--sidebar);padding:34px 40px 72px;min-width:0}
+.wrap{max-width:1120px;margin:0 auto}
+.hero{
+  position:relative;overflow:hidden;
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);
+  gap:38px;align-items:stretch;
+  padding:48px 46px;
+  color:var(--white);background:var(--green);
+  box-shadow:var(--shadow);
+}
+.hero-copy{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.hero-kicker{font-size:10px;letter-spacing:.2em;color:var(--brass);margin-bottom:16px}
+.hero h1{
+  margin:0;max-width:640px;
+  font-family:var(--serif);font-size:clamp(34px,4.4vw,60px);font-weight:400;
+  line-height:1.18;letter-spacing:.02em;text-wrap:balance;
+}
+.hero h1 em{font-style:normal;color:#E6CDA2}
+.hero-lead{max-width:560px;margin:18px 0 0;color:rgba(255,253,247,.72);font-size:14px;line-height:1.85}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.btn-primary,.btn-ghost{
+  min-height:44px;display:inline-flex;align-items:center;gap:9px;padding:0 17px;
+  text-decoration:none;font-size:12.5px;border:1px solid transparent;
+}
+.btn-primary{background:var(--brass);color:var(--green);border-color:var(--brass)}
+.btn-primary:hover{background:#C7A76B}
+.btn-ghost{color:var(--white);border-color:rgba(255,255,255,.28);background:transparent}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+.btn-primary svg,.btn-ghost svg{width:17px;height:17px}
+.hero-art{
+  position:absolute;right:-30px;bottom:-40px;width:360px;height:300px;
+  opacity:.22;pointer-events:none;
+}
+.hero-side{position:relative;z-index:2;display:flex;flex-direction:column;min-width:0}
+.entry-panel{background:var(--card);color:var(--ink);border:1px solid rgba(255,255,255,.22);height:100%;display:flex;flex-direction:column}
+.entry-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:13px 16px;border-bottom:1px solid var(--line);
+  font-size:10px;letter-spacing:.14em;color:var(--muted);
+}
+.entry-head b{font-weight:600;color:var(--green)}
+.entry-row{
+  display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;
+  padding:12px 14px;border-bottom:1px solid var(--line);min-width:0;
+}
+.entry-row:last-child{border-bottom:0}
+.entry-index{font-family:var(--mono);font-size:10px;color:var(--brass)}
+.entry-main{min-width:0}
+.entry-name{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;line-height:1.4}
+.entry-badge{
+  flex:none;padding:1px 6px;border:1px solid var(--line);background:var(--paper);
+  font-size:9px;font-weight:400;color:var(--muted);letter-spacing:.02em;
+}
+.entry-path{display:block;margin-top:2px;font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry-actions{display:flex;align-items:center;gap:4px}
+.entry-open{
+  min-height:36px;display:inline-flex;align-items:center;justify-content:center;padding:0 10px;
+  border:1px solid var(--green);color:var(--green);background:transparent;
+  text-decoration:none;font-size:10.5px;white-space:nowrap;
+}
+.entry-open:hover{background:var(--green);color:var(--white)}
+.copy-path{
+  width:36px;height:36px;border:1px solid var(--line);background:transparent;color:var(--muted);
+  display:grid;place-items:center;padding:0;position:relative;
+}
+.copy-path::after{content:"";position:absolute;inset:-4px}
+.copy-path:hover{color:var(--green);border-color:var(--green)}
+.copy-path svg{width:15px;height:15px}
+.meta-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  margin-top:1px;border:1px solid var(--line);background:var(--card);
+}
+.meta-cell{padding:14px 16px;border-right:1px solid var(--line);min-width:0}
+.meta-cell:last-child{border-right:0}
+.meta-cell b{display:block;font-family:var(--serif);font-size:19px;font-weight:400;line-height:1.25;color:var(--green)}
+.meta-cell span{display:block;margin-top:2px;font-size:10px;color:var(--muted);letter-spacing:.03em}
+.flow-section{margin-top:32px}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px}
+.section-head h2{
+  margin:0;font-family:var(--serif);font-size:24px;font-weight:400;line-height:1.3;color:var(--green);letter-spacing:.02em;
+}
+.section-head span{font-size:10px;letter-spacing:.12em;color:var(--muted);padding-bottom:3px}
+.flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.flow li{padding:14px 12px 16px;border-right:1px solid var(--line);min-width:0}
+.flow li:last-child{border-right:0}
+.flow .step-no{font-family:var(--mono);font-size:9.5px;color:var(--brass);letter-spacing:.04em}
+.flow b{display:block;margin:5px 0 3px;font-size:11.5px;font-weight:600;line-height:1.45}
+.flow span{display:block;font-size:10.5px;color:var(--muted);line-height:1.55}
+.doc-body{max-width:900px;margin:0 auto}
+.chapter{
+  margin-top:48px;padding-top:26px;border-top:1px solid var(--line);
+}
+.chapter:first-child{margin-top:42px}
+.chapter-head{display:grid;grid-template-columns:92px minmax(0,1fr);gap:18px;align-items:start;margin-bottom:22px}
+.chapter-no{
+  font-family:var(--serif);font-size:52px;line-height:.9;color:var(--brass);
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+}
+.chapter-kicker{font-size:9.5px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.chapter h1{
+  margin:4px 0 0;font-family:var(--serif);font-size:31px;font-weight:400;line-height:1.3;color:var(--green);letter-spacing:.02em;
+}
+.chapter-summary{margin:9px 0 0;max-width:70ch;font-size:13px;line-height:1.8;color:var(--muted)}
+.chapter-index{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 24px 110px}
+.chapter-index a{
+  padding:5px 9px;border:1px solid var(--line);background:var(--card);
+  font-size:11px;line-height:1.45;color:var(--muted);text-decoration:none;
+}
+.chapter-index a:hover{border-color:var(--green);color:var(--green)}
+h2{
+  display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;align-items:baseline;
+  margin:34px 0 12px;padding-top:10px;border-top:1px solid var(--line);
+  font-family:var(--serif);font-size:22px;font-weight:400;line-height:1.45;color:var(--green);
+  scroll-margin-top:84px;
+}
+h2 .h2-no{font-family:var(--mono);font-size:10px;color:var(--brass);letter-spacing:.02em;white-space:nowrap}
+h2 .h2-title{min-width:0}
+h3{margin:22px 0 8px;font-size:15px;font-weight:600;color:var(--green);line-height:1.6}
+.doc-body p{margin:0 0 10px;text-indent:2em;text-align:justify;max-width:76ch}
+.doc-body p:first-of-type{text-indent:2em}
+.doc-body strong{font-weight:600;color:var(--green)}
+.doc-body em{font-style:normal;color:var(--clay)}
+.doc-body ul,.doc-body ol{margin:6px 0 12px;padding-left:1.7em}
+.doc-body li{margin:3px 0}
+.table-block{margin:16px 0 24px}
+.table-caption,.figure-caption{
+  margin:0 0 7px;font-size:10.5px;line-height:1.55;color:var(--muted);letter-spacing:.02em;
+}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);background:var(--card)}
+table{width:100%;min-width:720px;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.65}
+thead th{
+  background:var(--green);color:var(--white);font-weight:500;text-align:left;
+  padding:9px 10px;border-right:1px solid rgba(255,255,255,.14);vertical-align:middle;
+}
+thead th:last-child{border-right:0}
+tbody td{padding:9px 10px;border-top:1px solid var(--line);border-right:1px solid var(--line);vertical-align:top;word-break:break-word}
+tbody td:last-child{border-right:0}
+tbody tr:nth-child(even){background:rgba(230,225,212,.24)}
+tbody tr:hover{background:rgba(176,138,80,.09)}
+.callout{
+  margin:18px 0 24px;padding:14px 18px 14px 20px;
+  border-left:4px solid var(--brass);background:var(--paper-deep);
+}
+.callout b{display:block;margin-bottom:4px;font-size:11.5px;color:var(--green);letter-spacing:.03em}
+.callout p{margin:0;text-indent:0;font-size:12.5px;line-height:1.8;color:var(--ink);max-width:none}
+figure.shot{
+  margin:22px 0 28px;background:var(--card);border:1px solid var(--line);padding:10px;
+}
+figure.shot button{
+  display:block;width:100%;padding:0;border:0;background:#E8E4D8;position:relative;overflow:hidden;
+}
+figure.shot img{width:100%;height:auto;transition:transform .25s ease}
+figure.shot button:hover img{transform:scale(1.012)}
+figure.shot .zoom-hint{
+  position:absolute;right:8px;bottom:8px;padding:4px 8px;background:rgba(23,54,42,.88);
+  color:var(--white);font-size:9px;letter-spacing:.06em;pointer-events:none;
+}
+figure.shot figcaption{margin:8px 2px 0;font-size:10.5px;color:var(--muted);line-height:1.55}
+code{
+  padding:1px 5px;background:rgba(23,54,42,.07);color:var(--green);
+  border:1px solid rgba(23,54,42,.10);word-break:break-all;
+}
+.path-line{font-family:var(--mono);font-size:11.5px;color:var(--green);background:var(--card);border:1px solid var(--line);padding:8px 10px;margin:8px 0 14px;overflow-wrap:anywhere}
+.page-foot{margin:56px 0 0;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;font-size:10.5px;color:var(--muted)}
+.page-foot b{font-weight:500;color:var(--green)}
+
+/* ===== 悬浮控件 ===== */
+.to-top{
+  position:fixed;right:22px;bottom:22px;z-index:35;width:44px;height:44px;
+  border:1px solid var(--green);background:var(--green);color:var(--white);
+  display:grid;place-items:center;opacity:0;visibility:hidden;transform:translateY(8px);
+  transition:opacity .2s ease,transform .2s ease,visibility .2s;
+}
+.to-top.is-visible{opacity:1;visibility:visible;transform:none}
+.to-top svg{width:18px;height:18px}
+.toast{
+  position:fixed;left:50%;bottom:26px;z-index:70;transform:translate(-50%,16px);
+  min-width:180px;max-width:min(420px,90vw);padding:10px 16px;
+  background:var(--green);color:var(--white);font-size:12px;text-align:center;
+  opacity:0;visibility:hidden;transition:.2s ease;pointer-events:none;
+}
+.toast.is-visible{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.lightbox{
+  position:fixed;inset:0;z-index:80;display:none;place-items:center;
+  padding:24px;background:rgba(15,27,22,.92);
+}
+.lightbox.is-open{display:grid}
+.lightbox img{max-width:min(1440px,94vw);max-height:86vh;width:auto;height:auto;border:8px solid var(--card)}
+.lightbox-close{
+  position:absolute;right:18px;top:18px;width:44px;height:44px;
+  border:1px solid rgba(255,255,255,.24);background:transparent;color:var(--white);display:grid;place-items:center;
+}
+.lightbox-close:hover{background:rgba(255,255,255,.1)}
+.lightbox-caption{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);max-width:90vw;color:rgba(255,255,255,.7);font-size:11px;text-align:center}
+
+/* ===== 响应式：窄屏优先 ===== */
+@media (max-width:1100px){
+  .hero{grid-template-columns:1fr;padding:36px 30px;gap:28px}
+  .hero h1{font-size:42px}
+  .entry-panel{max-width:600px}
+  .flow{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .flow li:nth-child(4){border-right:0}
+  .flow li:nth-child(n+5){border-top:1px solid var(--line)}
+  main{padding:28px 28px 64px}
+  .chapter-index{margin-left:0}
+}
+@media (max-width:900px){
+  :root{--topbar:60px}
+  .menu-btn{display:inline-flex}
+  .sidebar{transform:translateX(-100%);transition:transform .25s ease;box-shadow:var(--shadow)}
+  .sidebar.is-open{transform:none}
+  .scrim{display:block;position:fixed;inset:var(--topbar) 0 0 0;z-index:25;background:rgba(16,28,23,.45);opacity:0;visibility:hidden;transition:.2s}
+  .scrim.is-open{opacity:1;visibility:visible}
+  main{margin-left:0}
+  .brand{min-width:0}
+  .brand-copy small{display:none}
+  .top-search{max-width:none}
+  .top-search input{height:40px}
+  .print-btn span{display:none}
+  .print-btn{width:42px;padding:0}
+  .chapter-head{grid-template-columns:68px minmax(0,1fr);gap:14px}
+  .chapter-no{font-size:42px}
+  .chapter h1{font-size:27px}
+  .meta-strip{grid-template-columns:repeat(2,1fr)}
+  .meta-cell:nth-child(2){border-right:0}
+  .meta-cell:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .flow{grid-template-columns:1fr}
+  .flow li{border-right:0;border-top:1px solid var(--line);padding:11px 12px}
+  .flow li:first-child{border-top:0}
+  .doc-body{max-width:none}
+}
+@media (max-width:640px){
+  .topbar{padding:8px 12px;gap:8px;flex-wrap:wrap}
+  .brand{gap:9px}
+  .brand-mark{width:34px;height:34px}
+  .brand-copy b{font-size:12px}
+  .top-search{order:3;flex-basis:100%;margin-left:0}
+  .top-actions{margin-left:auto}
+  .hero{padding:28px 20px;gap:24px}
+  .hero h1{font-size:34px;line-height:1.2}
+  .hero-lead{font-size:13px}
+  .hero-actions{gap:8px}
+  .btn-primary,.btn-ghost{min-height:44px;padding:0 13px;font-size:11.5px}
+  main{padding:18px 16px 56px}
+  .meta-strip{grid-template-columns:1fr}
+  .meta-cell{border-right:0;border-bottom:1px solid var(--line)}
+  .meta-cell:last-child{border-bottom:0}
+  .section-head h2{font-size:21px}
+  .chapter-head{grid-template-columns:52px minmax(0,1fr);gap:10px}
+  .chapter-no{font-size:34px}
+  .chapter h1{font-size:23px}
+  .chapter-index{gap:5px}
+  .chapter-index a{font-size:10.5px}
+  h2{grid-template-columns:48px minmax(0,1fr);font-size:19px;gap:8px}
+  .doc-body p{font-size:14.5px;line-height:1.85;text-align:left}
+  table{min-width:640px;font-size:11.5px}
+  .entry-row{grid-template-columns:24px minmax(0,1fr);padding:12px}
+  .entry-actions{grid-column:2;justify-content:flex-start}
+  .entry-name{font-size:12px}
+  .entry-path{font-size:9.5px}
+  .page-foot{display:block}
+  .page-foot span{display:block;margin-top:4px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
+
+/* ===== 打印 / A4 ===== */
+@media print{
+  @page{size:A4;margin:16mm 15mm 18mm}
+  body{background:#fff;color:#000;font-size:10.5pt;line-height:1.7}
+  .topbar,.sidebar,.scrim,.to-top,.search-results,.lightbox,.toast,.skip-link{display:none!important}
+  main{margin:0;padding:0}
+  .wrap,.doc-body{max-width:none}
+  .hero{background:#fff;color:var(--green);box-shadow:none;padding:0 0 10mm;grid-template-columns:1fr;border-bottom:2px solid var(--green)}
+  .hero h1{font-size:30pt}
+  .hero h1 em{color:var(--green)}
+  .hero-lead{color:#333}
+  .hero-art{display:none}
+  .hero-actions{display:none}
+  .entry-panel{border:1px solid #999;max-width:none}
+  .entry-row{padding:6px 8px}
+  .entry-open{min-height:0;padding:2px 6px;font-size:8pt}
+  .copy-path{display:none}
+  .meta-strip{grid-template-columns:repeat(4,1fr);margin-top:6mm}
+  .meta-cell{padding:6px 8px}
+  .meta-cell b{font-size:14pt}
+  .flow-section{break-before:page}
+  .flow{grid-template-columns:repeat(4,1fr)}
+  .flow li{font-size:8pt;padding:6px}
+  .flow li:nth-child(4){border-right:0}
+  .flow li:nth-child(n+5){border-top:1px solid #ccc}
+  .chapter{break-before:page;border-top:0;padding-top:0;margin-top:0}
+  .chapter:first-child{break-before:auto}
+  .chapter-head{grid-template-columns:16mm 1fr;margin-bottom:6mm}
+  .chapter-no{font-size:26pt}
+  .chapter h1{font-size:20pt}
+  .chapter-summary{font-size:9pt}
+  .chapter-index{margin-left:0;gap:3px}
+  .chapter-index a{font-size:7.5pt;padding:2px 4px}
+  h2{font-size:13pt;margin:6mm 0 3mm;break-after:avoid}
+  h3{font-size:10.5pt;break-after:avoid}
+  .doc-body p{font-size:10.5pt;text-indent:2em;break-inside:avoid}
+  .table-block,.callout,figure.shot{break-inside:avoid}
+  .table-wrap{overflow:visible;border:1px solid #888}
+  table{min-width:0;font-size:8pt;table-layout:fixed}
+  thead{display:table-header-group}
+  thead th{background:#17362A!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:4px 5px}
+  tbody td{padding:4px 5px}
+  tr{break-inside:avoid}
+  figure.shot{padding:4px;margin:4mm 0}
+  figure.shot button{pointer-events:none}
+  figure.shot .zoom-hint{display:none}
+  .callout{border-left:3px solid #8a6a34;background:#F2EFE5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .page-foot{break-before:avoid}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#manualContent">跳到正文</a>
+
+<header class="topbar">
+  <a class="brand" href="#top" aria-label="回到手册首页">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="7" width="16" height="11"/><path d="M4 12c3-3 6 3 16 0"/><path d="M4 15c3-3 6 3 16 0"/></svg>
+    </span>
+    <span class="brand-copy"><b>心理沙盘系统</b><small>ACCOUNT &amp; OPERATIONS MANUAL</small></span>
+  </a>
+
+  <div class="top-search" role="search">
+    <label for="manualSearch" class="skip-link" style="position:absolute">搜索手册内容</label>
+    <input id="manualSearch" type="search" autocomplete="off" placeholder="搜索章节、入口、账号或报错提示">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></svg>
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+
+  <div class="top-actions">
+    <button class="icon-btn menu-btn" id="menuToggle" type="button" aria-label="打开章节目录" aria-controls="sidebar" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <button class="print-btn" id="printBtn" type="button" aria-label="打印手册">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 8V4h10v4"/><rect x="5" y="8" width="14" height="8"/><path d="M7 16h10v4H7z"/><circle cx="16" cy="11" r="1"/></svg>
+      <span>打印手册</span>
+    </button>
+  </div>
+</header>
+
+<aside class="sidebar" id="sidebar" aria-label="章节目录">
+  <div class="side-inner">
+    <div class="side-brand">
+      <b>账户管理与<br>全系统操作手册</b>
+      <span>本地部署版 · V1.2 · 2026.11.22</span>
+    </div>
+    <div class="side-label">CONTENTS / 目录</div>
+    <nav class="side-nav" id="sideNav"><div class="nav-group" data-target="sec-1"><a class="nav-chapter" href="#sec-1"><span class="nav-no">1</span><span class="nav-title">文档说明</span></a><div class="nav-sub"><a href="#sec-1-1">1.1 目的与适用范围</a><a href="#sec-1-2">1.2 版本与术语</a></div></div><div class="nav-group" data-target="sec-2"><a class="nav-chapter" href="#sec-2"><span class="nav-no">2</span><span class="nav-title">系统入口与角色总览</span></a><div class="nav-sub"><a href="#sec-2-1">2.1 四个入口一览</a><a href="#sec-2-2">2.2 角色职责与当前权限</a><a href="#sec-2-3">2.3 一条完整业务链路</a></div></div><div class="nav-group" data-target="sec-3"><a class="nav-chapter" href="#sec-3"><span class="nav-no">3</span><span class="nav-title">登录、退出与账号安全</span></a><div class="nav-sub"><a href="#sec-3-1">3.1 首次登录准备</a><a href="#sec-3-2">3.2 后台登录步骤</a><a href="#sec-3-3">3.3 登录后的工作概览</a><a href="#sec-3-4">3.4 学生测评入口与后台入口的区别</a><a href="#sec-3-5">3.5 登录状态恢复与失效</a><a href="#sec-3-6">3.6 修改本人密码</a><a href="#sec-3-7">3.7 退出登录</a><a href="#sec-3-8">3.8 登录错误与锁定</a></div></div><div class="nav-group" data-target="sec-4"><a class="nav-chapter" href="#sec-4"><span class="nav-no">4</span><span class="nav-title">教职员工控制台操作</span></a><div class="nav-sub"><a href="#sec-4-1">4.1 工作概览与指标</a><a href="#sec-4-2">4.2 报告审核流程</a><a href="#sec-4-3">4.3 修订、退回与通过</a><a href="#sec-4-4">4.4 生成分享二维码与复制链接</a><a href="#sec-4-5">4.5 数据看板</a></div></div><div class="nav-group" data-target="sec-5"><a class="nav-chapter" href="#sec-5"><span class="nav-no">5</span><span class="nav-title">用户与角色管理</span></a><div class="nav-sub"><a href="#sec-5-1">5.1 进入用户与角色</a><a href="#sec-5-2">5.2 新增用户</a><a href="#sec-5-3">5.3 编辑用户</a><a href="#sec-5-4">5.4 设置与重置密码</a><a href="#sec-5-5">5.5 启用、停用与删除</a><a href="#sec-5-6">5.6 登录状态列</a><a href="#sec-5-7">5.7 账号开通、调岗与离职流程</a></div></div><div class="nav-group" data-target="sec-6"><a class="nav-chapter" href="#sec-6"><span class="nav-no">6</span><span class="nav-title">学生沙盘测评操作</span></a><div class="nav-sub"><a href="#sec-6-1">6.1 学生登录测评入口</a><a href="#sec-6-2">6.2 确认本次测评信息</a><a href="#sec-6-3">6.3 选择与摆放沙具</a><a href="#sec-6-4">6.4 地形塑形与视角控制</a><a href="#sec-6-5">6.5 拍照、白噪与环境音</a><a href="#sec-6-6">6.6 完成并提交作品</a><a href="#sec-6-7">6.7 提交回执与后续流程</a></div></div><div class="nav-group" data-target="sec-7"><a class="nav-chapter" href="#sec-7"><span class="nav-no">7</span><span class="nav-title">报告查看器操作</span></a><div class="nav-sub"><a href="#sec-7-1">7.1 入口与打开方式</a><a href="#sec-7-2">7.2 咨询师完整版与家长/学生版</a><a href="#sec-7-3">7.3 分享二维码、打印与导出PDF</a></div></div><div class="nav-group" data-target="sec-8"><a class="nav-chapter" href="#sec-8"><span class="nav-no">8</span><span class="nav-title">家长/学生分享页</span></a><div class="nav-sub"><a href="#sec-8-1">8.1 扫码或链接进入</a><a href="#sec-8-2">8.2 可见内容与隐私边界</a><a href="#sec-8-3">8.3 分享链接生命周期与使用注意</a></div></div><div class="nav-group" data-target="sec-9"><a class="nav-chapter" href="#sec-9"><span class="nav-no">9</span><span class="nav-title">常见问题与故障处理</span></a><div class="nav-sub"><a href="#sec-9-1">9.1 登录类问题</a><a href="#sec-9-2">9.2 后台操作类问题</a><a href="#sec-9-3">9.3 学生测评与报告类问题</a><a href="#sec-9-4">9.4 分享类问题</a></div></div><div class="nav-group" data-target="sec-10"><a class="nav-chapter" href="#sec-10"><span class="nav-no">10</span><span class="nav-title">安全规范与日常检查</span></a><div class="nav-sub"><a href="#sec-10-1">10.1 账号与密码</a><a href="#sec-10-2">10.2 心理数据与分享</a><a href="#sec-10-3">10.3 日常检查清单</a></div></div><div class="nav-group" data-target="sec-a"><a class="nav-chapter" href="#sec-a"><span class="nav-no">A</span><span class="nav-title">账号开通与变更登记表</span></a><div class="nav-sub"></div></div><div class="nav-group" data-target="sec-b"><a class="nav-chapter" href="#sec-b"><span class="nav-no">B</span><span class="nav-title">系统操作速查表</span></a><div class="nav-sub"></div></div><div class="nav-group" data-target="sec-c"><a class="nav-chapter" href="#sec-c"><span class="nav-no">C</span><span class="nav-title">版本记录</span></a><div class="nav-sub"></div></div><div class="nav-group" data-target="sec-d"><a class="nav-chapter" href="#sec-d"><span class="nav-no">D</span><span class="nav-title">学生测评快速指引（可单独打印）</span></a><div class="nav-sub"><a href="#sec-d-1">D.1 开始前</a><a href="#sec-d-2">D.2 四步完成测评</a><a href="#sec-d-3">D.3 离开前</a></div></div></nav>
+    <div class="side-foot">
+      <b>本地系统入口</b>
+      <a href="http://127.0.0.1:8011/admin" target="_blank" rel="noopener">127.0.0.1:8011/admin</a>
+      <div style="margin-top:4px">内部资料，请按心理数据保密要求使用。</div>
+    </div>
+  </div>
+</aside>
+<div class="scrim" id="scrim" aria-hidden="true"></div>
+
+<main id="top">
+  <div class="wrap">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-copy">
+        <div class="hero-kicker">INTERNAL OPERATIONS MANUAL / 2026</div>
+        <h1 id="heroTitle">账户管理与<br><em>全系统操作手册</em></h1>
+        <p class="hero-lead">从账号开通、后台登录，到学生沙盘测评、作品提交、报告审核和分享查看。四个系统入口、九张实景截图和一套可直接照做的操作步骤。</p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="#quickEntry">
+            <span>查看系统入口</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
+          </a>
+          <a class="btn-ghost" href="#sec-3">
+            <span>从登录开始读</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 4h8l4 4v12H6z"/><path d="M14 4v4h4"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-side" id="quickEntry">
+        <div class="entry-panel" aria-label="系统入口">
+          <div class="entry-head"><b>系统入口</b><span>4 ENTRIES / 2026</span></div>
+
+          <div class="entry-row">
+            <span class="entry-index">01</span>
+            <div class="entry-main">
+              <div class="entry-name">教职员工控制台 <span class="entry-badge">教职员工登录</span></div>
+              <code class="entry-path">/admin</code>
+            </div>
+            <div class="entry-actions">
+              <a class="entry-open" href="http://127.0.0.1:8011/admin" target="_blank" rel="noopener">打开</a>
+              <button class="copy-path" type="button" data-copy="http://127.0.0.1:8011/admin" aria-label="复制教职员工控制台地址">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="8" y="8" width="11" height="11"/><path d="M5 15V5h10"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="entry-row">
+            <span class="entry-index">02</span>
+            <div class="entry-main">
+              <div class="entry-name">学生沙盘测评 <span class="entry-badge">仅学生登录</span></div>
+              <code class="entry-path">/workbench</code>
+            </div>
+            <div class="entry-actions">
+              <a class="entry-open" href="http://127.0.0.1:8011/workbench" target="_blank" rel="noopener">打开</a>
+              <button class="copy-path" type="button" data-copy="http://127.0.0.1:8011/workbench" aria-label="复制学生沙盘测评地址">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="8" y="8" width="11" height="11"/><path d="M5 15V5h10"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="entry-row">
+            <span class="entry-index">03</span>
+            <div class="entry-main">
+              <div class="entry-name">报告查看器 <span class="entry-badge">需报告ID</span></div>
+              <code class="entry-path">/report-viewer?report_id=…</code>
+            </div>
+            <div class="entry-actions">
+              <a class="entry-open" href="#sec-7">看说明</a>
+              <button class="copy-path" type="button" data-copy="http://127.0.0.1:8011/report-viewer?report_id=" aria-label="复制报告查看器地址前缀">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="8" y="8" width="11" height="11"/><path d="M5 15V5h10"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="entry-row">
+            <span class="entry-index">04</span>
+            <div class="entry-main">
+              <div class="entry-name">家长/学生分享页 <span class="entry-badge">免登录</span></div>
+              <code class="entry-path">/share/{token}</code>
+            </div>
+            <div class="entry-actions">
+              <a class="entry-open" href="#sec-8">看说明</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <svg class="hero-art" viewBox="0 0 360 300" fill="none" stroke="#C7A76B" aria-hidden="true">
+        <rect x="12" y="18" width="336" height="264"/>
+        <rect x="34" y="38" width="292" height="224"/>
+        <path d="M34 168c48-36 92 28 144 0s96-20 148 8"/>
+        <path d="M34 194c54-30 84 22 138-2s104-16 154 12"/>
+        <path d="M34 220c48-26 94 18 142-4s98-14 150 10"/>
+        <path d="M74 38v224M294 38v224" opacity=".35"/>
+        <circle cx="140" cy="124" r="5" fill="#C7A76B" stroke="none"/>
+        <circle cx="242" cy="96" r="3" fill="#C7A76B" stroke="none"/>
+        <path d="M140 124l28-18M242 96l-24 34" opacity=".6"/>
+      </svg>
+    </section>
+
+    <div class="meta-strip" aria-label="手册概览">
+      <div class="meta-cell"><b>10</b><span>章正文，覆盖从账号到分享</span></div>
+      <div class="meta-cell"><b>4</b><span>个系统入口与登录边界</span></div>
+      <div class="meta-cell"><b>9</b><span>张真实系统截图</span></div>
+      <div class="meta-cell"><b>V1.2</b><span>本地部署 · 2026-11-22</span></div>
+    </div>
+
+    <section class="flow-section" aria-labelledby="flowTitle">
+      <div class="section-head"><h2 id="flowTitle">一条完整的业务链路</h2><span>FROM ACCOUNT TO SHARE</span></div>
+      <ol class="flow">
+        <li><span class="step-no">01</span><b>建立学生账号</b><span>超级管理员创建账号并设置密码</span></li>
+        <li><span class="step-no">02</span><b>学生登录</b><span>使用学校发放的学生账号进入测评</span></li>
+        <li><span class="step-no">03</span><b>制作沙盘</b><span>摆放沙具、塑形、记录过程</span></li>
+        <li><span class="step-no">04</span><b>完成并提交</b><span>选择代表沙具、写描述、确认同意</span></li>
+        <li><span class="step-no">05</span><b>审核报告</b><span>咨询师修订、退回或通过</span></li>
+        <li><span class="step-no">06</span><b>生成分享</b><span>已通过报告生成二维码</span></li>
+        <li><span class="step-no">07</span><b>家长查看</b><span>扫码进入脱敏报告</span></li>
+      </ol>
+    </section>
+
+    <div class="doc-body" id="manualContent">
+<section class="chapter" id="sec-1"><header class="chapter-head"><div class="chapter-no">01</div><div><div class="chapter-kicker">CHAPTER 01 / INTERNAL MANUAL</div><h1>文档说明</h1><p class="chapter-summary">先确认手册的适用范围、入口边界和术语，再开始操作。</p></div></header><div class="chapter-index"><a href="#sec-1-1">1.1 目的与适用范围</a><a href="#sec-1-2">1.2 版本与术语</a></div><h2 id="sec-1-1"><span class="h2-no">1.1</span><span class="h2-title">目的与适用范围</span></h2><p>本手册用于指导学校心理服务团队使用心理沙盘发展性评估系统。内容覆盖系统入口、账号登录、用户与角色管理、学生测评组织实施、报告审核、报告查看和家长/学生分享。</p><p>本手册以2026年11月22日的当前部署为基准，主要供超级管理员、心理咨询师、班主任和系统运维人员使用；学生可按附录D的快速指引完成测评。系统界面、字段或权限如有调整，以实际页面为准。</p><aside class="callout"><b>使用前先确认</b><p>本手册中的地址均以当前本机部署 http://127.0.0.1:8011 为例。若系统部署到其他服务器，请只替换地址中的主机和端口，页面路径保持不变。</p><p>系统分为两条独立入口：后台 /admin 只面向教职员工；工作台 /workbench 只面向受测学生。教师、咨询师、超管不能进入工作台，学生也不能进入后台。</p><p>学生账号只能由超级管理员在后台“用户与角色”中创建并设置密码。学生忘记密码时，联系心理老师或管理员重置。</p></aside><h2 id="sec-1-2"><span class="h2-no">1.2</span><span class="h2-title">版本与术语</span></h2><div class="table-block"><p class="table-caption">表1　系统常用术语</p><div class="table-wrap"><table><colgroup><col style="width:20.00%"><col style="width:80.00%"></colgroup><thead><tr><th scope="col"><strong>项目</strong></th><th scope="col"><strong>说明</strong></th></tr></thead><tbody><tr><td>文档版本</td><td>V1.2，按“学生测评入口”重新定位工作台，补充账号创建、提交与职责边界说明，对应2026年11月22日部署</td></tr><tr><td>系统名称</td><td>心理沙盘发展性评估系统</td></tr><tr><td>受测学生</td><td>使用学校发放的学生账号进入沙盘工作台、完成并提交本次测评的学生</td></tr><tr><td>沙盘作品</td><td>学生在3D沙盘工作台中完成的场景与沙具布置</td></tr><tr><td>代表沙具</td><td>学生选定、最能代表自己此刻状态的单件沙具，是报告核心意象分析的依据</td></tr><tr><td>提交回执</td><td>学生提交成功后看到的编号、时间、作品图和沙具统计，不包含临床报告</td></tr><tr><td>报告编号</td><td>形如 PS-20261122-102825 的唯一编号，用于检索、审核和分享</td></tr><tr><td>分享链接</td><td>家长/学生可访问的脱敏报告地址，打开时无需登录</td></tr><tr><td>风险等级</td><td>报告中的L1—L4分级：L1平稳、L2轻度关注、L3中度关注、L4重点关护；仅作发展性评估参考，不用于临床诊断</td></tr></tbody></table></div></div><section class="chapter" id="sec-2"><header class="chapter-head"><div class="chapter-no">02</div><div><div class="chapter-kicker">CHAPTER 02 / INTERNAL MANUAL</div><h1>系统入口与角色总览</h1><p class="chapter-summary">四个入口、四类角色，以及一条从建立学生账号到家长查看的完整链路；后台只面向教职员工，工作台只面向学生。</p></div></header><div class="chapter-index"><a href="#sec-2-1">2.1 四个入口一览</a><a href="#sec-2-2">2.2 角色职责与当前权限</a><a href="#sec-2-3">2.3 一条完整业务链路</a></div><h2 id="sec-2-1"><span class="h2-no">2.1</span><span class="h2-title">四个入口一览</span></h2><p>系统由四个面向不同使用者的页面组成。先按下表确认应进入哪个入口，再按后续章节操作。</p><div class="table-block"><p class="table-caption">表2　系统入口与登录要求</p><div class="table-wrap"><table><colgroup><col style="width:5.29%"><col style="width:16.47%"><col style="width:24.71%"><col style="width:23.53%"><col style="width:19.41%"><col style="width:10.59%"></colgroup><thead><tr><th scope="col"><strong>序号</strong></th><th scope="col"><strong>系统/页面</strong></th><th scope="col"><strong>入口地址</strong></th><th scope="col"><strong>登录要求</strong></th><th scope="col"><strong>主要用途</strong></th><th scope="col"><strong>适用对象</strong></th></tr></thead><tbody><tr><td>1</td><td>教职员工控制台</td><td>/admin</td><td>教职员工账号登录；学生账号被拒绝</td><td>账号与角色管理、报告审核、分享、数据看板</td><td>超级管理员、咨询师、班主任</td></tr><tr><td>2</td><td>学生沙盘测评</td><td>/workbench</td><td>仅学生账号登录；教职员工账号被拒绝</td><td>学生制作3D沙盘、完成并提交本次测评</td><td>受测学生</td></tr><tr><td>3</td><td>报告查看器</td><td>/report-viewer?report_id=报告ID</td><td>当前为内部页面，不单独设账号登录</td><td>阅读九章报告、切换咨询师版/家长学生版、打印、导出PDF</td><td>咨询师、管理员</td></tr><tr><td>4</td><td>家长/学生分享页</td><td>/share/分享令牌</td><td>无需登录</td><td>家长或学生扫码查看脱敏报告</td><td>家长、学生</td></tr><tr><td>5</td><td>健康检查</td><td>/api/v1/health</td><td>无需登录</td><td>运维确认服务是否在线</td><td>系统运维人员</td></tr></tbody></table></div></div><p>完整访问示例：教职员工在浏览器地址栏输入 http://127.0.0.1:8011/admin 打开控制台；学生在受测设备上输入 http://127.0.0.1:8011/workbench 打开学生测评入口。报告查看器通常由后台按钮自动打开，不需要手工拼接地址。</p><p>后台与工作台不是同一套入口：后台使用教职员工账号，工作台使用学生账号，两个登录接口会互相拒绝对方角色。为避免心理数据泄露，应只在受控电脑、受控网络和授权人员范围内使用，不要把内部页面地址发到公开群组。</p><h2 id="sec-2-2"><span class="h2-no">2.2</span><span class="h2-title">角色职责与当前权限</span></h2><div class="table-block"><p class="table-caption">表3　角色职责与当前权限</p><div class="table-wrap"><table><colgroup><col style="width:14.21%"><col style="width:25.79%"><col style="width:26.32%"><col style="width:15.79%"><col style="width:17.89%"></colgroup><thead><tr><th scope="col"><strong>角色</strong></th><th scope="col"><strong>核心职责</strong></th><th scope="col"><strong>后台权限</strong></th><th scope="col"><strong>工作台权限</strong></th><th scope="col"><strong>账号登录</strong></th></tr></thead><tbody><tr><td>超级管理员</td><td>管理账号、角色权限、全校数据与系统配置</td><td>可使用全部后台页面；可创建、编辑、重置密码、启停和删除用户，包括学生账号</td><td>不能进入</td><td>可登录后台；不能登录工作台</td></tr><tr><td>心理咨询师</td><td>审核评估报告、修订建议、生成家长/学生分享二维码</td><td>可使用报告审核、数据看板和报告查看；看不到“用户与角色”入口，访问用户接口会被拒绝</td><td>不能进入</td><td>可登录后台；不能登录工作台</td></tr><tr><td>班主任</td><td>查看本班测评进度与群体发展画像</td><td>当前可登录后台查看报告与数据；班级级数据范围隔离尚未启用；用户管理不可见</td><td>不能进入</td><td>可登录后台；不能登录工作台</td></tr><tr><td>受测学生</td><td>使用学生账号进入沙盘工作台，完成并提交本次沙盘测评</td><td>当前后台不开放；学生账号访问后台接口返回403</td><td>可使用；只能提交作品，不查看临床报告</td><td>可登录工作台；不能登录后台</td></tr><tr><td>家长/学生访客</td><td>查看分享报告</td><td>只读，不能进入后台，也不能修改报告</td><td>不适用</td><td>无需登录</td></tr></tbody></table></div></div><p>角色决定账号能进入哪条入口。超级管理员以外的账号不应共用管理员账号；教师和咨询师不应把后台账号交给学生使用，学生也不应使用他人账号完成测评。</p><h2 id="sec-2-3"><span class="h2-no">2.3</span><span class="h2-title">一条完整业务链路</span></h2><div class="table-block"><p class="table-caption">表4　从建立账号到分享的完整链路</p><div class="table-wrap"><table><colgroup><col style="width:22.50%"><col style="width:18.75%"><col style="width:33.13%"><col style="width:25.62%"></colgroup><thead><tr><th scope="col"><strong>步骤</strong></th><th scope="col"><strong>操作人</strong></th><th scope="col"><strong>使用的入口</strong></th><th scope="col"><strong>完成标志</strong></th></tr></thead><tbody><tr><td>1. 建立学生账号</td><td>超级管理员</td><td>后台 → 用户与角色 → 新增用户</td><td>学生账号已建立、角色为“受测学生”、初始密码已受控交付</td></tr><tr><td>2. 学生登录测评</td><td>受测学生</td><td>工作台 → 学生账号登录</td><td>已显示本人姓名、学号和年级班级，进入3D沙盘</td></tr><tr><td>3. 制作沙盘</td><td>受测学生</td><td>工作台 → 3D沙盘</td><td>沙具与地形布置完成，至少放入1件沙具</td></tr><tr><td>4. 完成并提交</td><td>受测学生</td><td>工作台 → 完成并提交</td><td>选择代表沙具、填写作品说明、勾选知情同意并提交成功</td></tr><tr><td>5. 查看提交回执</td><td>受测学生</td><td>工作台 → 提交回执</td><td>看到提交编号、时间、作品图和沙具统计，不显示临床结论</td></tr><tr><td>6. 审核报告</td><td>咨询师</td><td>后台 → 报告审核</td><td>报告状态为“已通过”</td></tr><tr><td>7. 生成分享二维码</td><td>咨询师</td><td>报告审核页或报告查看器</td><td>二维码和分享链接已生成</td></tr><tr><td>8. 家长/学生查看</td><td>家长或学生</td><td>手机扫码 → 分享页</td><td>能打开脱敏报告，且看不到风险研判章节</td></tr></tbody></table></div></div><aside class="callout"><b>两个入口不要混用</b><p>教师和咨询师只在后台工作；需要现场陪同学生时，不应把自己的后台账号交给学生登录工作台。</p><p>学生测评结束后，报告由后台自动保存并进入审核流程。学生端只显示提交回执，不显示报告正文、风险等级或分享二维码。</p></aside><section class="chapter" id="sec-3"><header class="chapter-head"><div class="chapter-no">03</div><div><div class="chapter-kicker">CHAPTER 03 / INTERNAL MANUAL</div><h1>登录、退出与账号安全</h1><p class="chapter-summary">后台登录、学生测评入口、会话、改密、退出，以及常见登录错误的处理方式；两边账号不能互相登录。</p></div></header><div class="chapter-index"><a href="#sec-3-1">3.1 首次登录准备</a><a href="#sec-3-2">3.2 后台登录步骤</a><a href="#sec-3-3">3.3 登录后的工作概览</a><a href="#sec-3-4">3.4 学生测评入口与后台入口的区别</a><a href="#sec-3-5">3.5 登录状态恢复与失效</a><a href="#sec-3-6">3.6 修改本人密码</a><a href="#sec-3-7">3.7 退出登录</a><a href="#sec-3-8">3.8 登录错误与锁定</a></div><h2 id="sec-3-1"><span class="h2-no">3.1</span><span class="h2-title">首次登录准备</span></h2><p>首次使用后台前，先向超级管理员确认账号是否已建立、角色是否正确、是否已设置初始密码。学生首次测评前，由学校统一发放学生账号和密码，学生不需要自己注册。系统不会把密码通过页面展示给他人，初始密码应由管理员当面或通过受控方式交付。</p><p>建议使用最新版 Chrome 或 Edge 浏览器，并保持浏览器缩放为100%。如果页面显示旧版内容，先按 Ctrl+F5 强制刷新，再重新登录。3D沙盘需要浏览器支持 WebGL，显卡加速应保持开启。</p><h2 id="sec-3-2"><span class="h2-no">3.2</span><span class="h2-title">后台登录步骤</span></h2><figure class="shot" id="fig-1"><button type="button" aria-label="放大查看：图1 教职员工控制台登录页"><img src="assets/00_login.png" alt="图1 教职员工控制台登录页" loading="lazy"><span class="zoom-hint">点击放大</span></button><figcaption>图1　教职员工控制台登录页</figcaption></figure><div class="table-block"><p class="table-caption">表5　后台登录操作步骤</p><div class="table-wrap"><table><colgroup><col style="width:8.75%"><col style="width:30.00%"><col style="width:61.25%"></colgroup><thead><tr><th scope="col"><strong>步骤</strong></th><th scope="col"><strong>操作</strong></th><th scope="col"><strong>说明</strong></th></tr></thead><tbody><tr><td>1</td><td>打开教职员工控制台</td><td>在浏览器地址栏输入 http://127.0.0.1:8011/admin。</td></tr><tr><td>2</td><td>输入登录账号</td><td>账号由超级管理员创建，例如 lin.zhiyuan；不区分大小写，系统会统一转为小写。</td></tr><tr><td>3</td><td>输入登录密码</td><td>点击密码框右侧的眼睛图标可以显示或隐藏密码；输入完成后按 Enter 或点击“登录控制台”。</td></tr><tr><td>4</td><td>进入工作概览</td><td>登录成功后自动进入“工作概览”，顶部显示当前登录人、角色和所属部门。</td></tr><tr><td>5</td><td>首次登录修改密码</td><td>点击右上角“修改密码”，按提示设置只有本人知道的新密码。</td></tr></tbody></table></div></div><p>后台登录接口只接受教职员工账号。使用学生账号访问后台会被拒绝，并提示学生应从沙盘工作台进入。学生登录步骤见6.1节。</p><aside class="callout"><b>密码与账号规则</b><p>密码长度为8—128位，至少包含字母和数字；建议再加入符号，但系统只强制字母和数字。</p><p>账号为3—32位小写字母、数字、点、下划线或短横线，且必须以字母或数字开头。</p><p>连续5次密码错误会锁定账号15分钟；锁定期间即使密码正确也不能登录。</p></aside><h2 id="sec-3-3"><span class="h2-no">3.3</span><span class="h2-title">登录后的工作概览</span></h2><figure class="shot" id="fig-2"><button type="button" aria-label="放大查看：图2 登录后的工作概览"><img src="assets/01_dashboard.png" alt="图2 登录后的工作概览" loading="lazy"><span class="zoom-hint">点击放大</span></button><figcaption>图2　登录后的工作概览</figcaption></figure><p>工作概览是默认首页，展示评估报告总数、待审核数量、L2及以上重点关护数量、可访问分享链接数量，以及审核队列和预警等级分布。咨询师每天开始工作时，先看“待审核”和“重点关护”，再进入审核队列。</p><p>页面顶部“已同步”表示最近一次数据刷新时间。需要立即获取最新数据时，可点击浏览器刷新或进入报告审核页点击“刷新队列”。</p><h2 id="sec-3-4"><span class="h2-no">3.4</span><span class="h2-title">学生测评入口与后台入口的区别</span></h2><div class="table-block"><p class="table-caption">表6　后台与学生测评入口的区别</p><div class="table-wrap"><table><colgroup><col style="width:20.00%"><col style="width:38.75%"><col style="width:41.25%"></colgroup><thead><tr><th scope="col"><strong>对比项</strong></th><th scope="col"><strong>教职员工后台 /admin</strong></th><th scope="col"><strong>学生测评入口 /workbench</strong></th></tr></thead><tbody><tr><td>使用对象</td><td>超级管理员、心理咨询师、班主任</td><td>受测学生</td></tr><tr><td>账号来源</td><td>超级管理员在“用户与角色”中创建</td><td>超级管理员在“用户与角色”中创建，角色必须是“受测学生”</td></tr><tr><td>登录接口</td><td>/api/v1/admin/login</td><td>/api/v1/workbench/login</td></tr><tr><td>登录后看到</td><td>工作概览、报告审核、用户与角色、数据看板</td><td>3D沙盘、本人只读身份信息、作品提交回执</td></tr><tr><td>禁止行为</td><td>学生账号不能登录后台</td><td>教师、咨询师、超管不能登录工作台</td></tr><tr><td>退出方式</td><td>右上角“退出”</td><td>顶部“退出”</td></tr></tbody></table></div></div><h2 id="sec-3-5"><span class="h2-no">3.5</span><span class="h2-title">登录状态恢复与失效</span></h2><p>登录状态保存在当前浏览器标签页的会话中，有效期12小时。同一标签页刷新页面可以自动恢复登录；关闭标签页后，通常需要重新输入账号和密码。</p><p>如果页面提示“登录状态已失效”，说明会话已过期、被管理员撤销，或账号被停用。此时系统会清空本地登录状态并重新显示登录页，重新登录即可；如果仍无法登录，按第9章的登录类问题排查。</p><h2 id="sec-3-6"><span class="h2-no">3.6</span><span class="h2-title">修改本人密码</span></h2><figure class="shot" id="fig-3"><button type="button" aria-label="放大查看：图3 修改登录密码弹窗"><img src="assets/04_change_password.png" alt="图3 修改登录密码弹窗" loading="lazy"><span class="zoom-hint">点击放大</span></button><figcaption>图3　修改登录密码弹窗</figcaption></figure><div class="table-block"><p class="table-caption">表7　修改本人密码</p><div class="table-wrap"><table><colgroup><col style="width:8.75%"><col style="width:32.50%"><col style="width:58.75%"></colgroup><thead><tr><th scope="col"><strong>步骤</strong></th><th scope="col"><strong>操作</strong></th><th scope="col"><strong>说明</strong></th></tr></thead><tbody><tr><td>1</td><td>点击右上角“修改密码”</td><td>按钮位于顶部操作者信息右侧。</td></tr><tr><td>2</td><td>输入当前密码</td><td>用于确认是本人操作。</td></tr><tr><td>3</td><td>输入新密码并再次确认</td><td>两次输入必须一致；密码至少8位，且同时包含字母和数字。</td></tr><tr><td>4</td><td>点击“确认保存”</td><td>保存成功后，当前会话保持登录，其他设备上的旧会话会被退出。</td></tr></tbody></table></div></div><p>如果忘记当前密码，不能在本页自助找回。请联系超级管理员在“用户与角色”页重置密码；管理员重置后，旧登录会话会失效，需要使用新密码重新登录。</p><h2 id="sec-3-7"><span class="h2-no">3.7</span><span class="h2-title">退出登录</span></h2><p>点击右上角“退出”，在浏览器确认框中确认后，系统会撤销当前会话并返回登录页。使用公共电脑、借用设备或临时演示后，必须退出登录，不能只关闭页面。</p><p>退出后如果再次打开同一地址仍显示已登录，先刷新页面确认；仍有异常时关闭标签页后重新打开登录页。</p><h2 id="sec-3-8"><span class="h2-no">3.8</span><span class="h2-title">登录错误与锁定</span></h2><div class="table-block"><p class="table-caption">表8　常见登录提示与处理方式</p><div class="table-wrap"><table><colgroup><col style="width:38.12%"><col style="width:28.75%"><col style="width:33.13%"></colgroup><thead><tr><th scope="col"><strong>页面提示</strong></th><th scope="col"><strong>原因</strong></th><th scope="col"><strong>处理方式</strong></th></tr></thead><tbody><tr><td>请输入账号和密码</td><td>账号或密码为空</td><td>补齐后重试</td></tr><tr><td>账号或密码错误，还可尝试 N 次</td><td>账号不存在或密码不正确</td><td>核对账号和后仍失败时，联系超级管理员重置密码</td></tr><tr><td>该账号尚未设置登录密码，请联系超级管理员</td><td>账号已建立但未设置密码</td><td>由超级管理员在用户列表中设置密码</td></tr><tr><td>账号已停用，请联系管理员</td><td>账号状态为“停用”</td><td>由超级管理员确认是否启用，或改用其他授权账号</td></tr><tr><td>密码连续错误5次，账号已锁定15分钟</td><td>连续输错密码达到上限</td><td>等待15分钟后重试，或由管理员重置密码</td></tr><tr><td>学生账号不能登录后台</td><td>学生账号访问了教职员工后台</td><td>学生请从 /workbench 进入；教师不要把自己的后台账号交给学生</td></tr><tr><td>该入口仅面向受测学生</td><td>教师、咨询师或超管账号登录工作台</td><td>教职员工请从 /admin 进入；工作台只使用学生账号</td></tr><tr><td>仅超级管理员可管理账号与角色</td><td>咨询师或班主任访问用户管理接口</td><td>使用超级管理员账号处理账号管理</td></tr></tbody></table></div></div><section class="chapter" id="sec-4"><header class="chapter-head"><div class="chapter-no">04</div><div><div class="chapter-kicker">CHAPTER 04 / INTERNAL MANUAL</div><h1>教职员工控制台操作</h1><p class="chapter-summary">工作概览、报告审核、正文修订、分享二维码和数据看板。</p></div></header><div class="chapter-index"><a href="#sec-4-1">4.1 工作概览与指标</a><a href="#sec-4-2">4.2 报告审核流程</a><a href="#sec-4-3">4.3 修订、退回与通过</a><a href="#sec-4-4">4.4 生成分享二维码与复制链接</a><a href="#sec-4-5">4.5 数据看板</a></div><h2 id="sec-4-1"><span class="h2-no">4.1</span><span class="h2-title">工作概览与指标</span></h2><p>工作概览中的四个指标分别对应：全部评估报告、待审核报告、L2及以上重点关护报告、当前可访问的分享链接。审核队列按风险线索和时间排序，便于先处理风险较高的报告。</p><p>“预警等级分布”按每份报告的最高等级统计；“需要重点关护”列出L2及以上报告。指标只用于工作排序，不能替代咨询师的专业判断。</p><h2 id="sec-4-2"><span class="h2-no">4.2</span><span class="h2-title">报告审核流程</span></h2><figure class="shot" id="fig-4"><button type="button" aria-label="放大查看：图4 报告审核修订工作台"><img src="assets/08_review.png" alt="图4 报告审核修订工作台" loading="lazy"><span class="zoom-hint">点击放大</span></button><figcaption>图4　报告审核修订工作台</figcaption></figure><div class="table-block"><p class="table-caption">表9　报告审核操作步骤</p><div class="table-wrap"><table><colgroup><col style="width:8.75%"><col style="width:30.00%"><col style="width:61.25%"></colgroup><thead><tr><th scope="col"><strong>步骤</strong></th><th scope="col"><strong>操作</strong></th><th scope="col"><strong>说明</strong></th></tr></thead><tbody><tr><td>1</td><td>进入报告审核</td><td>点击左侧导航“报告审核”，或从工作概览点击“进入审核队列”。</td></tr><tr><td>2</td><td>筛选报告范围</td><td>可按学校、班级、年级、起始日期、截止日期筛选，点击“应用筛选”生效；“重置”恢复全部。</td></tr><tr><td>3</td><td>搜索或切换状态</td><td>搜索框支持学生姓名、学校、班级、报告编号；状态页签包括全部、待审核、待修订、已通过、已退回。</td></tr><tr><td>4</td><td>选择一份报告</td><td>在左侧列表点击报告卡片，右侧显示报告摘要和九章正文。</td></tr><tr><td>5</td><td>阅读与核对</td><td>按章节核对沙盘作品、代表沙具、六维方向、成绩、风险研判、访谈建议和训练模块。第五章“风险研判”仅咨询师可见。</td></tr><tr><td>6</td><td>写审核意见</td><td>在底部“审核意见”框填写修订建议；需要改正文时，点击“修订 AI 正文”打开修订面板，保存草稿。</td></tr><tr><td>7</td><td>决定状态</td><td>点击“退回修订”将状态改为待修订；点击“审核通过”将状态改为已通过，并在通过时应用已保存的正文草稿。</td></tr><tr><td>8</td><td>生成分享二维码</td><td>只有“已通过”的报告才能直接从审核页生成二维码；扫码进入家长/学生脱敏版。</td></tr></tbody></table></div></div><h2 id="sec-4-3"><span class="h2-no">4.3</span><span class="h2-title">修订、退回与通过</span></h2><p>“修订 AI 正文”用于咨询师对报告正文做必要校正。打开后按章节编辑，填写审核意见，先点“保存草稿”；草稿保存后报告状态会进入“待修订”，审核通过时系统将草稿合并为正式报告。</p><p>“退回修订”适合发现事实、表述或建议需要补充的情况。退回后应在审核意见中写清楚需要修改的章节和问题，避免只写“请修改”。</p><p>“审核通过”表示报告可以用于分享。通过前应确认：受测者信息无误、代表沙具选择正确、风险章节已核对、家长版不会暴露咨询师内部判断。</p><aside class="callout"><b>谨慎使用“用大模型重分析”</b><p>该按钮会调用已配置的多模态模型重新分析记录，并覆盖当前报告内容。使用前应确认原报告可重新生成，且当前修订草稿不会被需要保留的内容覆盖。</p><p>日常审核优先使用正文修订和审核意见，不建议把“重分析”当作普通刷新按钮。</p></aside><h2 id="sec-4-4"><span class="h2-no">4.4</span><span class="h2-title">生成分享二维码与复制链接</span></h2><p>审核通过后，点击审核页右下角“生成二维码”。系统弹出“报告分享二维码”，可让家长或学生扫码，也可点击“复制分享链接”发送给家长。分享页自动隐藏风险研判章节和咨询师内部字段。</p><p>二维码中的地址由服务器配置决定。如果二维码指向 127.0.0.1 或 8000 等本机地址，手机将无法打开；此时应联系系统管理员，把对家长开放的地址配置为手机可访问的域名或局域网地址。</p><h2 id="sec-4-5"><span class="h2-no">4.5</span><span class="h2-title">数据看板</span></h2><p>数据看板汇总报告数量、L2及以上占比、中心区域沙具数量、首要训练需求、风险分布、模块分布和区域热力图。它用于查看群体趋势和安排训练资源，不用于给单个学生贴标签。</p><p>看板数据来自已完成报告。报告数量或分布与预期不一致时，先确认筛选范围和报告状态，再判断是否为数据问题。</p><section class="chapter" id="sec-5"><header class="chapter-head"><div class="chapter-no">05</div><div><div class="chapter-kicker">CHAPTER 05 / INTERNAL MANUAL</div><h1>用户与角色管理</h1><p class="chapter-summary">仅超级管理员可操作：新增、编辑、重置密码、启停和删除账号，并负责建立学生账号。</p></div></header><div class="chapter-index"><a href="#sec-5-1">5.1 进入用户与角色</a><a href="#sec-5-2">5.2 新增用户</a><a href="#sec-5-3">5.3 编辑用户</a><a href="#sec-5-4">5.4 设置与重置密码</a><a href="#sec-5-5">5.5 启用、停用与删除</a><a href="#sec-5-6">5.6 登录状态列</a><a href="#sec-5-7">5.7 账号开通、调岗与离职流程</a></div><p>本章仅适用于超级管理员。咨询师和班主任看不到“用户与角色”导航；即使直接访问用户接口，也会被服务端拒绝。</p><h2 id="sec-5-1"><span class="h2-no">5.1</span><span class="h2-title">进入用户与角色</span></h2><figure class="shot" id="fig-5"><button type="button" aria-label="放大查看：图5 用户与角色管理页"><img src="assets/02_users.png" alt="图5 用户与角色管理页" loading="lazy"><span class="zoom-hint">点击放大</span></button><figcaption>图5　用户与角色管理页</figcaption></figure><p>点击左侧导航“用户与角色”。页面上方是四张角色卡片，显示超级管理员、心理咨询师、班主任、受测学生的人数；点击卡片可按角色筛选列表。下方是用户表，包含用户、角色、所属/学段、登录状态、编号、状态和操作列。</p><div class="table-block"><p class="table-caption">表10　用户与角色页面区域说明</p><div class="table-wrap"><table><colgroup><col style="width:26.25%"><col style="width:73.75%"></colgroup><thead><tr><th scope="col"><strong>区域</strong></th><th scope="col"><strong>用途</strong></th></tr></thead><tbody><tr><td>角色卡片</td><td>查看各角色人数；点击卡片筛选下方列表，再次点击可取消筛选。</td></tr><tr><td>搜索框</td><td>按姓名、账号、部门搜索；输入后列表即时过滤。</td></tr><tr><td>角色/状态筛选</td><td>按角色或启用状态过滤；选择“全部角色”“全部状态”恢复全量。</td></tr><tr><td>登录状态列</td><td>显示未设置密码、密码已设置·未登录、最近登录时间或密码错误已锁定。</td></tr><tr><td>状态开关</td><td>绿色为启用，灰色为停用；点击后立即切换。</td></tr><tr><td>操作按钮</td><td>钥匙图标设置/重置密码，铅笔编辑用户，垃圾桶删除用户。</td></tr></tbody></table></div></div><h2 id="sec-5-2"><span class="h2-no">5.2</span><span class="h2-title">新增用户</span></h2><figure class="shot" id="fig-6"><button type="button" aria-label="放大查看：图6 新增用户抽屉"><img src="assets/03_add_user.png" alt="图6 新增用户抽屉" loading="lazy"><span class="zoom-hint">点击放大</span></button><figcaption>图6　新增用户抽屉</figcaption></figure><div class="table-block"><p class="table-caption">表11　新增用户字段说明</p><div class="table-wrap"><table><colgroup><col style="width:19.37%"><col style="width:40.00%"><col style="width:40.63%"></colgroup><thead><tr><th scope="col"><strong>字段</strong></th><th scope="col"><strong>填写要求</strong></th><th scope="col"><strong>说明</strong></th></tr></thead><tbody><tr><td>姓名</td><td>必填</td><td>显示在用户列表和顶部操作者信息中。</td></tr><tr><td>账号</td><td>必填，3—32位</td><td>只能使用小写字母、数字、点、下划线或短横线，且以字母或数字开头；保存时自动转为小写。</td></tr><tr><td>角色</td><td>必填</td><td>超级管理员、心理咨询师、班主任、受测学生四选一；新增时默认“受测学生”，应按实际人员切换。</td></tr><tr><td>状态</td><td>必填</td><td>正常或停用；新员工一般选“正常”。</td></tr><tr><td>所属部门/学段</td><td>建议填写</td><td>如“心理发展中心 / 初中部”；班主任可填写年级或学部。</td></tr><tr><td>年级</td><td>按需填写</td><td>如“初二”；用于班主任、学生账号的班级信息。</td></tr><tr><td>班级</td><td>按需填写</td><td>如“3班”；用于后续班级数据关联。</td></tr><tr><td>学生编号</td><td>学生角色建议填写</td><td>用于关联测评档案，可留空。</td></tr><tr><td>登录密码</td><td>学生账号建议立即填写</td><td>填写后立即成为初始密码；教职员工可稍后设置，但学生账号没有密码就不能登录工作台。</td></tr></tbody></table></div></div><p>点击右上角“新增用户”，填写姓名、账号和角色。需要立即登录的人员，在“登录密码”中设置初始密码；教职员工可以留空，稍后在列表中设置，但学生账号应在发放前设置好密码，否则无法登录工作台。保存前核对角色和状态，角色选错会让账号进入错误的入口。</p><p>账号保存后不能与已有账号重复。出现“该账号已存在”时，先搜索该账号，确认是否为离职后重新入职或同名人员，不要新建重复账号。</p><aside class="callout"><b>学生账号的开通规则</b><p>学生账号只能由超级管理员创建，角色必须选“受测学生”；教师、咨询师、班主任不能自行给学生开号。</p><p>姓名、学号、年级、班级会显示在学生端只读身份卡中，并作为提交回执和报告归属依据，创建前应核对准确。</p><p>学生账号只能进入 /workbench，不能进入后台；教职员工账号也不能进入工作台。</p></aside><h2 id="sec-5-3"><span class="h2-no">5.3</span><span class="h2-title">编辑用户</span></h2><p>点击用户行右侧铅笔图标打开编辑抽屉。可修改姓名、账号、角色、部门、年级、班级、学生编号和状态。账号修改后，原账号立即失效，需要使用新账号登录。</p><p>角色变更后，用户下次刷新或重新登录时按新角色显示导航。若用户正在使用后台，应先通知其退出后重新登录，避免继续按旧角色操作。</p><h2 id="sec-5-4"><span class="h2-no">5.4</span><span class="h2-title">设置与重置密码</span></h2><p>点击用户行右侧钥匙图标，或在新增加/编辑抽屉的“登录密码”中填写密码，可为该用户设置新密码。管理员设置密码时不需要知道用户原密码。学生账号忘记密码时，也由超级管理员在此重置。</p><div class="table-block"><p class="table-caption">表12　密码设置与重置场景</p><div class="table-wrap"><table><colgroup><col style="width:25.62%"><col style="width:38.13%"><col style="width:36.25%"></colgroup><thead><tr><th scope="col"><strong>场景</strong></th><th scope="col"><strong>操作</strong></th><th scope="col"><strong>影响</strong></th></tr></thead><tbody><tr><td>新账号首次设置密码</td><td>在新增用户时填写“登录密码”</td><td>该账号可以立即用此密码登录对应入口</td></tr><tr><td>学生忘记测评密码</td><td>在列表中点击钥匙图标，输入新密码</td><td>旧密码立即失效，学生需用新密码重新登录工作台</td></tr><tr><td>已有账号忘记密码</td><td>在列表中点击钥匙图标，输入新密码</td><td>旧密码立即失效，该账号已有登录会话会被退出</td></tr><tr><td>账号被锁定</td><td>先等待15分钟，或由管理员重置密码</td><td>重置密码同时清除失败次数和锁定状态</td></tr><tr><td>教职员工主动改密</td><td>本人在后台右上角“修改密码”操作</td><td>当前会话保留，其他设备会话退出</td></tr></tbody></table></div></div><p>密码不得通过群聊、朋友圈、普通邮件正文传递。推荐当面告知，或使用学校认可的安全方式；教职员工首次登录后应立即修改密码，学生账号由学校统一管理，忘记密码时联系心理老师或管理员。</p><h2 id="sec-5-5"><span class="h2-no">5.5</span><span class="h2-title">启用、停用与删除</span></h2><p>点击状态开关可停用或启用账号。停用后账号不能登录，但历史数据和账号记录保留；离职、长期借调或发现异常登录时，优先使用“停用”，确认不再需要后再删除。</p><p>点击垃圾桶图标删除用户，系统会二次确认。删除会同时清理该账号的登录会话，且不可恢复；当前正在登录的账号不能被删除。</p><div class="table-block"><p class="table-caption">表13　账号状态操作对照</p><div class="table-wrap"><table><colgroup><col style="width:20.63%"><col style="width:43.75%"><col style="width:35.62%"></colgroup><thead><tr><th scope="col"><strong>操作</strong></th><th scope="col"><strong>适用场景</strong></th><th scope="col"><strong>结果</strong></th></tr></thead><tbody><tr><td>停用</td><td>离职、长期请假、账号疑似泄露、临时冻结</td><td>不能登录，数据和账号保留</td></tr><tr><td>启用</td><td>人员返岗、误停用、临时冻结解除</td><td>恢复登录，原密码仍有效</td></tr><tr><td>删除</td><td>确认人员不再使用且无需保留账号</td><td>删除账号和登录会话，不可恢复</td></tr><tr><td>重置密码</td><td>忘记密码、疑似泄露、交接账号</td><td>旧密码失效，旧会话退出</td></tr></tbody></table></div></div><h2 id="sec-5-6"><span class="h2-no">5.6</span><span class="h2-title">登录状态列</span></h2><div class="table-block"><p class="table-caption">表14　登录状态列含义</p><div class="table-wrap"><table><colgroup><col style="width:30.00%"><col style="width:40.62%"><col style="width:29.38%"></colgroup><thead><tr><th scope="col"><strong>显示</strong></th><th scope="col"><strong>含义</strong></th><th scope="col"><strong>建议处理</strong></th></tr></thead><tbody><tr><td>未设置密码</td><td>账号已建立，但没有密码，不能登录</td><td>确认人员需要登录后，设置初始密码</td></tr><tr><td>密码已设置 · 未登录</td><td>已有密码，但从未成功登录</td><td>确认账号和初始密码已交付；必要时重置</td></tr><tr><td>最近 2026-11-22 20:05</td><td>最近一次成功登录时间</td><td>用于核对账号是否被本人使用</td></tr><tr><td>密码错误已锁定</td><td>连续输错达到上限，处于锁定状态</td><td>等待15分钟或重置密码</td></tr><tr><td>状态开关为灰色</td><td>账号已停用</td><td>确认是否应恢复；离职账号保持停用或删除</td></tr></tbody></table></div></div><h2 id="sec-5-7"><span class="h2-no">5.7</span><span class="h2-title">账号开通、调岗与离职流程</span></h2><div class="table-block"><p class="table-caption">表15　账号全生命周期操作流程</p><div class="table-wrap"><table><colgroup><col style="width:20.00%"><col style="width:18.13%"><col style="width:40.00%"><col style="width:21.87%"></colgroup><thead><tr><th scope="col"><strong>场景</strong></th><th scope="col"><strong>责任人</strong></th><th scope="col"><strong>操作步骤</strong></th><th scope="col"><strong>完成标准</strong></th></tr></thead><tbody><tr><td>新建学生账号</td><td>超级管理员</td><td>新增用户 → 角色选“受测学生” → 填年级/班级/学号 → 设初始密码 → 受控交付</td><td>学生可用账号登录工作台，身份卡信息正确</td></tr><tr><td>新员工开通</td><td>超级管理员</td><td>新增用户 → 选教职员工角色 → 填部门/年级/班级 → 设初始密码 → 当面交付</td><td>账号可登录后台，角色正确，首次登录已改密</td></tr><tr><td>岗位调整</td><td>超级管理员</td><td>编辑用户 → 修改角色/部门/班级 → 通知本人退出重登</td><td>新角色导航正确，旧权限不再可见</td></tr><tr><td>学生忘记密码</td><td>超级管理员</td><td>核实身份 → 钥匙图标重置 → 交给心理老师或本人</td><td>学生可用新密码登录工作台，旧会话退出</td></tr><tr><td>离职或长期停用</td><td>超级管理员</td><td>先停用账号 → 确认无在用业务 → 必要时删除</td><td>账号不能登录，交接完成</td></tr><tr><td>发现异常登录</td><td>超级管理员</td><td>立即停用 → 重置密码 → 核对最近登录 → 通知本人</td><td>异常会话失效，账号恢复受控</td></tr></tbody></table></div></div><section class="chapter" id="sec-6"><header class="chapter-head"><div class="chapter-no">06</div><div><div class="chapter-kicker">CHAPTER 06 / INTERNAL MANUAL</div><h1>学生沙盘测评操作</h1><p class="chapter-summary">学生使用学校账号登录，确认只读身份信息，摆放沙具、完成作品并提交给心理老师。</p></div></header><div class="chapter-index"><a href="#sec-6-1">6.1 学生登录测评入口</a><a href="#sec-6-2">6.2 确认本次测评信息</a><a href="#sec-6-3">6.3 选择与摆放沙具</a><a href="#sec-6-4">6.4 地形塑形与视角控制</a><a href="#sec-6-5">6.5 拍照、白噪与环境音</a><a href="#sec-6-6">6.6 完成并提交作品</a><a href="#sec-6-7">6.7 提交回执与后续流程</a></div><h2 id="sec-6-1"><span class="h2-no">6.1</span><span class="h2-title">学生登录测评入口</span></h2><p>学生在受测设备上打开 http://127.0.0.1:8011/workbench。页面标题为“学生心理沙盘测评”，主文案为“让心里的风景被看见”，按钮为“开始测评”。学生使用学校发放的账号和密码登录，不需要自己注册，也不能使用教师或咨询师账号进入。</p><figure class="shot" id="fig-7"><button type="button" aria-label="放大查看：图7 学生心理沙盘测评登录页"><img src="assets/09_workbench_login.png" alt="图7 学生心理沙盘测评登录页" loading="lazy"><span class="zoom-hint">点击放大</span></button><figcaption>图7　学生心理沙盘测评登录页</figcaption></figure><p>登录时注意：账号不区分大小写；连续5次密码错误会锁定15分钟；登录状态保存在当前浏览器标签页，有效期12小时。离开设备前点击顶部“退出”，系统会撤销当前会话并返回登录页。</p><p>尚未开通账号、忘记密码或账号被停用时，请联系学校心理老师或系统管理员。学生账号只能由超级管理员在后台“用户与角色”中创建或重置密码，工作台不能自行注册。</p><aside class="callout"><b>学生端与教师端是两条入口</b><p>学生只进入 /workbench；教师、咨询师、班主任只进入 /admin。两边账号不能互相登录。</p><p>学生登录后看到的是自己的只读身份信息、3D沙盘和作品提交回执，不显示后台、报告审核或分享入口。</p></aside><p>登录成功后进入3D沙盘。工作台由四个区域组成：左侧“地形/塑形与微调”、中部3D沙盘与本人信息卡、右侧“沙具抽屉”、顶部视角与环境控制。第一次使用建议先点“说明”查看内置操作提示。</p><div class="table-block"><p class="table-caption">表16　学生沙盘工作台区域说明</p><div class="table-wrap"><table><colgroup><col style="width:20.63%"><col style="width:38.75%"><col style="width:40.62%"></colgroup><thead><tr><th scope="col"><strong>区域</strong></th><th scope="col"><strong>主要控件</strong></th><th scope="col"><strong>用途</strong></th></tr></thead><tbody><tr><td>顶部左侧</td><td>斜45°、正90°、复位</td><td>切换观察视角，复位回到默认斜45°</td></tr><tr><td>顶部中部</td><td>本人信息卡、创作时长、沙具数、快照数</td><td>查看本人姓名、年级班级和本次制作状态；信息不可自行修改</td></tr><tr><td>顶部右侧</td><td>白天/黄昏/夜晚、晴天/下雨/下雪</td><td>调整环境氛围；白噪、轻音乐、拍照、说明、退出、完成并提交</td></tr><tr><td>左侧面板</td><td>选择、堆沙、挖沙、挖水、抚平</td><td>地形塑形与笔刷调整；撤销、重做、清空沙盘</td></tr><tr><td>中部</td><td>3D沙盘</td><td>放置、选中、旋转、缩放、镜像、移除沙具</td></tr><tr><td>右侧面板</td><td>沙具抽屉、搜索、分类</td><td>从500件沙具中选择并放入沙盘</td></tr></tbody></table></div></div><h2 id="sec-6-2"><span class="h2-no">6.2</span><span class="h2-title">确认本次测评信息</span></h2><p>点击顶部本人信息卡或右侧“查看”，打开“确认本次测评信息”。姓名、学号、学部/年级/班级由学校账号统一带入，学生端只读，不能自行修改；如信息有误，应联系心理老师或管理员更正。</p><div class="table-block"><p class="table-caption">表17　学生测评信息字段</p><div class="table-wrap"><table><colgroup><col style="width:22.50%"><col style="width:18.75%"><col style="width:58.75%"></colgroup><thead><tr><th scope="col"><strong>字段</strong></th><th scope="col"><strong>是否可编辑</strong></th><th scope="col"><strong>说明</strong></th></tr></thead><tbody><tr><td>姓名</td><td>只读</td><td>来自学生账号；显示在身份卡和提交回执中</td></tr><tr><td>学号</td><td>只读</td><td>来自学生账号的学生编号；未设置时显示“未设置”</td></tr><tr><td>学部 / 年级 / 班级</td><td>只读</td><td>由学校账号统一维护，用于报告归属和后台检索</td></tr><tr><td>今天想说的话</td><td>可选</td><td>最多800字；可记录今天的心情或想让老师知道的情况，随本次测评提交</td></tr></tbody></table></div></div><p>点击“保存”只保存“今天想说的话”，不会改变姓名、学号或班级。学生不需要填写座位、联系方式、成绩、教师观察等教职员工字段，这些字段不会出现在学生端。</p><h2 id="sec-6-3"><span class="h2-no">6.3</span><span class="h2-title">选择与摆放沙具</span></h2><p>右侧“沙具抽屉”共500件沙具，按人物、建筑、自然、动物、交通、学习、体验、饮食等分类。可以点击分类筛选，也可以在搜索框按名称、子类或意象检索。</p><p>点击沙具卡片可将沙具加入沙盘，或直接把卡片拖入沙盘指定位置。选中沙具后，中部下方出现微调条：逆时针/顺时针旋转15°、水平镜像、缩小/放大、移除。</p><p>学生按自己的节奏选择和摆放，陪同人员只做设备和安全方面的必要协助，不替学生决定沙具位置或解释象征意义。作品本身比“摆得整齐”更重要。</p><h2 id="sec-6-4"><span class="h2-no">6.4</span><span class="h2-title">地形塑形与视角控制</span></h2><div class="table-block"><p class="table-caption">表18　地形工具与视角操作</p><div class="table-wrap"><table><colgroup><col style="width:25.62%"><col style="width:33.13%"><col style="width:41.25%"></colgroup><thead><tr><th scope="col"><strong>工具/操作</strong></th><th scope="col"><strong>用途</strong></th><th scope="col"><strong>使用方式</strong></th></tr></thead><tbody><tr><td>选择</td><td>选中、拖拽沙具</td><td>默认工具；点击沙具后可旋转、缩放、镜像或移除</td></tr><tr><td>堆沙</td><td>堆出沙丘、山体</td><td>在沙面上按住拖动；笔刷直径40—220px，力度40%/70%/100%/140%</td></tr><tr><td>挖沙</td><td>挖出凹陷、沟谷</td><td>在沙面上按住拖动；可配合不同笔刷直径</td></tr><tr><td>挖水</td><td>露出蓝色水面</td><td>在沙面上按住拖动；用于河流、湖泊等水域</td></tr><tr><td>抚平</td><td>恢复平整沙面</td><td>在塑形区域拖动，抹平局部起伏</td></tr><tr><td>斜45°/正90°/复位</td><td>切换观察角度</td><td>顶部按钮；右键拖拽可环绕观察，滚轮缩放</td></tr><tr><td>撤销/重做</td><td>回退或恢复操作</td><td>左侧面板按钮；快捷键 Ctrl+Z 撤销，Ctrl+Shift+Z 或 Ctrl+Y 重做</td></tr><tr><td>清空沙盘</td><td>移除全部沙具并抹平地形</td><td>需要二次确认；清空会进入撤销栈，但画面无法自动恢复</td></tr></tbody></table></div></div><p>当前最多保留20步撤销记录。进行大幅清空或重新布置前，可先用“拍照”保存过程快照，避免误操作后无法回溯。</p><h2 id="sec-6-5"><span class="h2-no">6.5</span><span class="h2-title">拍照、白噪与环境音</span></h2><p>顶部“拍照 n/6”可保存制作过程快照，最多6张；快照会随作品一并提交，帮助心理老师了解制作过程，不替代最终沙盘图。</p><p>“白噪”“轻音乐”用于降低环境干扰，可按学生需要开启或关闭；“白天/黄昏/夜晚”“晴天/下雨/下雪”只改变视觉氛围，不改变沙盘数据。</p><h2 id="sec-6-6"><span class="h2-no">6.6</span><span class="h2-title">完成并提交作品</span></h2><p>沙盘中至少有1件沙具后，点击右上角“完成并提交”。系统进入两步收尾：先选代表沙具，再填写沙盘描述和知情同意。</p><div class="table-block"><p class="table-caption">表19　完成并提交作品步骤</p><div class="table-wrap"><table><colgroup><col style="width:27.50%"><col style="width:46.25%"><col style="width:26.25%"></colgroup><thead><tr><th scope="col"><strong>步骤</strong></th><th scope="col"><strong>操作</strong></th><th scope="col"><strong>要求</strong></th></tr></thead><tbody><tr><td>01 选择代表沙具</td><td>在沙盘已有沙具中点击一件最能代表自己此刻状态的沙具</td><td>必须选择；会随作品提交给心理老师，用于核心意象分析</td></tr><tr><td>02 描述沙盘</td><td>写下作品的整体场景、重要元素、想表达的状态</td><td>必填，10—600字；页面会实时提示还差多少字</td></tr><tr><td>可选：哪一件沙具最像你</td><td>填写一件最像自己的沙具或意象</td><td>可选，最多60字；帮助老师理解自我像</td></tr><tr><td>可选：想补充的话</td><td>填写最近的心情、学习或生活里发生的事</td><td>可选，最多800字；随本次测评提交给心理老师</td></tr><tr><td>勾选知情同意</td><td>确认作品与文字提交给学校心理老师，用于心理辅导参考</td><td>必选；不用于分班、评优或临床诊断</td></tr><tr><td>提交本次作品</td><td>点击“提交本次作品”</td><td>系统保存沙盘图和文字，生成报告供心理老师后台审核</td></tr><tr><td>返回沙盘</td><td>点击“返回沙盘”或右上角“关闭”</td><td>不提交，回到沙盘继续调整；已填写内容可能保留在当前页面</td></tr></tbody></table></div></div><aside class="callout"><b>提交过程中不要刷新页面</b><p>提交需要上传沙盘图和文字。网络较慢时按钮会显示“正在提交…”，请等待完成。</p><p>如果提交失败，页面会提示“本次作品尚未提交”。此时先保存高清作品图，再联系心理老师处理，不要直接刷新或关闭页面。</p></aside><h2 id="sec-6-7"><span class="h2-no">6.7</span><span class="h2-title">提交回执与后续流程</span></h2><p>提交成功后，页面显示“作品已提交”，并给出提交时间、短编号、作品图以及沙具数、占用区域、中心区域沙具三项统计。回执只用于确认本次提交完成，不包含报告正文。</p><div class="table-block"><p class="table-caption">表20　学生提交回执内容</p><div class="table-wrap"><table><colgroup><col style="width:26.25%"><col style="width:43.75%"><col style="width:30.00%"></colgroup><thead><tr><th scope="col"><strong>页面元素</strong></th><th scope="col"><strong>学生可见内容</strong></th><th scope="col"><strong>说明</strong></th></tr></thead><tbody><tr><td>提交状态</td><td>作品已提交 / 已交给老师</td><td>表示后端已保存作品，报告进入后台审核流程</td></tr><tr><td>提交时间与编号</td><td>提交时间、提交编号前8位</td><td>需要向老师核对时，可提供该编号</td></tr><tr><td>作品图</td><td>本次沙盘的导出图</td><td>可点击“保存高清作品图”下载1600×1150 PNG</td></tr><tr><td>沙具统计</td><td>沙具数、占用区域、中心区域沙具</td><td>仅作提交摘要，不构成心理判断</td></tr><tr><td>后续说明</td><td>“工作台不向学生展示风险判断或临床结论”</td><td>需要沟通时由心理老师另行联系</td></tr></tbody></table></div></div><p>学生端不提供“查看完整报告”“生成分享二维码”或报告详情入口。报告由后台生成并保存，由心理老师在后台审核、决定是否分享；学生如需了解结果，应按学校安排与心理老师沟通。</p><section class="chapter" id="sec-7"><header class="chapter-head"><div class="chapter-no">07</div><div><div class="chapter-kicker">CHAPTER 07 / INTERNAL MANUAL</div><h1>报告查看器操作</h1><p class="chapter-summary">教职员工查看完整报告与家长/学生版的差异，以及打印、导出和分享。</p></div></header><div class="chapter-index"><a href="#sec-7-1">7.1 入口与打开方式</a><a href="#sec-7-2">7.2 咨询师完整版与家长/学生版</a><a href="#sec-7-3">7.3 分享二维码、打印与导出PDF</a></div><h2 id="sec-7-1"><span class="h2-no">7.1</span><span class="h2-title">入口与打开方式</span></h2><figure class="shot" id="fig-8"><button type="button" aria-label="放大查看：图8 咨询师完整版报告查看器"><img src="assets/06_report_viewer.png" alt="图8 咨询师完整版报告查看器" loading="lazy"><span class="zoom-hint">点击放大</span></button><figcaption>图8　咨询师完整版报告查看器</figcaption></figure><p>报告查看器的常用入口有两类：后台审核页点击“完整报告”或“家长版预览”；家长/学生通过分享链接或二维码打开。学生工作台不提供报告查看入口，学生在提交后只看到提交回执。</p><p>内部直接访问时，地址格式为 http://127.0.0.1:8011/report-viewer?report_id=报告ID&amp;mode=counselor。报告ID由系统生成，不要手工编造；日常操作优先使用后台按钮跳转。</p><h2 id="sec-7-2"><span class="h2-no">7.2</span><span class="h2-title">咨询师完整版与家长/学生版</span></h2><div class="table-block"><p class="table-caption">表21　报告查看器两种模式</p><div class="table-wrap"><table><colgroup><col style="width:25.00%"><col style="width:53.13%"><col style="width:21.87%"></colgroup><thead><tr><th scope="col"><strong>版本</strong></th><th scope="col"><strong>可见内容</strong></th><th scope="col"><strong>使用场景</strong></th></tr></thead><tbody><tr><td>咨询师完整版</td><td>九章完整报告、第五章风险研判、制作过程、成绩单原图、咨询师内部提示</td><td>咨询师审核、督导、访谈准备</td></tr><tr><td>家长/学生版</td><td>第一章概览、第二章意象、第三章六维、第四章学业、第六章访谈建议、第七章职业发展、第八章训练模块、第九章总体建议；隐藏风险研判和咨询师内部字段</td><td>家长沟通、学生反馈、分享二维码</td></tr><tr><td>L4报告家长版</td><td>在上述内容基础上显示“建议家长先与心理老师沟通”提示，训练模块可能暂缓</td><td>避免家长单独解读高危线索</td></tr></tbody></table></div></div><p>顶部“咨询师完整版 / 家长 / 学生版”可切换预览。通过分享链接打开时，页面锁定为家长/学生版，不能切回咨询师版；这是分享页的隐私保护设计。</p><h2 id="sec-7-3"><span class="h2-no">7.3</span><span class="h2-title">分享二维码、打印与导出PDF</span></h2><div class="table-block"><p class="table-caption">表22　报告查看器工具栏操作</p><div class="table-wrap"><table><colgroup><col style="width:26.25%"><col style="width:45.00%"><col style="width:28.75%"></colgroup><thead><tr><th scope="col"><strong>按钮</strong></th><th scope="col"><strong>操作</strong></th><th scope="col"><strong>注意</strong></th></tr></thead><tbody><tr><td>生成分享二维码</td><td>点击后生成分享链接和二维码，页面显示二维码区域</td><td>建议报告审核通过后再生成；同一报告可生成长期链接</td></tr><tr><td>打印</td><td>调用浏览器打印，按A4版式输出</td><td>打印前确认页面已加载完、图片已显示</td></tr><tr><td>导出 A4 PDF</td><td>将当前模式导出为PDF，文件名包含报告编号和版本</td><td>需要页面依赖的 html2pdf 正常加载；失败时先检查网络，再重试</td></tr></tbody></table></div></div><p>导出PDF会按当前模式生成：咨询师版包含风险章节，家长/学生版自动脱敏。发送给家长前，务必确认当前处于“家长/学生版”，不要把咨询师完整版PDF发出去。</p><section class="chapter" id="sec-8"><header class="chapter-head"><div class="chapter-no">08</div><div><div class="chapter-kicker">CHAPTER 08 / INTERNAL MANUAL</div><h1>家长/学生分享页</h1><p class="chapter-summary">家长/学生免登录查看的脱敏范围、链接生命周期和使用边界。</p></div></header><div class="chapter-index"><a href="#sec-8-1">8.1 扫码或链接进入</a><a href="#sec-8-2">8.2 可见内容与隐私边界</a><a href="#sec-8-3">8.3 分享链接生命周期与使用注意</a></div><h2 id="sec-8-1"><span class="h2-no">8.1</span><span class="h2-title">扫码或链接进入</span></h2><figure class="shot" id="fig-9"><button type="button" aria-label="放大查看：图9 家长/学生脱敏分享页"><img src="assets/07_share.png" alt="图9 家长/学生脱敏分享页" loading="lazy"><span class="zoom-hint">点击放大</span></button><figcaption>图9　家长/学生脱敏分享页</figcaption></figure><p>家长或学生用手机相机、微信扫一扫扫描二维码，或直接打开分享链接。链接会跳转到报告查看器并携带分享令牌，页面顶部显示“家长/学生脱敏版·扫码查看”。</p><p>分享页不需要账号密码，也不需要安装应用。打开后可直接阅读报告，也可以使用“打印”或“导出A4 PDF”。页面没有“咨询师完整版”切换按钮，不能查看风险研判章节。</p><h2 id="sec-8-2"><span class="h2-no">8.2</span><span class="h2-title">可见内容与隐私边界</span></h2><div class="table-block"><p class="table-caption">表23　家长/学生分享页可见范围</p><div class="table-wrap"><table><colgroup><col style="width:48.13%"><col style="width:21.87%"><col style="width:30.00%"></colgroup><thead><tr><th scope="col"><strong>内容</strong></th><th scope="col"><strong>家长/学生版是否可见</strong></th><th scope="col"><strong>说明</strong></th></tr></thead><tbody><tr><td>封面、报告编号、受测编号、年级、生成时间</td><td>可见</td><td>用于确认报告归属</td></tr><tr><td>第一章 沙盘概览与整体印象</td><td>可见</td><td>保留发展性描述，隐藏部分咨询师过程观察</td></tr><tr><td>第二章 核心意象与代表沙具</td><td>可见</td><td>以平实语言描述象征线索</td></tr><tr><td>第三章 六维发展方向</td><td>可见</td><td>用于家庭教育沟通</td></tr><tr><td>第四章 学业表现</td><td>可见</td><td>保留已填写的成绩信息</td></tr><tr><td>第五章 风险研判</td><td>不可见</td><td>整章移除；家长版不展示风险分级</td></tr><tr><td>第六章 访谈建议</td><td>可见</td><td>用于家长/老师沟通准备</td></tr><tr><td>第七章 职业发展优势</td><td>可见</td><td>发展性建议</td></tr><tr><td>第八章 训练模块</td><td>可见</td><td>L4报告可能显示“训练模块暂缓”</td></tr><tr><td>第九章 总体建议</td><td>可见</td><td>家长与学生可执行的建议</td></tr><tr><td>咨询师内部备注、原始记录、纵向对比、质量警告</td><td>不可见</td><td>分享序列化时自动剔除</td></tr></tbody></table></div></div><h2 id="sec-8-3"><span class="h2-no">8.3</span><span class="h2-title">分享链接生命周期与使用注意</span></h2><p>当前分享二维码默认生成长期链接，适合家长会后长期查看。分享链接本身相当于访问凭证，任何拿到链接的人都能打开报告；不要把链接发到班级群、朋友圈或公开网页。</p><p>如链接误发或需要停止访问，联系系统管理员撤销该分享链接。撤销后旧链接和旧二维码都会失效，需要重新生成。</p><aside class="callout"><b>分享前检查</b><p>报告已审核通过，受测者信息与报告编号对应正确。</p><p>当前模式为“家长/学生版”，没有把咨询师完整版PDF或截图发出。</p><p>分享链接中的主机地址能被家长手机访问；127.0.0.1 只能本机访问。</p><p>家长已知晓报告是发展性评估参考，不用于临床诊断、分班或评优。</p></aside><section class="chapter" id="sec-9"><header class="chapter-head"><div class="chapter-no">09</div><div><div class="chapter-kicker">CHAPTER 09 / INTERNAL MANUAL</div><h1>常见问题与故障处理</h1><p class="chapter-summary">按登录、后台、学生测评、报告和分享分类的排查表。</p></div></header><div class="chapter-index"><a href="#sec-9-1">9.1 登录类问题</a><a href="#sec-9-2">9.2 后台操作类问题</a><a href="#sec-9-3">9.3 学生测评与报告类问题</a><a href="#sec-9-4">9.4 分享类问题</a></div><h2 id="sec-9-1"><span class="h2-no">9.1</span><span class="h2-title">登录类问题</span></h2><div class="table-block"><p class="table-caption">表24　登录类问题排查</p><div class="table-wrap"><table><colgroup><col style="width:33.13%"><col style="width:32.50%"><col style="width:34.37%"></colgroup><thead><tr><th scope="col"><strong>现象</strong></th><th scope="col"><strong>可能原因</strong></th><th scope="col"><strong>处理</strong></th></tr></thead><tbody><tr><td>登录页反复提示账号或密码错误</td><td>账号输错、密码错误、账号未设置密码</td><td>核对账号；仍失败时由超级管理员检查密码设置并重置</td></tr><tr><td>工作台提示“请输入账号和密码”</td><td>账号或密码为空</td><td>补齐学生账号和密码后重试</td></tr><tr><td>工作台提示“学生账号或密码错误”</td><td>账号输错、密码错误、账号未设置密码、账号已停用</td><td>核对账号；仍失败时联系心理老师或管理员重置密码、检查账号状态</td></tr><tr><td>账号被锁定15分钟</td><td>连续5次密码错误</td><td>等待锁定结束；紧急情况下由管理员重置密码</td></tr><tr><td>登录后马上回到登录页</td><td>会话过期、账号被停用、管理员撤销会话</td><td>重新登录；仍失败时检查账号状态</td></tr><tr><td>学生账号不能登录后台</td><td>学生访问了教职员工后台</td><td>学生从 /workbench 登录；不要用学生账号进入后台</td></tr><tr><td>教师或咨询师账号不能登录工作台</td><td>工作台仅面向学生账号</td><td>教职员工从 /admin 登录；不要把后台账号交给学生使用</td></tr><tr><td>学生账号无法进入工作台</td><td>账号角色不是“受测学生”、未设置密码或账号停用</td><td>管理员核对角色、设置密码并确认状态为启用</td></tr><tr><td>咨询师看不到“用户与角色”</td><td>角色权限限制</td><td>账号管理由超级管理员完成</td></tr></tbody></table></div></div><h2 id="sec-9-2"><span class="h2-no">9.2</span><span class="h2-title">后台操作类问题</span></h2><div class="table-block"><p class="table-caption">表25　后台操作问题排查</p><div class="table-wrap"><table><colgroup><col style="width:33.13%"><col style="width:30.63%"><col style="width:36.24%"></colgroup><thead><tr><th scope="col"><strong>现象</strong></th><th scope="col"><strong>可能原因</strong></th><th scope="col"><strong>处理</strong></th></tr></thead><tbody><tr><td>页面显示旧版界面</td><td>浏览器缓存旧HTML</td><td>按 Ctrl+F5 强制刷新；仍无效时关闭标签页重新打开</td></tr><tr><td>用户列表没有刚新增的人</td><td>筛选条件限制了列表</td><td>把角色筛选恢复“全部角色”、状态恢复“全部状态”，清除搜索词</td></tr><tr><td>删除用户失败</td><td>试图删除当前登录账号，或账号已被删除</td><td>当前账号不能删除；刷新列表确认账号是否存在</td></tr><tr><td>生成二维码按钮不可用</td><td>报告尚未审核通过</td><td>先在审核页点击“审核通过”，再生成二维码</td></tr><tr><td>复制分享链接失败</td><td>浏览器不允许剪贴板访问</td><td>手动长按/选择二维码区域保存，或从二维码弹窗复制</td></tr><tr><td>报告状态显示“待修订”</td><td>保存过修订草稿或退回修订</td><td>继续修订后重新审核通过</td></tr></tbody></table></div></div><h2 id="sec-9-3"><span class="h2-no">9.3</span><span class="h2-title">学生测评与报告类问题</span></h2><div class="table-block"><p class="table-caption">表26　学生测评与报告问题排查</p><div class="table-wrap"><table><colgroup><col style="width:34.37%"><col style="width:31.25%"><col style="width:34.38%"></colgroup><thead><tr><th scope="col"><strong>现象</strong></th><th scope="col"><strong>可能原因</strong></th><th scope="col"><strong>处理</strong></th></tr></thead><tbody><tr><td>工作台提示“请先登录”或自动回到登录页</td><td>会话过期、账号停用、未登录</td><td>使用学生账号重新登录；仍失败时联系心理老师或管理员检查账号状态</td></tr><tr><td>学生身份卡显示“未设置”</td><td>账号缺少学号，或年级/班级未维护</td><td>管理员在“用户与角色”中补齐学生编号、年级和班级后，学生重新登录</td></tr><tr><td>学生想改姓名或班级但改不了</td><td>学生端身份信息为只读</td><td>联系心理老师或管理员在后台修改账号信息，学生端不能自行修改</td></tr><tr><td>工作台3D画面空白或不显示</td><td>浏览器WebGL/显卡加速异常</td><td>使用最新Chrome/Edge；关闭占用显卡的其他页面后刷新</td></tr><tr><td>点“完成并提交”无法进入下一步</td><td>沙盘里还没有沙具，或未选代表沙具</td><td>先放入至少1件沙具，再选择代表沙具</td></tr><tr><td>“提交本次作品”按钮不可用</td><td>描述不足10字或未勾选知情同意</td><td>补足描述并勾选知情同意后重试</td></tr><tr><td>提交失败</td><td>网络中断、服务异常、图片上传失败</td><td>不要刷新；先保存高清作品图，再联系心理老师处理</td></tr><tr><td>提交后看不到报告内容</td><td>学生端按设计只显示提交回执</td><td>属于正常权限边界；需要了解结果时按学校安排与心理老师沟通</td></tr><tr><td>后台看不到刚提交的作品</td><td>报告仍在生成、筛选条件限制或学生提交失败</td><td>先刷新审核队列；确认学生是否看到“作品已提交”回执</td></tr><tr><td>报告打开后显示“报告尚未加载”</td><td>地址缺少report_id或分享令牌失效</td><td>从后台“完整报告”或有效分享链接重新打开</td></tr><tr><td>PDF导出失败</td><td>html2pdf依赖未加载、网络不稳</td><td>检查网络后重试；也可先用浏览器“打印”另存为PDF</td></tr><tr><td>家长扫码打不开</td><td>二维码地址是127.0.0.1/8000等本机地址</td><td>联系管理员配置手机可访问的域名或局域网地址</td></tr><tr><td>报告图片不显示</td><td>图片尚未加载完或媒体路径异常</td><td>等待加载、刷新后重试；仍异常时联系运维检查媒体目录</td></tr></tbody></table></div></div><h2 id="sec-9-4"><span class="h2-no">9.4</span><span class="h2-title">分享类问题</span></h2><div class="table-block"><p class="table-caption">表27　分享类问题排查</p><div class="table-wrap"><table><colgroup><col style="width:34.37%"><col style="width:33.13%"><col style="width:32.50%"></colgroup><thead><tr><th scope="col"><strong>现象</strong></th><th scope="col"><strong>原因</strong></th><th scope="col"><strong>处理</strong></th></tr></thead><tbody><tr><td>分享页看不到风险章节</td><td>家长/学生版按设计隐藏风险研判</td><td>属于正常隐私保护；需要风险信息时由咨询师在内部沟通</td></tr><tr><td>分享页提示链接不存在或已撤回</td><td>链接被撤销、令牌错误、报告已删除</td><td>重新生成分享链接；确认报告仍存在</td></tr><tr><td>分享页提示链接已过期</td><td>分享链接设置了有效期</td><td>重新生成二维码或联系管理员延长有效期</td></tr><tr><td>二维码扫描后进入空白页</td><td>地址不可访问或报告尚未加载完</td><td>先在本机打开链接验证；检查服务器地址和网络</td></tr><tr><td>L4报告家长版出现沟通提示</td><td>系统对重点关护报告的保护提示</td><td>由心理老师按学校流程与家长沟通，不要让家长单独解读</td></tr></tbody></table></div></div><section class="chapter" id="sec-10"><header class="chapter-head"><div class="chapter-no">10</div><div><div class="chapter-kicker">CHAPTER 10 / INTERNAL MANUAL</div><h1>安全规范与日常检查</h1><p class="chapter-summary">账号、密码、心理数据和日常检查的底线要求。</p></div></header><div class="chapter-index"><a href="#sec-10-1">10.1 账号与密码</a><a href="#sec-10-2">10.2 心理数据与分享</a><a href="#sec-10-3">10.3 日常检查清单</a></div><h2 id="sec-10-1"><span class="h2-no">10.1</span><span class="h2-title">账号与密码</span></h2><p>账号实行一人一号。超级管理员账号只保留必要数量，不与其他角色共用；学生账号只发给学生本人，教师和咨询师不得借用学生账号进入工作台。离职、调岗、长期请假或发现异常登录时，先停用账号，再按流程处理。</p><p>密码只在本人和管理员之间当面或通过受控方式传递，不得写在纸质公告、群公告、共享表格或聊天记录中。发现密码可能泄露时，立即重置并停用旧会话。</p><p>使用公共电脑或借用设备时，操作结束必须退出登录：后台点右上角“退出”，学生工作台点顶部“退出”。不要让浏览器保存密码，不要勾选“记住密码”。</p><h2 id="sec-10-2"><span class="h2-no">10.2</span><span class="h2-title">心理数据与分享</span></h2><p>沙盘作品、学生自述、文字补充和报告都属于敏感心理数据。只能在授权工作场景中使用，不得公开发布、不得用于与评估无关的排名、分班或评优。</p><p>学生提交后，作品与文字进入后台，由心理老师查看和审核。学生端不展示风险判断或临床结论；分享前确认对象是家长本人或受测学生本人，不要把分享链接转发给无关人员。</p><p>需要截图或导出PDF用于督导、培训时，先去除姓名、学号、班级等可识别信息，并确认接收方的保密义务。</p><h2 id="sec-10-3"><span class="h2-no">10.3</span><span class="h2-title">日常检查清单</span></h2><div class="table-block"><p class="table-caption">表28　账户与系统日常检查清单</p><div class="table-wrap"><table><colgroup><col style="width:15.00%"><col style="width:52.50%"><col style="width:32.50%"></colgroup><thead><tr><th scope="col"><strong>周期</strong></th><th scope="col"><strong>检查项</strong></th><th scope="col"><strong>处理标准</strong></th></tr></thead><tbody><tr><td>每日</td><td>工作概览的待审核数量、重点关护名单</td><td>当天新增的待审核报告进入队列；L2及以上有明确跟进人</td></tr><tr><td>每日</td><td>账号锁定与异常登录</td><td>确认“密码错误已锁定”账号是否为本人操作；异常账号先停用</td></tr><tr><td>每周</td><td>未设置密码账号、停用账号、离职账号</td><td>应开通的开通，应停用的停用，应删除的完成交接后删除</td></tr><tr><td>每周</td><td>分享链接数量与使用情况</td><td>确认链接对应报告和接收对象；不再需要的链接联系管理员撤销</td></tr><tr><td>每月</td><td>角色与部门信息</td><td>核对咨询师、班主任、学生角色是否与实际岗位一致</td></tr><tr><td>每月</td><td>浏览器与服务可用性</td><td>清理旧缓存；确认健康检查返回正常；保留运维联系方式</td></tr></tbody></table></div></div><section class="chapter" id="sec-a"><header class="chapter-head"><div class="chapter-no">A</div><div><div class="chapter-kicker">APPENDIX A / INTERNAL MANUAL</div><h1>账号开通与变更登记表</h1><p class="chapter-summary">线下登记账号开通、调岗、停用和删除，不记录明文密码。</p></div></header><p>本表用于线下登记账号开通、调岗、停用和删除，不记录明文密码。密码通过当面或受控方式交付。</p><div class="table-block"><p class="table-caption">表29　账号开通与变更登记表（可复制使用）</p><div class="table-wrap"><table><colgroup><col style="width:4.94%"><col style="width:9.89%"><col style="width:14.29%"><col style="width:12.09%"><col style="width:14.29%"><col style="width:8.79%"><col style="width:8.79%"><col style="width:10.44%"><col style="width:8.79%"><col style="width:7.69%"></colgroup><thead><tr><th scope="col"><strong>序号</strong></th><th scope="col"><strong>姓名</strong></th><th scope="col"><strong>账号</strong></th><th scope="col"><strong>角色</strong></th><th scope="col"><strong>部门/学段</strong></th><th scope="col"><strong>年级/班级</strong></th><th scope="col"><strong>学号</strong></th><th scope="col"><strong>交付方式</strong></th><th scope="col"><strong>日期</strong></th><th scope="col"><strong>经办人</strong></th></tr></thead><tbody><tr><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>当面/受控方式</td><td>&#160;</td><td>&#160;</td></tr><tr><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>当面/受控方式</td><td>&#160;</td><td>&#160;</td></tr><tr><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>当面/受控方式</td><td>&#160;</td><td>&#160;</td></tr><tr><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>当面/受控方式</td><td>&#160;</td><td>&#160;</td></tr><tr><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>当面/受控方式</td><td>&#160;</td><td>&#160;</td></tr><tr><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>当面/受控方式</td><td>&#160;</td><td>&#160;</td></tr></tbody></table></div></div><section class="chapter" id="sec-b"><header class="chapter-head"><div class="chapter-no">B</div><div><div class="chapter-kicker">APPENDIX B / INTERNAL MANUAL</div><h1>系统操作速查表</h1><p class="chapter-summary">把高频任务压缩成一张可打印的速查表。</p></div></header><div class="table-block"><p class="table-caption">表30　系统操作速查</p><div class="table-wrap"><table><colgroup><col style="width:25.62%"><col style="width:33.75%"><col style="width:40.63%"></colgroup><thead><tr><th scope="col"><strong>我要做什么</strong></th><th scope="col"><strong>从哪里进入</strong></th><th scope="col"><strong>关键步骤</strong></th></tr></thead><tbody><tr><td>登录后台</td><td>/admin</td><td>输账号密码 → 登录 → 工作概览 → 首次改密</td></tr><tr><td>管理账号</td><td>后台 → 用户与角色</td><td>新增/编辑 → 选角色 → 设密码 → 启停/删除</td></tr><tr><td>建学生账号</td><td>后台 → 用户与角色 → 新增用户</td><td>角色选“受测学生” → 填年级/班级/学号 → 设密码 → 受控交付</td></tr><tr><td>学生做一次测评</td><td>/workbench</td><td>学生账号登录 → 确认信息 → 摆沙具/塑形 → 完成并提交 → 选代表沙具 → 写描述 → 提交</td></tr><tr><td>审核报告</td><td>后台 → 报告审核</td><td>筛选 → 打开报告 → 核对 → 写意见 → 退回/通过</td></tr><tr><td>生成分享二维码</td><td>审核页或报告查看器</td><td>确认已通过 → 生成二维码 → 复制链接/让家长扫码</td></tr><tr><td>查看完整报告</td><td>后台审核页</td><td>点击“完整报告” → 咨询师完整版</td></tr><tr><td>发给家长</td><td>报告查看器 → 分享二维码</td><td>确认家长/学生版 → 生成/扫码 → 不公开传播</td></tr><tr><td>排查服务是否在线</td><td>/api/v1/health</td><td>浏览器打开应返回 status: ok</td></tr></tbody></table></div></div><section class="chapter" id="sec-c"><header class="chapter-head"><div class="chapter-no">C</div><div><div class="chapter-kicker">APPENDIX C / INTERNAL MANUAL</div><h1>版本记录</h1><p class="chapter-summary">记录手册版本与后续修订。</p></div></header><div class="table-block"><p class="table-caption">表31　文档版本记录</p><div class="table-wrap"><table><colgroup><col style="width:14.38%"><col style="width:20.00%"><col style="width:53.13%"><col style="width:12.49%"></colgroup><thead><tr><th scope="col"><strong>版本</strong></th><th scope="col"><strong>日期</strong></th><th scope="col"><strong>修订内容</strong></th><th scope="col"><strong>编制/修订</strong></th></tr></thead><tbody><tr><td>V1.2</td><td>2026-11-22</td><td>重新定位沙盘工作台：从教职员工共用入口改为学生测评入口；后台与工作台账号分离；补充学生账号创建、只读身份、提交回执与学生快速指引；更新登录截图与权限说明</td><td>平台管理中心</td></tr><tr><td>V1.1</td><td>2026-11-22</td><td>补充沙盘工作台账号登录说明（已废止）：工作台与后台共用教职员工账号，账号仅由超级管理员创建；更新登录截图、操作步骤和故障排查</td><td>平台管理中心</td></tr><tr><td>V1.0</td><td>2026-11-22</td><td>首次发布：账户登录、用户与角色管理、沙盘工作台、报告审核、报告查看器、家长/学生分享页操作说明</td><td>平台管理中心</td></tr><tr><td>&#160;</td><td>&#160;</td><td>&#160;</td><td>&#160;</td></tr></tbody></table></div></div><p>版本记录用于追踪操作规则和界面变化。系统功能调整后，应同步更新本手册并在版本记录中登记。</p><section class="chapter" id="sec-d"><header class="chapter-head"><div class="chapter-no">D</div><div><div class="chapter-kicker">APPENDIX D / INTERNAL MANUAL</div><h1>学生测评快速指引（可单独打印）</h1><p class="chapter-summary">可单独打印给学生：登录、完成、提交、退出四步。</p></div></header><div class="chapter-index"><a href="#sec-d-1">D.1 开始前</a><a href="#sec-d-2">D.2 四步完成测评</a><a href="#sec-d-3">D.3 离开前</a></div><p>这份指引给学生本人看。你只需要完成一次沙盘，并在结束时提交给学校心理老师。</p><h2 id="sec-d-1"><span class="h2-no">D.1</span><span class="h2-title">开始前</span></h2><p>使用学校发给你的学生账号和密码登录测评入口。账号只能本人使用，不要借给同学。登录后先确认姓名、学号和班级是否正确；如果有误，告诉心理老师，不需要自己修改。</p><h2 id="sec-d-2"><span class="h2-no">D.2</span><span class="h2-title">四步完成测评</span></h2><div class="table-block"><p class="table-caption">表32　学生测评四步</p><div class="table-wrap"><table><colgroup><col style="width:7.87%"><col style="width:50.56%"><col style="width:41.57%"></colgroup><thead><tr><th scope="col"><strong>步骤</strong></th><th scope="col"><strong>你要做什么</strong></th><th scope="col"><strong>看到什么</strong></th></tr></thead><tbody><tr><td>1</td><td>打开测评入口，输入学生账号和密码，点击“开始测评”</td><td>进入“学生心理沙盘测评”</td></tr><tr><td>2</td><td>按自己的想法摆放沙具、堆沙、挖水；想调整就撤销或重做</td><td>中部是3D沙盘，右侧是沙具抽屉</td></tr><tr><td>3</td><td>点击“完成并提交”，选一件最能代表此刻的你、最像你的沙具</td><td>进入“SUBMIT WORK / 作品提交”</td></tr><tr><td>4</td><td>写一段沙盘描述（不少于10字），勾选知情同意，点击“提交本次作品”</td><td>看到“作品已提交”和提交编号</td></tr></tbody></table></div></div><aside class="callout"><b>提交后你会看到什么</b><p>你会看到提交时间、短编号、作品图，以及沙具数、占用区域、中心区域沙具三项统计。</p><p>工作台不会向你展示风险判断或临床结论。需要进一步沟通时，心理老师会另行联系你。</p><p>如果提交失败，先保存高清作品图，再告诉心理老师，不要反复刷新页面。</p></aside><h2 id="sec-d-3"><span class="h2-no">D.3</span><span class="h2-title">离开前</span></h2><p>如果使用的是学校公共电脑，提交完成后点击顶部“退出”，确认回到登录页再离开。不要把自己的账号密码留在纸上、桌面上或聊天记录里。</p>
+    </div>
+  </div>
+</main>
+    <footer class="page-foot">
+      <div><b>心理沙盘系统 · 账户管理与全系统操作手册 V1.0</b><br>本地部署版 · 编制日期 2026-11-22 · 内部资料</div>
+      <div>服务地址 <code>http://127.0.0.1:8011</code><br><a href="/api/v1/health" target="_blank" rel="noopener">服务健康检查</a></div>
+    </footer>
+  </div>
+</main>
+
+<button class="to-top" id="toTop" type="button" aria-label="回到顶部">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+</button>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="查看大图">
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="关闭大图">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:18px;height:18px"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+  </button>
+  <img id="lightboxImage" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const body = document.body;
+  const sidebar = document.getElementById("sidebar");
+  const scrim = document.getElementById("scrim");
+  const menuToggle = document.getElementById("menuToggle");
+  const topSearch = document.getElementById("manualSearch");
+  const searchResults = document.getElementById("searchResults");
+  const printBtn = document.getElementById("printBtn");
+  const toTop = document.getElementById("toTop");
+  const toastEl = document.getElementById("toast");
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImage = document.getElementById("lightboxImage");
+  const lightboxCaption = document.getElementById("lightboxCaption");
+  const lightboxClose = document.getElementById("lightboxClose");
+
+  let toastTimer = null;
+
+  function showToast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add("is-visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toastEl.classList.remove("is-visible");
+    }, 2200);
+  }
+
+  function closeDrawer() {
+    sidebar.classList.remove("is-open");
+    scrim.classList.remove("is-open");
+    menuToggle.setAttribute("aria-expanded", "false");
+    body.style.overflow = "";
+  }
+
+  function openDrawer() {
+    sidebar.classList.add("is-open");
+    scrim.classList.add("is-open");
+    menuToggle.setAttribute("aria-expanded", "true");
+    if (window.innerWidth < 900) body.style.overflow = "hidden";
+  }
+
+  menuToggle.addEventListener("click", function () {
+    if (sidebar.classList.contains("is-open")) closeDrawer();
+    else openDrawer();
+  });
+  scrim.addEventListener("click", closeDrawer);
+  window.addEventListener("resize", function () {
+    if (window.innerWidth >= 900) closeDrawer();
+  });
+  sidebar.querySelectorAll("a").forEach(function (link) {
+    link.addEventListener("click", function () {
+      if (window.innerWidth < 900) closeDrawer();
+    });
+  });
+
+  printBtn.addEventListener("click", function () {
+    window.print();
+  });
+
+  /* ===== 章节目录与当前章节 ===== */
+  const navGroups = Array.prototype.slice.call(document.querySelectorAll(".nav-group"));
+  const chapters = Array.prototype.slice.call(document.querySelectorAll("section.chapter"));
+  const subLinks = Array.prototype.slice.call(document.querySelectorAll(".nav-sub a"));
+
+  function setActiveChapter(id) {
+    navGroups.forEach(function (group) {
+      const isActive = group.getAttribute("data-target") === id;
+      group.classList.toggle("is-active", isActive);
+      if (isActive) {
+        const activeLink = group.querySelector(".nav-chapter");
+        if (activeLink) activeLink.setAttribute("aria-current", "true");
+      } else {
+        const activeLink = group.querySelector(".nav-chapter");
+        if (activeLink) activeLink.removeAttribute("aria-current");
+      }
+    });
+  }
+
+  if ("IntersectionObserver" in window) {
+    const chapterObserver = new IntersectionObserver(function (entries) {
+      const visible = entries.filter(function (entry) { return entry.isIntersecting; });
+      if (visible.length) {
+        visible.sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; });
+        setActiveChapter(visible[0].target.id);
+      }
+    }, { rootMargin: "-88px 0px -66% 0px", threshold: [0.1, 0.35, 0.6] });
+    chapters.forEach(function (chapter) { chapterObserver.observe(chapter); });
+
+    const headingObserver = new IntersectionObserver(function (entries) {
+      const visible = entries.filter(function (entry) { return entry.isIntersecting; });
+      if (visible.length) {
+        const id = visible[0].target.id;
+        subLinks.forEach(function (link) {
+          link.classList.toggle("is-current", link.getAttribute("href") === "#" + id);
+        });
+      }
+    }, { rootMargin: "-92px 0px -72% 0px", threshold: [0.1, 0.4] });
+    document.querySelectorAll("h2[id]").forEach(function (heading) { headingObserver.observe(heading); });
+  } else {
+    setActiveChapter(chapters.length ? chapters[0].id : "");
+  }
+
+  /* ===== 搜索 ===== */
+  const searchIndex = chapters.map(function (chapter) {
+    const titleEl = chapter.querySelector("h1");
+    return {
+      id: chapter.id,
+      title: titleEl ? titleEl.textContent.trim() : chapter.id,
+      text: chapter.textContent.replace(/\s+/g, " ")
+    };
+  });
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, function (char) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char];
+    });
+  }
+
+  function snippetFor(text, needle) {
+    const lower = text.toLowerCase();
+    const idx = lower.indexOf(needle.toLowerCase());
+    if (idx < 0) return text.slice(0, 72) + "…";
+    const start = Math.max(0, idx - 24);
+    const end = Math.min(text.length, idx + needle.length + 44);
+    return (start > 0 ? "…" : "") + text.slice(start, end) + (end < text.length ? "…" : "");
+  }
+
+  function hideSearch() {
+    searchResults.hidden = true;
+  }
+
+  function renderSearch() {
+    const query = topSearch.value.trim();
+    if (query.length < 2) { hideSearch(); return; }
+    const matches = searchIndex
+      .filter(function (item) { return item.text.toLowerCase().indexOf(query.toLowerCase()) >= 0; })
+      .slice(0, 8);
+    if (!matches.length) {
+      searchResults.innerHTML = '<div class="search-empty">没有找到“' + escapeHtml(query) + '”。可以换一个更短的词，或直接浏览左侧目录。</div>';
+      searchResults.hidden = false;
+      return;
+    }
+    let html = '<div class="search-head">找到 ' + matches.length + ' 个相关章节</div>';
+    matches.forEach(function (item) {
+      html += '<a class="search-item" href="#' + item.id + '"><b>' + escapeHtml(item.title) + '</b><span>' + escapeHtml(snippetFor(item.text, query)) + '</span></a>';
+    });
+    searchResults.innerHTML = html;
+    searchResults.hidden = false;
+  }
+
+  topSearch.addEventListener("input", renderSearch);
+  topSearch.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      const first = searchResults.querySelector("a");
+      if (first) { first.click(); hideSearch(); topSearch.blur(); }
+    }
+    if (event.key === "Escape") { hideSearch(); topSearch.blur(); }
+  });
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest(".top-search")) hideSearch();
+  });
+  searchResults.addEventListener("click", function (event) {
+    if (event.target.closest("a")) hideSearch();
+  });
+
+  /* ===== 图片放大 ===== */
+  let lastTrigger = null;
+
+  function openLightbox(button) {
+    lastTrigger = button;
+    const img = button.querySelector("img");
+    if (!img) return;
+    lightboxImage.src = img.currentSrc || img.src;
+    lightboxImage.alt = img.alt || "";
+    lightboxCaption.textContent = img.alt || "";
+    lightbox.classList.add("is-open");
+    body.style.overflow = "hidden";
+    lightboxClose.focus();
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove("is-open");
+    lightboxImage.src = "";
+    body.style.overflow = "";
+    if (lastTrigger) lastTrigger.focus();
+  }
+
+  document.querySelectorAll("figure.shot button").forEach(function (button) {
+    button.addEventListener("click", function () { openLightbox(button); });
+  });
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", function (event) {
+    if (event.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
+  });
+
+  /* ===== 复制路径 ===== */
+  document.querySelectorAll("[data-copy]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const value = button.getAttribute("data-copy");
+      const done = function () { showToast("已复制地址：" + value); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(value).then(done).catch(function () {
+          showToast("复制失败，请手动选择地址。");
+        });
+      } else {
+        showToast("当前浏览器不支持自动复制，请手动选择地址。");
+      }
+    });
+  });
+
+  /* ===== 回到顶部 ===== */
+  function updateToTop() {
+    toTop.classList.toggle("is-visible", window.scrollY > 560);
+  }
+  window.addEventListener("scroll", updateToTop, { passive: true });
+  updateToTop();
+  toTop.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+})();
+</script>
+</body>
+</html>

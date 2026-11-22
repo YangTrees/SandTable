@@ -1,0 +1,249 @@
+    <footer class="page-foot">
+      <div><b>心理沙盘系统 · 账户管理与全系统操作手册 V1.0</b><br>本地部署版 · 编制日期 2026-11-22 · 内部资料</div>
+      <div>服务地址 <code>http://127.0.0.1:8011</code><br><a href="/api/v1/health" target="_blank" rel="noopener">服务健康检查</a></div>
+    </footer>
+  </div>
+</main>
+
+<button class="to-top" id="toTop" type="button" aria-label="回到顶部">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+</button>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="查看大图">
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="关闭大图">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:18px;height:18px"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+  </button>
+  <img id="lightboxImage" src="" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const body = document.body;
+  const sidebar = document.getElementById("sidebar");
+  const scrim = document.getElementById("scrim");
+  const menuToggle = document.getElementById("menuToggle");
+  const topSearch = document.getElementById("manualSearch");
+  const searchResults = document.getElementById("searchResults");
+  const printBtn = document.getElementById("printBtn");
+  const toTop = document.getElementById("toTop");
+  const toastEl = document.getElementById("toast");
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImage = document.getElementById("lightboxImage");
+  const lightboxCaption = document.getElementById("lightboxCaption");
+  const lightboxClose = document.getElementById("lightboxClose");
+
+  let toastTimer = null;
+
+  function showToast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add("is-visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toastEl.classList.remove("is-visible");
+    }, 2200);
+  }
+
+  function closeDrawer() {
+    sidebar.classList.remove("is-open");
+    scrim.classList.remove("is-open");
+    menuToggle.setAttribute("aria-expanded", "false");
+    body.style.overflow = "";
+  }
+
+  function openDrawer() {
+    sidebar.classList.add("is-open");
+    scrim.classList.add("is-open");
+    menuToggle.setAttribute("aria-expanded", "true");
+    if (window.innerWidth < 900) body.style.overflow = "hidden";
+  }
+
+  menuToggle.addEventListener("click", function () {
+    if (sidebar.classList.contains("is-open")) closeDrawer();
+    else openDrawer();
+  });
+  scrim.addEventListener("click", closeDrawer);
+  window.addEventListener("resize", function () {
+    if (window.innerWidth >= 900) closeDrawer();
+  });
+  sidebar.querySelectorAll("a").forEach(function (link) {
+    link.addEventListener("click", function () {
+      if (window.innerWidth < 900) closeDrawer();
+    });
+  });
+
+  printBtn.addEventListener("click", function () {
+    window.print();
+  });
+
+  /* ===== 章节目录与当前章节 ===== */
+  const navGroups = Array.prototype.slice.call(document.querySelectorAll(".nav-group"));
+  const chapters = Array.prototype.slice.call(document.querySelectorAll("section.chapter"));
+  const subLinks = Array.prototype.slice.call(document.querySelectorAll(".nav-sub a"));
+
+  function setActiveChapter(id) {
+    navGroups.forEach(function (group) {
+      const isActive = group.getAttribute("data-target") === id;
+      group.classList.toggle("is-active", isActive);
+      if (isActive) {
+        const activeLink = group.querySelector(".nav-chapter");
+        if (activeLink) activeLink.setAttribute("aria-current", "true");
+      } else {
+        const activeLink = group.querySelector(".nav-chapter");
+        if (activeLink) activeLink.removeAttribute("aria-current");
+      }
+    });
+  }
+
+  if ("IntersectionObserver" in window) {
+    const chapterObserver = new IntersectionObserver(function (entries) {
+      const visible = entries.filter(function (entry) { return entry.isIntersecting; });
+      if (visible.length) {
+        visible.sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; });
+        setActiveChapter(visible[0].target.id);
+      }
+    }, { rootMargin: "-88px 0px -66% 0px", threshold: [0.1, 0.35, 0.6] });
+    chapters.forEach(function (chapter) { chapterObserver.observe(chapter); });
+
+    const headingObserver = new IntersectionObserver(function (entries) {
+      const visible = entries.filter(function (entry) { return entry.isIntersecting; });
+      if (visible.length) {
+        const id = visible[0].target.id;
+        subLinks.forEach(function (link) {
+          link.classList.toggle("is-current", link.getAttribute("href") === "#" + id);
+        });
+      }
+    }, { rootMargin: "-92px 0px -72% 0px", threshold: [0.1, 0.4] });
+    document.querySelectorAll("h2[id]").forEach(function (heading) { headingObserver.observe(heading); });
+  } else {
+    setActiveChapter(chapters.length ? chapters[0].id : "");
+  }
+
+  /* ===== 搜索 ===== */
+  const searchIndex = chapters.map(function (chapter) {
+    const titleEl = chapter.querySelector("h1");
+    return {
+      id: chapter.id,
+      title: titleEl ? titleEl.textContent.trim() : chapter.id,
+      text: chapter.textContent.replace(/\s+/g, " ")
+    };
+  });
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, function (char) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char];
+    });
+  }
+
+  function snippetFor(text, needle) {
+    const lower = text.toLowerCase();
+    const idx = lower.indexOf(needle.toLowerCase());
+    if (idx < 0) return text.slice(0, 72) + "…";
+    const start = Math.max(0, idx - 24);
+    const end = Math.min(text.length, idx + needle.length + 44);
+    return (start > 0 ? "…" : "") + text.slice(start, end) + (end < text.length ? "…" : "");
+  }
+
+  function hideSearch() {
+    searchResults.hidden = true;
+  }
+
+  function renderSearch() {
+    const query = topSearch.value.trim();
+    if (query.length < 2) { hideSearch(); return; }
+    const matches = searchIndex
+      .filter(function (item) { return item.text.toLowerCase().indexOf(query.toLowerCase()) >= 0; })
+      .slice(0, 8);
+    if (!matches.length) {
+      searchResults.innerHTML = '<div class="search-empty">没有找到“' + escapeHtml(query) + '”。可以换一个更短的词，或直接浏览左侧目录。</div>';
+      searchResults.hidden = false;
+      return;
+    }
+    let html = '<div class="search-head">找到 ' + matches.length + ' 个相关章节</div>';
+    matches.forEach(function (item) {
+      html += '<a class="search-item" href="#' + item.id + '"><b>' + escapeHtml(item.title) + '</b><span>' + escapeHtml(snippetFor(item.text, query)) + '</span></a>';
+    });
+    searchResults.innerHTML = html;
+    searchResults.hidden = false;
+  }
+
+  topSearch.addEventListener("input", renderSearch);
+  topSearch.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      const first = searchResults.querySelector("a");
+      if (first) { first.click(); hideSearch(); topSearch.blur(); }
+    }
+    if (event.key === "Escape") { hideSearch(); topSearch.blur(); }
+  });
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest(".top-search")) hideSearch();
+  });
+  searchResults.addEventListener("click", function (event) {
+    if (event.target.closest("a")) hideSearch();
+  });
+
+  /* ===== 图片放大 ===== */
+  let lastTrigger = null;
+
+  function openLightbox(button) {
+    lastTrigger = button;
+    const img = button.querySelector("img");
+    if (!img) return;
+    lightboxImage.src = img.currentSrc || img.src;
+    lightboxImage.alt = img.alt || "";
+    lightboxCaption.textContent = img.alt || "";
+    lightbox.classList.add("is-open");
+    body.style.overflow = "hidden";
+    lightboxClose.focus();
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove("is-open");
+    lightboxImage.src = "";
+    body.style.overflow = "";
+    if (lastTrigger) lastTrigger.focus();
+  }
+
+  document.querySelectorAll("figure.shot button").forEach(function (button) {
+    button.addEventListener("click", function () { openLightbox(button); });
+  });
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", function (event) {
+    if (event.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
+  });
+
+  /* ===== 复制路径 ===== */
+  document.querySelectorAll("[data-copy]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const value = button.getAttribute("data-copy");
+      const done = function () { showToast("已复制地址：" + value); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(value).then(done).catch(function () {
+          showToast("复制失败，请手动选择地址。");
+        });
+      } else {
+        showToast("当前浏览器不支持自动复制，请手动选择地址。");
+      }
+    });
+  });
+
+  /* ===== 回到顶部 ===== */
+  function updateToTop() {
+    toTop.classList.toggle("is-visible", window.scrollY > 560);
+  }
+  window.addEventListener("scroll", updateToTop, { passive: true });
+  updateToTop();
+  toTop.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+})();
+</script>
+</body>
+</html>

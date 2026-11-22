@@ -1,26 +1,27 @@
 # SandTable · 心理沙盘 3D 工作台
 
-面向学校心理老师与咨询师的 3D 心理沙盘工作台：在浏览器中摆放沙具、塑造地形、记录制作过程与描述，提交后生成九章节发展性评估报告；咨询师在管理后台审核、修订并生成家长 / 学生分享页。
+面向学校心理测评场景的 3D 心理沙盘系统：学生使用学校发放的账号进入工作台，在浏览器中摆放沙具、塑造地形、记录制作过程与描述，完成后提交给心理老师；教职员工在管理后台审核、修订并生成家长 / 学生分享页。
 
 ## 功能
 
 - Three.js 3D 沙盘：固定 4:3（1200 × 900）沙箱，支持堆沙、挖沙、挖水、抚平、笔刷直径与力度、撤销 / 重做、沙具水平镜像
 - 500 件沙具库：按器物分类与子类检索，支持搜索、分类筛选和场景内微调
-- 工作台档案：学校、班级、座位号、联系方式、结构化成绩，以及学生姓名 / 学号 / 年级 / 性别；结构化成绩写入报告第四章，并注明“待与成绩单核对”
+- 工作台档案：学生登录后只读显示姓名、学号、学部 / 年级 / 班级；身份以账号为准，学生不能自行改档案
 - 制作过程记录：实时计时、过程快照（最多 6 张）、地形操作计数、空间关系、九宫格分布与留白估算
-- 收尾流程：选择代表沙具，填写沙盘描述、自我叙事与可选教师观察，确认后提交
+- 收尾流程：选择代表沙具，填写沙盘描述、自我像与可选补充；完成后提交给心理老师，学生端只显示提交回执
 - 九章节报告：整体概览、意象假设、六维方向、学业表现、风险研判、访谈建议、生涯优势、训练模块、总体建议
 - 认知维度证据门控：有自述 / 成绩 / 教师观察时不直接由空间分布推断学科能力；缺证时标注“理论假说·待核实”
 - 管理后台：报告范围筛选、评估统计、审核队列、AI 正文修订草稿、审核通过后生成分享二维码
 - 双版本报告：咨询师完整版与家长 / 学生脱敏版；风险章节仅咨询师可见
+- 入口隔离：`/admin` 只接受教职员工账号，`/workbench` 只接受学生账号；学生账号只能由超级管理员创建
 - Demo 报告显式标识，默认关闭（`ALLOW_DEMO_REPORT=false`）
 
 ## 技术结构
 
 - 前端：单文件 HTML，React UMD + Babel 运行时编译，Three.js 渲染，无构建步骤
 - 后端：FastAPI + SQLAlchemy，开发环境默认 SQLite（`backend/data/sandplay.db`）
-- 鉴权：管理接口统一使用共享请求头 `X-Counselor-Token`；当前版本不区分多角色会话
-- 数据库四表：`assessments / report_reviews / share_links / admin_users`
+- 鉴权：后台与工作台分别使用独立会话；`/api/v1/admin/*` 拒绝学生账号，`/api/v1/workbench/*` 只接受学生账号
+- 数据库表：`assessments / report_reviews / share_links / admin_users / admin_sessions`
 - 报告存储：评估正文在 `assessments.report_json`，AI 原稿与审核草稿在 `report_reviews`
 
 ## 目录
@@ -50,6 +51,7 @@ python -m venv .venv
 pip install -r requirements.txt
 Copy-Item .env.example .env
 # 编辑 .env，填入 MULTIMODAL_API_KEY 等配置
+# 首次建库前必须设置 ADMIN_INITIAL_PASSWORD，用于初始化首位超级管理员
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
@@ -66,16 +68,23 @@ python -m http.server 8765
 
 打开：
 
-- 工作台：`http://127.0.0.1:8765/sandplay_workbench_react.html`
-- 管理后台：`http://127.0.0.1:8765/admin_dashboard.html`
+- 学生测评入口：`http://127.0.0.1:8000/workbench`
+- 教职员工控制台：`http://127.0.0.1:8000/admin`
+- 操作手册：`http://127.0.0.1:8000/manual/`
 
-前端默认请求 `http://127.0.0.1:8000/api/v1`；后端需允许跨域访问。
+前端默认请求 `http://127.0.0.1:8000/api/v1`；通过 FastAPI 同源访问时使用当前站点地址。后端需允许跨域访问。
 
 ## 主要接口
 
-- `POST /api/v1/assessments`：创建工作台评估并生成报告
+- `POST /api/v1/workbench/login`：学生登录
+- `GET /api/v1/workbench/me`：学生当前会话
+- `POST /api/v1/workbench/logout`：学生退出
+- `POST /api/v1/assessments`：学生提交沙盘作品，只返回提交回执
 - `GET /api/v1/reports/{id}`：读取完整报告
 - `POST /api/v1/reports/{id}/share`：生成分享链接
+- `POST /api/v1/admin/login`：教职员工登录
+- `GET /api/v1/admin/me`：教职员工当前会话
+- `POST /api/v1/admin/logout`：教职员工退出
 - `GET /api/v1/admin/bootstrap`：后台初始化数据
 - `GET /api/v1/admin/reports`：报告列表，支持 `school / class_name / grade / date_from / date_to / status / q`
 - `GET /api/v1/admin/stats`：统计，支持同一组范围筛选
