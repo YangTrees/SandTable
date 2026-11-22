@@ -28,7 +28,7 @@ from .config import (
     UPLOAD_DIR,
 )
 from .db import SessionLocal, get_db, init_db
-from .models import Assessment, ShareLink
+from .models import Assessment, ReportReview, ShareLink
 from .report_engine import generate_report
 from .schemas import AssessmentPayload, ShareRequest
 from .utils import iso_utc, new_id, new_share_token, public_copy
@@ -158,6 +158,8 @@ def _assessment_summary(row: Assessment) -> dict[str, Any]:
         "student_no": row.student_no,
         "grade_level": row.grade_level,
         "gender": row.gender,
+        "school_name": getattr(row, "school_name", ""),
+        "class_name": getattr(row, "class_name", ""),
         "representative_item_id": row.representative_item_id,
         "representative_item_name": row.representative_item_name,
         "report_engine": row.report_engine,
@@ -207,6 +209,11 @@ async def create_assessment(
         student_name=payload_obj.student.name or "匿名受测者",
         grade_level=payload_obj.student.grade_level or "未填写",
         gender=payload_obj.student.gender or "未填写",
+        school_name=payload_obj.student.school_name,
+        class_name=payload_obj.student.class_name,
+        seat_no=payload_obj.student.seat_no,
+        contact_phone=payload_obj.student.contact_phone,
+        academic_scores_json=json.dumps(payload_obj.student.academic_scores or {}, ensure_ascii=False),
         representative_item_id=payload_obj.representative_item_id,
         representative_item_name=payload_obj.representative_item_name,
         sandplay_description=payload_obj.sandplay_description,
@@ -329,7 +336,16 @@ async def reanalyze_report(
 
     row.report_json = json.dumps(report, ensure_ascii=False)
     row.report_engine = engine
+    row.report_revision = 0
     row.status = "completed"
+    review = db.get(ReportReview, row.id)
+    if review:
+        review.status = "pending"
+        review.ai_report_json = None
+        review.draft_report_json = None
+        review.draft_note = ""
+        review.draft_updated_at = None
+        review.review_applied_at = None
     db.commit()
     db.refresh(row)
 

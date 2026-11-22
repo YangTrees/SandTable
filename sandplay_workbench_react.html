@@ -1408,7 +1408,358 @@
       .env-divider { height: 18px; margin: 0 1px; }
       .env-btn { min-width: 30px; padding: 0 7px; font-size: 10px; height: 28px; }
     }
-  </style>
+      /* ===== P1: 工作台结构、过程记录与审核修订 ===== */
+    .room-layer.dusk {
+      filter: blur(2.8px) saturate(.82) brightness(.82) sepia(.08);
+    }
+    .room-layer.dusk::after {
+      background: linear-gradient(180deg, rgba(236, 158, 105, .22), rgba(33, 38, 58, .42));
+      mix-blend-mode: soft-light;
+    }
+    .room-vignette.dusk {
+      background:
+        radial-gradient(68% 58% at 50% 44%, rgba(255, 183, 118, .12), rgba(15, 24, 42, .4)),
+        linear-gradient(180deg, rgba(84, 49, 58, .2), transparent 34%, rgba(9, 14, 25, .42));
+    }
+    .studio-app.dusk-mode .env-btn.active {
+      background: rgba(255, 192, 135, .2);
+      color: #ffe0c2;
+      border-color: rgba(255, 200, 150, .36);
+    }
+    @media (min-width: 1024px) {
+      .workspace {
+        position: absolute;
+        inset: 86px 18px 18px;
+        display: grid;
+        grid-template-columns: minmax(230px, 292px) minmax(0, 1fr) 264px;
+        gap: 14px;
+        padding: 0;
+        min-height: 0;
+        z-index: 10;
+      }
+      .rail-left,
+      .rail-right {
+        position: relative;
+        left: auto;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        width: auto;
+        max-height: none;
+        min-height: 0;
+        overflow: hidden;
+        z-index: 12;
+      }
+      .rail-left { order: 1; display: flex; flex-direction: column; min-height: 0; }
+      .stage {
+        position: relative;
+        inset: auto;
+        order: 2;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+      }
+      .rail-right { order: 3; overflow: auto; }
+      .wood-shell {
+        width: min(100%, calc((100vh - 218px) * 4 / 3));
+        height: auto;
+        aspect-ratio: 4 / 3;
+        max-height: 100%;
+        margin: auto;
+      }
+      .sand-canvas { height: 100%; min-height: 0; }
+      .specimen-grid { max-height: none; flex: 1; }
+    }
+    @media (max-width: 1023px) {
+      .wood-shell {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 3;
+        min-height: 0;
+      }
+      .sand-canvas { height: 100%; min-height: 0; }
+      .stage { min-height: 0; }
+      .session-topbar { position: relative; top: auto; left: auto; right: auto; margin-bottom: 10px; flex-wrap: wrap; }
+      .session-metrics { order: 3; width: 100%; justify-content: flex-start; }
+    }
+    .session-topbar {
+      position: relative;
+      top: auto;
+      left: auto;
+      right: auto;
+      z-index: 30;
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      flex: 0 0 auto;
+      pointer-events: none;
+    }
+    .session-topbar > * { pointer-events: auto; }
+    .testee-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 216px;
+      max-width: 300px;
+      padding: 9px 11px 9px 9px;
+      border: 1px solid rgba(255, 255, 255, .56);
+      border-radius: 999px 18px 18px 999px;
+      background: rgba(255, 255, 255, .48);
+      box-shadow: 0 10px 28px -18px rgba(25, 30, 34, .55);
+      backdrop-filter: blur(18px) saturate(1.4);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+    }
+    .testee-card:hover { background: rgba(255, 255, 255, .68); }
+    .testee-avatar {
+      width: 34px; height: 34px;
+      flex: 0 0 auto;
+      display: grid; place-items: center;
+      border-radius: 50%;
+      background: #1e2420;
+      color: #f6efe2;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .testee-copy { display: grid; gap: 2px; min-width: 0; }
+    .testee-copy strong { font-size: 12.5px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .testee-copy small { font-size: 10px; color: rgba(30, 30, 32, .58); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .testee-copy em { font-style: normal; font-size: 9.5px; color: rgba(30, 30, 32, .45); }
+    .testee-edit {
+      margin-left: auto;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(30, 30, 32, .07);
+      color: rgba(30, 30, 32, .62);
+      font-size: 9.5px;
+      white-space: nowrap;
+    }
+    .session-metrics {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      padding-top: 8px;
+    }
+    .session-metric {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .5);
+      background: rgba(255, 255, 255, .38);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: rgba(30, 30, 32, .7);
+      font-size: 9.5px;
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
+    .session-metric b { color: #111; font-family: "Inter", var(--sans); font-size: 11px; margin-right: 4px; }
+    .session-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .52);
+      background: rgba(255, 255, 255, .4);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .utility-btn {
+      height: 30px;
+      padding: 0 10px;
+      border: 1px solid rgba(30, 30, 32, .1);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .32);
+      color: rgba(30, 30, 32, .68);
+      font-size: 9.5px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .utility-btn:hover { background: rgba(255, 255, 255, .68); color: #111; }
+    .utility-btn.active { background: #202620; color: #fff8e9; border-color: #202620; }
+    .utility-btn.photo { position: relative; }
+    .utility-btn.pulse { animation: pulseGlow 1.4s ease-in-out infinite; }
+    @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } 50% { box-shadow: 0 0 0 4px rgba(255,255,255,.34); } }
+    .finish-top {
+      height: 36px;
+      padding: 0 13px;
+      border: 1px solid rgba(255, 255, 255, .55);
+      border-radius: 999px;
+      background: #202620;
+      color: #f8f1e5;
+      font-size: 10.5px;
+      font-weight: 650;
+      letter-spacing: .03em;
+      cursor: pointer;
+      box-shadow: 0 8px 22px -14px rgba(0, 0, 0, .7);
+    }
+    .finish-top:hover { background: #313a33; }
+    .asset-search {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 8px 0 7px;
+      padding: 0 9px;
+      border: 1px solid rgba(30, 30, 32, .12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .58);
+    }
+    .asset-search input {
+      width: 100%;
+      height: 30px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #1e1e20;
+      font-size: 10px;
+    }
+    .asset-search span { font-size: 11px; color: rgba(30, 30, 32, .4); }
+    .selected-panel {
+      margin-top: 8px;
+      padding: 9px;
+      border: 1px solid rgba(255, 255, 255, .55);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .36);
+    }
+    .selected-panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+    .selected-panel-head strong { font-size: 10.5px; color: #111; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .selected-panel-head small { font-size: 9px; color: rgba(30, 30, 32, .48); }
+    .selected-tools {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 5px;
+    }
+    .selected-tools button {
+      height: 28px;
+      border: 1px solid rgba(30, 30, 32, .1);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, .46);
+      color: rgba(30, 30, 32, .74);
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .selected-tools button:hover { background: rgba(255, 255, 255, .8); color: #111; }
+    .selected-tools .remove { color: #a44335; }
+    .brush-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .brush-row .micro-label { margin: 0; }
+    .brush-row .mono-value { font-size: 9px; }
+    .strength-steps {
+      display: flex;
+      gap: 4px;
+    }
+    .strength-steps button {
+      width: 23px; height: 23px;
+      border: 1px solid rgba(30, 30, 32, .12);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, .36);
+      color: rgba(30, 30, 32, .62);
+      font-size: 8px;
+      cursor: pointer;
+    }
+    .strength-steps button.active { background: #202620; color: #fff8e9; border-color: #202620; }
+    .profile-panel,
+    .help-panel,
+    .confirm-panel {
+      position: relative;
+      width: min(680px, calc(100vw - 32px));
+      max-height: calc(100vh - 40px);
+      overflow: auto;
+      border: 1px solid rgba(255, 255, 255, .62);
+      border-radius: 26px;
+      background: linear-gradient(155deg, rgba(255, 255, 255, .78), rgba(246, 241, 231, .64));
+      box-shadow: 0 42px 110px -46px rgba(24, 27, 31, .7);
+      backdrop-filter: blur(26px) saturate(1.3);
+      -webkit-backdrop-filter: blur(26px) saturate(1.3);
+      color: #1e1e20;
+      animation: finishRise .22s ease both;
+    }
+    .profile-body { padding: 14px 20px 8px; }
+    .profile-hint { margin: 6px 0 4px; color: rgba(30, 30, 32, .5); font-size: 9.5px; }
+    .student-fields { margin-top: 4px; }
+    .score-panel {
+      margin-top: 13px;
+      padding: 10px;
+      border: 1px solid rgba(30, 30, 32, .1);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, .36);
+    }
+    .score-panel-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .score-panel-head span { font-size: 10.5px; font-weight: 650; color: #111; }
+    .score-panel-head small { font-size: 9px; color: rgba(30, 30, 32, .48); }
+    .score-meta-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+    .score-subject-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; margin-top: 7px; }
+    .score-subject label { display: block; margin-bottom: 3px; font-size: 9px; color: rgba(30, 30, 32, .58); }
+    .score-subject input {
+      width: 100%; height: 31px;
+      border: 1px solid rgba(30, 30, 32, .13);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, .58);
+      padding: 0 7px;
+      font-size: 10px;
+      color: #1e1e20;
+    }
+    .help-body { padding: 12px 20px 20px; }
+    .help-row {
+      display: grid;
+      grid-template-columns: 82px minmax(0, 1fr);
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(30, 30, 32, .08);
+      font-size: 10.5px;
+      line-height: 1.7;
+    }
+    .help-row b { color: #111; }
+    .help-row span { color: rgba(30, 30, 32, .64); }
+    .help-note { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(30, 30, 32, .06); font-size: 9.5px; color: rgba(30, 30, 32, .58); }
+    .confirm-panel { width: min(420px, calc(100vw - 36px)); padding: 24px; text-align: center; }
+    .confirm-mark {
+      width: 44px; height: 44px;
+      display: grid; place-items: center;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      background: #f0d9cf;
+      color: #9d4a33;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .confirm-panel h2 { margin: 0 0 8px; font-size: 17px; color: #111; }
+    .confirm-panel p { margin: 0; color: rgba(30, 30, 32, .6); font-size: 10.5px; line-height: 1.7; }
+    .confirm-actions { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+    .finish-btn.danger { background: #9d4a33; border-color: #9d4a33; color: #fff8ee; }
+    @media (max-width: 1023px) {
+      .session-actions { flex-wrap: wrap; justify-content: flex-end; }
+      .session-topbar { align-items: stretch; }
+      .testee-card { max-width: none; flex: 1 1 100%; }
+      .score-meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .score-subject-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+</style>
 </head>
 <body>
   <div id="root"></div>
@@ -1417,7 +1768,7 @@
     const { useCallback, useEffect, useMemo, useRef, useState } = React;
     const h = React.createElement;
 
-    const WORLD = { width: 1200, depth: 760, segX: 160, segZ: 100 };
+    const WORLD = { width: 1200, depth: 900, segX: 160, segZ: 100 };
     const REPORT_API_BASE = (window.localStorage.getItem("sandplay_report_api") || "http://127.0.0.1:8000/api/v1").replace(/\/$/, "");
     const BACKEND_ORIGIN_PORTS = ["8000", "80", "443", ""];
     const REPORT_VIEWER_PAGE = (location.protocol.indexOf("http") === 0 && BACKEND_ORIGIN_PORTS.includes(location.port))
@@ -1472,6 +1823,64 @@
     const textureCache = new Map();
 
     function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+    function formatDuration(totalSeconds) {
+      const seconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+      const pad = (value) => String(value).padStart(2, "0");
+      return `${pad(Math.floor(seconds / 60))}:${pad(seconds % 60)}`;
+    }
+    function downscaleDataUrl(dataUrl, maxWidth = 960, quality = 0.78) {
+      return new Promise((resolve) => {
+        if (!dataUrl) { resolve(""); return; }
+        const image = new Image();
+        image.onload = () => {
+          const ratio = Math.min(1, maxWidth / image.width);
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(image.width * ratio);
+          canvas.height = Math.round(image.height * ratio);
+          const context = canvas.getContext("2d");
+          context.fillStyle = "#eee7db";
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        image.onerror = () => resolve(dataUrl);
+        image.src = dataUrl;
+      });
+    }
+    function createDefaultProfile() {
+      return {
+        name: "",
+        student_no: "",
+        school_name: "",
+        class_name: "",
+        seat_no: "",
+        contact_phone: "",
+        grade_level: "初中",
+        gender: "不透露",
+        academic_scores: { exam_name: "", exam_date: "", total_score: "", class_rank: "", subjects: {} },
+        self_narrative: "",
+        teacher_observation: "",
+        transcript_name: ""
+      };
+    }
+    function normaliseProfile(profile) {
+      const base = createDefaultProfile();
+      const value = profile || {};
+      return {
+        ...base,
+        ...value,
+        academic_scores: {
+          ...base.academic_scores,
+          ...(value.academic_scores || {}),
+          subjects: { ...((value.academic_scores || {}).subjects || {}) }
+        }
+      };
+    }
+    function profileSummary(profile) {
+      const value = normaliseProfile(profile);
+      return [value.school_name, value.class_name, value.seat_no].filter(Boolean).join(" · ") || "学校 / 班级 / 座位待填写";
+    }
+
     function uid(prefix) {
       if (window.crypto && window.crypto.randomUUID) return `${prefix}_${window.crypto.randomUUID()}`;
       return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
@@ -1492,7 +1901,7 @@
         verification_question: (asset && asset.verification_question) || "",
         x: clamp(x, -WORLD.width / 2 + 30, WORLD.width / 2 - 30),
         z: clamp(z, -WORLD.depth / 2 + 30, WORLD.depth / 2 - 30),
-        scale: 1, rotation: 0
+        scale: 1, rotation: 0, mirrored: false
       };
     }
     function getGridKey(x, z) {
@@ -1501,23 +1910,134 @@
       return GRID_KEYS[row][col];
     }
     function buildGridDistribution(items) {
+      const cellWidth = WORLD.width / 3;
+      const cellDepth = WORLD.depth / 3;
       const cells = {};
-      GRID_KEYS.flat().forEach((key) => { cells[key] = { key, label: GRID_LABELS[key], count: 0, item_ids: [], item_names: [] }; });
+      GRID_KEYS.flat().forEach((key) => {
+        cells[key] = {
+          key, label: GRID_LABELS[key], count: 0, item_ids: [], item_names: [],
+          estimated_area: 0, area_ratio: 0, blank_ratio: 1
+        };
+      });
       items.forEach((item) => {
         const key = getGridKey(item.x, item.z);
-        cells[key].count += 1;
-        cells[key].item_ids.push(item.id);
-        cells[key].item_names.push(item.label);
+        const cell = cells[key];
+        const footprint = Math.pow(132 * (Number(item.scale) || 1), 2) * 0.62;
+        cell.count += 1;
+        cell.item_ids.push(item.id);
+        cell.item_names.push(item.label);
+        cell.estimated_area += footprint;
       });
+      Object.values(cells).forEach((cell) => {
+        const cellArea = cellWidth * cellDepth;
+        cell.area_ratio = Number(clamp(cell.estimated_area / cellArea, 0, 1).toFixed(4));
+        cell.blank_ratio = Number((1 - cell.area_ratio).toFixed(4));
+        cell.estimated_area = Number(cell.estimated_area.toFixed(1));
+      });
+      const center = cells.center;
       return {
         grid_type: "3x3",
         world_size: { width: WORLD.width, depth: WORLD.depth },
-        cell_size: { width: WORLD.width / 3, depth: WORLD.depth / 3 },
+        cell_size: { width: cellWidth, depth: cellDepth },
+        coordinate_system: "world-centered，x 向右为正，z 向下（近景）为正；原点在沙盘中心",
         cells: GRID_KEYS.flat().map((key) => cells[key]),
         summary: {
           total_items: items.length,
           occupied_cells: Object.values(cells).filter((cell) => cell.count > 0).length,
-          center_count: cells.center.count
+          center_count: center.count,
+          occupied_area_ratio: Number(
+            clamp(
+              GRID_KEYS.flat().reduce((sum, key) => sum + cells[key].estimated_area, 0) / (WORLD.width * WORLD.depth),
+              0,
+              1
+            ).toFixed(4)
+          ),
+          blank_area_ratio: Number(
+            (1 - clamp(
+              GRID_KEYS.flat().reduce((sum, key) => sum + cells[key].estimated_area, 0) / (WORLD.width * WORLD.depth),
+              0,
+              1
+            )).toFixed(4)
+          ),
+          area_estimation: "按沙具 132*scale 的正方形投影估算，非像素级掩膜"
+        }
+      };
+    }
+    function buildSpatialRelations(sourceItems) {
+      const items = (sourceItems || []).map((item) => ({ ...item }));
+      const fences = items.filter((item) => /栅栏|围栏|围墙|栏杆|篱笆|fence|barrier/i.test(String(item.label || "")));
+      const find = (index, parents) => {
+        let cursor = index;
+        while (parents[cursor] !== cursor) {
+          parents[cursor] = parents[parents[cursor]];
+          cursor = parents[cursor];
+        }
+        return cursor;
+      };
+      const parents = items.map((_, index) => index);
+      const distances = items.map(() => []);
+      for (let i = 0; i < items.length; i += 1) {
+        for (let j = i + 1; j < items.length; j += 1) {
+          const distance = Math.hypot(items[i].x - items[j].x, items[i].z - items[j].z);
+          distances[i].push({ index: j, distance });
+          distances[j].push({ index: i, distance });
+          if (distance <= 150) {
+            const left = find(i, parents);
+            const right = find(j, parents);
+            if (left !== right) parents[right] = left;
+          }
+        }
+      }
+      const clusterLabels = {};
+      let clusterSequence = 0;
+      const enriched = items.map((item, index) => {
+        const root = find(index, parents);
+        if (!(root in clusterLabels)) {
+          clusterSequence += 1;
+          clusterLabels[root] = `cluster_${String(clusterSequence).padStart(2, "0")}`;
+        }
+        const sorted = distances[index].slice().sort((a, b) => a.distance - b.distance);
+        const nearest = sorted[0] || null;
+        const neighbors = sorted.filter((entry) => entry.distance <= 180).slice(0, 6);
+        let nearestFence = null;
+        if (!/栅栏|围栏|围墙|栏杆|篱笆|fence|barrier/i.test(String(item.label || ""))) {
+          fences.forEach((fence) => {
+            const distance = Math.hypot(item.x - fence.x, item.z - fence.z);
+            if (!nearestFence || distance < nearestFence.distance) nearestFence = { id: fence.id, label: fence.label, distance };
+          });
+        }
+        const enclosed = Boolean(nearestFence && nearestFence.distance <= 230);
+        return {
+          ...item,
+          cluster_id: clusterLabels[root],
+          neighbor_ids: neighbors.map((entry) => items[entry.index].id),
+          neighbor_labels: neighbors.map((entry) => items[entry.index].label),
+          neighbor_count: neighbors.length,
+          nearest_neighbor_id: nearest ? items[nearest.index].id : null,
+          nearest_neighbor_label: nearest ? items[nearest.index].label : null,
+          nearest_neighbor_distance: nearest ? Number(nearest.distance.toFixed(1)) : null,
+          fence_relation: nearestFence ? {
+            fence_id: nearestFence.id,
+            fence_label: nearestFence.label,
+            distance: Number(nearestFence.distance.toFixed(1)),
+            enclosed: enclosed
+          } : null,
+          enclosed_by_fence: enclosed,
+          isolated: !nearest || nearest.distance > 210
+        };
+      });
+      const clusterIds = new Set(enriched.map((item) => item.cluster_id));
+      return {
+        items: enriched,
+        summary: {
+          cluster_count: clusterIds.size,
+          fence_count: fences.length,
+          enclosed_item_count: enriched.filter((item) => item.enclosed_by_fence).length,
+          isolated_item_count: enriched.filter((item) => item.isolated).length,
+          cluster_threshold: 150,
+          neighbor_threshold: 180,
+          fence_enclosure_threshold: 230,
+          relation_note: "邻近聚类与栅栏包围为几何近似，仅供访谈核验，不等同于临床判断"
         }
       };
     }
@@ -2000,6 +2520,13 @@
           exposure: 0.76, waterEnv: 0.2, particleOpacity: 0.6
         };
       }
+      if (light === "dusk") {
+        return {
+          ambientSky: "#f0b58a", ambientGround: "#5b463f", ambientIntensity: 0.5,
+          sunColor: "#ffb36f", sunIntensity: 0.72, fillColor: "#7aa8d8", fillIntensity: 0.3,
+          exposure: 0.9, waterEnv: 0.34, particleOpacity: 0.52
+        };
+      }
       if (weather === "rain") {
         return {
           ambientSky: "#dbe8f0", ambientGround: "#6d675f", ambientIntensity: 0.46,
@@ -2136,6 +2663,7 @@
       if (night && weather === "rain") return ["#162333", "#1c2a38", "#14212e", "#0b141d"];
       if (night && weather === "snow") return ["#26344d", "#33465f", "#2a3a50", "#1a2537"];
       if (night) return ["#1b2740", "#24314d", "#1b2b40", "#111b2b"];
+      if (light === "dusk") return ["#3d3145", "#735063", "#bf7459", "#e4a36b"];
       if (weather === "rain") return ["#dfe5e8", "#c8d2d8", "#9fb0b8", "#748994"];
       if (weather === "snow") return ["#fbfdff", "#eef4f7", "#dfeaf0", "#cbdcdf"];
       return ["#f3e7d3", "#e9eadf", "#d5dfda", "#c5d2d0"];
@@ -2270,16 +2798,156 @@
         h("div", { className: "specimen-label" }, data.label)
       );
     }
-    function CompleteModal({ items, onClose, onSubmit, onSkip, busy, error }) {
+
+    const SCORE_SUBJECTS = ["语文", "数学", "英语", "科学", "综合"];
+    function StudentFields({ student, onChange }) {
+      const value = normaliseProfile({ ...student, academic_scores: student && student.academic_scores });
+      const scores = value.academic_scores || {};
+      const subjects = scores.subjects || {};
+      const setField = (key, fieldValue) => onChange({ ...value, [key]: fieldValue });
+      const setScore = (key, fieldValue) => onChange({
+        ...value,
+        academic_scores: { ...scores, [key]: fieldValue }
+      });
+      const setSubject = (subject, fieldValue) => onChange({
+        ...value,
+        academic_scores: { ...scores, subjects: { ...subjects, [subject]: fieldValue } }
+      });
+      return h("div", { className: "student-fields" },
+        h("div", { className: "student-grid" },
+          h("div", { className: "finish-field" }, h("label", null, "学校"), h("input", { value: value.school_name, maxLength: 60, onChange: (event) => setField("school_name", event.target.value), placeholder: "如 中科青行实验学校" })),
+          h("div", { className: "finish-field" }, h("label", null, "班级"), h("input", { value: value.class_name, maxLength: 30, onChange: (event) => setField("class_name", event.target.value), placeholder: "如 三年二班" })),
+          h("div", { className: "finish-field" }, h("label", null, "座位"), h("input", { value: value.seat_no, maxLength: 20, onChange: (event) => setField("seat_no", event.target.value), placeholder: "如 3排2座" })),
+          h("div", { className: "finish-field" }, h("label", null, "联系方式"), h("input", { value: value.contact_phone, maxLength: 40, onChange: (event) => setField("contact_phone", event.target.value), placeholder: "家长或班主任电话（可选）" })),
+          h("div", { className: "finish-field" }, h("label", null, "姓名（可选）"), h("input", { value: value.name, maxLength: 24, onChange: (event) => setField("name", event.target.value), placeholder: "匿名也可以" })),
+          h("div", { className: "finish-field" }, h("label", null, "学号（可选）"), h("input", { value: value.student_no, maxLength: 32, onChange: (event) => setField("student_no", event.target.value), placeholder: "如 T001" })),
+          h("div", { className: "finish-field" }, h("label", null, "年级段"), h("select", { value: value.grade_level, onChange: (event) => setField("grade_level", event.target.value) },
+            ["小学低年级", "小学高年级", "初中", "高中", "大学", "其他"].map((item) => h("option", { key: item, value: item }, item))
+          )),
+          h("div", { className: "finish-field" }, h("label", null, "性别"), h("select", { value: value.gender, onChange: (event) => setField("gender", event.target.value) },
+            ["不透露", "男", "女"].map((item) => h("option", { key: item, value: item }, item))
+          ))
+        ),
+        h("div", { className: "score-panel" },
+          h("div", { className: "score-panel-head" },
+            h("span", null, "结构化成绩"),
+            h("small", null, "只填已知项；缺项会在报告中标注待补充")
+          ),
+          h("div", { className: "score-meta-grid" },
+            h("div", { className: "finish-field" }, h("label", null, "考试名称"), h("input", { value: scores.exam_name || "", onChange: (event) => setScore("exam_name", event.target.value), placeholder: "如 期中考试" })),
+            h("div", { className: "finish-field" }, h("label", null, "考试日期"), h("input", { value: scores.exam_date || "", onChange: (event) => setScore("exam_date", event.target.value), placeholder: "YYYY-MM-DD" })),
+            h("div", { className: "finish-field" }, h("label", null, "总分"), h("input", { value: scores.total_score || "", onChange: (event) => setScore("total_score", event.target.value), placeholder: "如 286" })),
+            h("div", { className: "finish-field" }, h("label", null, "班级排名"), h("input", { value: scores.class_rank || "", onChange: (event) => setScore("class_rank", event.target.value), placeholder: "如 12/45" }))
+          ),
+          h("div", { className: "score-subject-grid" },
+            SCORE_SUBJECTS.map((subject) => h("div", { key: subject, className: "score-subject" },
+              h("label", null, subject),
+              h("input", { value: subjects[subject] || "", onChange: (event) => setSubject(subject, event.target.value), placeholder: "分数" })
+            ))
+          )
+        )
+      );
+    }
+
+    function ProfileModal({ profile, onClose, onSave }) {
+      const [draft, setDraft] = React.useState(() => normaliseProfile(profile));
+      return h("div", { className: "finish-overlay" },
+        h("div", { className: "profile-panel" },
+          h("div", { className: "finish-head" },
+            h("div", null,
+              h("div", { className: "finish-kicker" }, "TESTEE PROFILE / 受测者档案"),
+              h("h2", { className: "finish-title" }, "先建立受测者卡片"),
+              h("p", { className: "finish-sub" }, "这张卡片会显示在沙盘顶部，并随报告一起进入统计与访谈。姓名、学号可留空。")
+            ),
+            h("button", { type: "button", className: "export-close", onClick: onClose }, "关闭")
+          ),
+          h("div", { className: "profile-body" },
+            h(StudentFields, { student: draft, onChange: setDraft }),
+            h("div", { className: "finish-field" },
+              h("label", null, "受测者自述（可选）"),
+              h("textarea", {
+                value: draft.self_narrative || "", maxLength: 800,
+                onChange: (event) => setDraft({ ...draft, self_narrative: event.target.value }),
+                placeholder: "最近的学习状态、家里发生的事、来做沙盘时的心情……"
+              })
+            ),
+            h("div", { className: "profile-hint" }, draft.transcript_name ? `成绩单：${draft.transcript_name}（将在生成报告时上传）` : "成绩单可在完成收尾时上传图片。")
+          ),
+          h("div", { className: "finish-footer" },
+            h("div", { className: "finish-footer-note" }, "档案只保存在本次会话与报告中，不会进入公开分享页。"),
+            h("div", { className: "finish-actions" },
+              h("button", { type: "button", className: "finish-btn", onClick: onClose }, "取消"),
+              h("button", { type: "button", className: "finish-btn dark", onClick: () => { onSave(normaliseProfile(draft)); onClose(); } }, "保存档案")
+            )
+          )
+        )
+      );
+    }
+
+    function TesteeCard({ profile, elapsed, itemCount, photoCount, onOpen }) {
+      const value = normaliseProfile(profile);
+      const initial = (value.name || "受").trim().slice(0, 1) || "受";
+      return h("button", { type: "button", className: "testee-card", onClick: onOpen, title: "编辑受测者档案" },
+        h("span", { className: "testee-avatar" }, initial),
+        h("span", { className: "testee-copy" },
+          h("strong", null, value.name || "匿名受测者"),
+          h("small", null, profileSummary(value)),
+          h("em", null, `已制作 ${formatDuration(elapsed)} · ${itemCount} 件沙具${photoCount ? ` · ${photoCount} 张快照` : ""}`)
+        ),
+        h("span", { className: "testee-edit" }, "编辑")
+      );
+    }
+
+    function HelpModal({ onClose }) {
+      const rows = [
+        ["放置沙具", "从左侧沙具库点击卡片，或拖入沙盘；选中后可旋转、缩放、水平镜像。"],
+        ["地形塑形", "右侧选择堆沙 / 挖沙 / 注水 / 抚平，拖拽绘制；笔刷直径与力度可调。"],
+        ["观察视角", "右键拖拽环绕；滚轮缩放；Shift + 滚轮旋转沙具。"],
+        ["过程记录", "顶部可拍过程快照，最多 6 张；白噪音 / 轻音乐可随时开关。"],
+        ["撤销与重做", "Ctrl+Z 撤销，Ctrl+Shift+Z 或 Ctrl+Y 重做；清空需要二次确认。"],
+        ["结束制作", "点击顶部「结束制作」，选择代表沙具并填写描述后生成报告。"]
+      ];
+      return h("div", { className: "finish-overlay" },
+        h("div", { className: "help-panel" },
+          h("div", { className: "finish-head" },
+            h("div", null,
+              h("div", { className: "finish-kicker" }, "QUICK GUIDE / 操作说明"),
+              h("h2", { className: "finish-title" }, "把注意力留给沙盘本身"),
+              h("p", { className: "finish-sub" }, "所有操作都可以撤销；不确定时先慢慢放，再回头调整。")
+            ),
+            h("button", { type: "button", className: "export-close", onClick: onClose }, "关闭")
+          ),
+          h("div", { className: "help-body" },
+            rows.map(([title, text]) => h("div", { key: title, className: "help-row" },
+              h("b", null, title),
+              h("span", null, text)
+            )),
+            h("div", { className: "help-note" }, "隐私提示：分享页只展示脱敏后的家长 / 学生版；咨询师完整版需要后台令牌。")
+          )
+        )
+      );
+    }
+
+    function ClearConfirmModal({ count, onCancel, onConfirm }) {
+      return h("div", { className: "finish-overlay" },
+        h("div", { className: "confirm-panel" },
+          h("div", { className: "confirm-mark" }, "!"),
+          h("h2", null, "确认清空整个沙盘？"),
+          h("p", null, `这会移除 ${count} 件沙具并抹平所有地形。该操作会进入撤销栈，但清空后画面无法自动恢复。`),
+          h("div", { className: "confirm-actions" },
+            h("button", { type: "button", className: "finish-btn", onClick: onCancel }, "先不清空"),
+            h("button", { type: "button", className: "finish-btn danger", onClick: onConfirm }, "确认清空")
+          )
+        )
+      );
+    }
+    function CompleteModal({ items, profile, onClose, onSubmit, onSkip, busy, error }) {
       const [stage, setStage] = React.useState("representative");
       const [representativeId, setRepresentativeId] = React.useState(items[0] ? items[0].id : "");
       const [description, setDescription] = React.useState("");
-      const [selfNarrative, setSelfNarrative] = React.useState("");
-      const [teacherObservation, setTeacherObservation] = React.useState("");
-      const [studentName, setStudentName] = React.useState("");
-      const [studentNo, setStudentNo] = React.useState("");
-      const [gradeLevel, setGradeLevel] = React.useState("初中");
-      const [gender, setGender] = React.useState("不透露");
+      const [selfNarrative, setSelfNarrative] = React.useState(() => (profile && profile.self_narrative) || "");
+      const [teacherObservation, setTeacherObservation] = React.useState(() => (profile && profile.teacher_observation) || "");
+      const [student, setStudent] = React.useState(() => normaliseProfile(profile));
       const [transcriptFile, setTranscriptFile] = React.useState(null);
       const [consent, setConsent] = React.useState(true);
       const [localError, setLocalError] = React.useState("");
@@ -2310,7 +2978,7 @@
           description: description.trim(),
           selfNarrative: selfNarrative.trim(),
           teacherObservation: teacherObservation.trim(),
-          student: { name: studentName.trim(), student_no: studentNo.trim(), grade_level: gradeLevel, gender },
+          student: normaliseProfile(student),
           transcriptFile,
           consent
         });
@@ -2323,7 +2991,7 @@
           description: description.trim(),
           selfNarrative: selfNarrative.trim(),
           teacherObservation: teacherObservation.trim(),
-          student: { name: studentName.trim(), student_no: studentNo.trim(), grade_level: gradeLevel, gender },
+          student: normaliseProfile(student),
           transcriptFile, consent
         });
       };
@@ -2409,16 +3077,7 @@
                 }),
                 h("span", { className: "counter" }, `${teacherObservation.length} / 400`)
               ),
-              h("div", { className: "student-grid" },
-                h("div", { className: "finish-field" }, h("label", null, "姓名（可选）"), h("input", { value: studentName, maxLength: 24, onChange: (event) => setStudentName(event.target.value), placeholder: "匿名也可以" })),
-                h("div", { className: "finish-field" }, h("label", null, "学号（可选）"), h("input", { value: studentNo, maxLength: 32, onChange: (event) => setStudentNo(event.target.value), placeholder: "如 T001" })),
-                h("div", { className: "finish-field" }, h("label", null, "年级段"), h("select", { value: gradeLevel, onChange: (event) => setGradeLevel(event.target.value) },
-                  ["小学低年级", "小学高年级", "初中", "高中", "大学", "其他"].map((value) => h("option", { key: value, value }, value))
-                )),
-                h("div", { className: "finish-field" }, h("label", null, "性别"), h("select", { value: gender, onChange: (event) => setGender(event.target.value) },
-                  ["不透露", "男", "女"].map((value) => h("option", { key: value, value }, value))
-                ))
-              ),
+              h(StudentFields, { student, onChange: setStudent }),
               h("label", { className: "file-drop" },
                 h("div", null,
                   h("strong", null, transcriptFile ? transcriptFile.name : "上传成绩单图片（可选）"),
@@ -2660,7 +3319,7 @@
       const rendererRef = useRef(null);
       const sceneRef = useRef(null);
       const cameraRef = useRef(null);
-      const cameraBaseRef = useRef(1240);
+      const cameraBaseRef = useRef(1340);
       const terrainRef = useRef(null);
       const edgeSkirtRef = useRef(null);
       const spritesRef = useRef(new Map());
@@ -2672,6 +3331,8 @@
       const lightModeRef = useRef("day");
       const weatherModeRef = useRef("sunny");
       const brushPointRef = useRef(null);
+      const brushStrengthRef = useRef(1);
+      const audioRef = useRef({ ctx: null, master: null, nodes: [], mode: "off" });
       const raycasterRef = useRef(new THREE.Raycaster());
       const pointerRef = useRef(new THREE.Vector2());
       const cameraStateRef = useRef({ distance: 1.0, azimuth: 0.015, polar: 0.78 });
@@ -2691,20 +3352,26 @@
         itemDeletedTotal: 0,
         hesitationCount: 0,
         terrainStrokeCount: 0,
+        terrainActionCounts: { mound: 0, dig: 0, water: 0, smooth: 0 },
         buryActions: [],
         destructiveLoops: 0,
         addHistory: {},
-        undoCount: 0
+        undoCount: 0,
+        redoCount: 0,
+        mirrorCount: 0,
+        snapshotCount: 0
       });
 
       const [items, setItems] = useState([]);
       const [selectedId, setSelectedId] = useState(null);
       const [tool, setTool] = useState("select");
       const [brushSize, setBrushSize] = useState(96);
+      const [brushStrength, setBrushStrength] = useState(1);
       const [viewMode, setViewMode] = useState("reference");
       const [lightMode, setLightMode] = useState("day");
       const [weatherMode, setWeatherMode] = useState("sunny");
       const [undoStack, setUndoStack] = useState([]);
+      const [redoStack, setRedoStack] = useState([]);
       const [exportPayload, setExportPayload] = useState(null);
       const [exportModalOpen, setExportModalOpen] = useState(false);
       const [completionOpen, setCompletionOpen] = useState(false);
@@ -2713,6 +3380,14 @@
       const [toast, setToast] = useState("");
       const [sceneReady, setSceneReady] = useState(false);
       const [assetCategory, setAssetCategory] = useState("全部");
+      const [assetQuery, setAssetQuery] = useState("");
+      const [profile, setProfile] = useState(createDefaultProfile);
+      const [profileOpen, setProfileOpen] = useState(false);
+      const [helpOpen, setHelpOpen] = useState(false);
+      const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+      const [processPhotos, setProcessPhotos] = useState([]);
+      const [ambientMode, setAmbientMode] = useState("off");
+      const [elapsedSec, setElapsedSec] = useState(0);
       const specimenGridRef = useRef(null);
       const hasCategoryData = useMemo(
         () => SANDPLAY_CATEGORY_DEFS.some((entry) => TEST_ICONS.some((item) => item.category === entry.key)),
@@ -2730,8 +3405,14 @@
         if (hasCategoryData && assetCategory !== "全部") {
           base = base.filter((item) => item.category === assetCategory);
         }
+        const keyword = assetQuery.trim().toLowerCase();
+        if (keyword) {
+          base = base.filter((item) => [
+            item.label, item.category, item.subcategory, item.psychology_meaning, item.spatial_role
+          ].filter(Boolean).join(" ").toLowerCase().includes(keyword));
+        }
         return base;
-      }, [assetCategory, hasCategoryData]);
+      }, [assetCategory, assetQuery, hasCategoryData]);
       useEffect(() => {
         const node = specimenGridRef.current;
         if (!node) return undefined;
@@ -2739,11 +3420,20 @@
         return () => cancelAnimationFrame(frame);
       }, [assetCategory, visibleIcons.length]);
 
+      useEffect(() => {
+        const tick = () => setElapsedSec(Math.floor((Date.now() - telemetryRef.current.pageStartedAt) / 1000));
+        tick();
+        const timer = window.setInterval(tick, 1000);
+        return () => window.clearInterval(timer);
+      }, []);
+
       const itemsRef = useRef(items);
       const selectedIdRef = useRef(selectedId);
       const toolRef = useRef(tool);
       const brushSizeRef = useRef(brushSize);
       const viewModeRef = useRef(viewMode);
+      useEffect(() => { brushSizeRef.current = brushSize; }, [brushSize]);
+      useEffect(() => { brushStrengthRef.current = brushStrength; }, [brushStrength]);
       useEffect(() => { itemsRef.current = items; }, [items]);
       useEffect(() => { selectedIdRef.current = selectedId; updateSelectionRing(); }, [selectedId]);
       useEffect(() => {
@@ -2762,6 +3452,83 @@
         window.clearTimeout(toastTimerRef.current);
         toastTimerRef.current = window.setTimeout(() => setToast(""), 2200);
       }, []);
+      const stopAmbient = useCallback(() => {
+        const audio = audioRef.current;
+        audio.nodes.forEach((node) => {
+          try { if (typeof node.stop === "function") node.stop(); } catch (error) {}
+          try { node.disconnect(); } catch (error) {}
+        });
+        if (audio.master) {
+          try { audio.master.gain.cancelScheduledValues(audio.ctx.currentTime); } catch (error) {}
+          try { audio.master.disconnect(); } catch (error) {}
+        }
+        audio.nodes = [];
+        audio.master = null;
+        audio.mode = "off";
+      }, []);
+      const setAmbient = useCallback((mode) => {
+        const nextMode = mode === "white" || mode === "music" ? mode : "off";
+        stopAmbient();
+        if (nextMode === "off") {
+          setAmbientMode("off");
+          showToast("环境音已关闭");
+          return;
+        }
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtor) { showToast("当前浏览器不支持环境音"); return; }
+        const audio = audioRef.current;
+        if (!audio.ctx) audio.ctx = new AudioCtor();
+        const ctx = audio.ctx;
+        if (ctx.state === "suspended") ctx.resume();
+        const master = ctx.createGain();
+        master.gain.value = nextMode === "white" ? 0.055 : 0.035;
+        master.connect(ctx.destination);
+        audio.master = master;
+        if (nextMode === "white") {
+          const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+          const channel = buffer.getChannelData(0);
+          let last = 0;
+          for (let i = 0; i < channel.length; i += 1) {
+            const white = Math.random() * 2 - 1;
+            last = (last + 0.02 * white) / 1.02;
+            channel[i] = last * 3.2;
+          }
+          const source = ctx.createBufferSource();
+          source.buffer = buffer;
+          source.loop = true;
+          const filter = ctx.createBiquadFilter();
+          filter.type = "lowpass";
+          filter.frequency.value = 1250;
+          const gain = ctx.createGain();
+          gain.gain.value = 0.8;
+          source.connect(filter).connect(gain).connect(master);
+          source.start();
+          audio.nodes = [source, filter, gain];
+        } else {
+          const frequencies = [196, 293.66, 392, 587.33];
+          const oscillators = frequencies.map((frequency, index) => {
+            const oscillator = ctx.createOscillator();
+            oscillator.type = index % 2 === 0 ? "sine" : "triangle";
+            oscillator.frequency.value = frequency;
+            const gain = ctx.createGain();
+            gain.gain.value = 0.12 / (index + 1);
+            const lfo = ctx.createOscillator();
+            lfo.frequency.value = 0.05 + index * 0.013;
+            const lfoGain = ctx.createGain();
+            lfoGain.gain.value = 0.04;
+            lfo.connect(lfoGain).connect(gain.gain);
+            oscillator.connect(gain).connect(master);
+            oscillator.start();
+            lfo.start();
+            return [oscillator, gain, lfo, lfoGain];
+          }).flat();
+          audio.nodes = oscillators;
+        }
+        audio.mode = nextMode;
+        setAmbientMode(nextMode);
+        showToast(nextMode === "white" ? "白噪音已开启" : "轻音乐已开启");
+      }, [showToast, stopAmbient]);
+      useEffect(() => () => stopAmbient(), [stopAmbient]);
       const noteAction = (type) => {
         const t = telemetryRef.current;
         const now = Date.now();
@@ -2842,9 +3609,19 @@
           hesitation_count: t.hesitationCount,
           item_moved_total: t.hesitationCount,
           terrain_stroke_count: t.terrainStrokeCount,
+          terrain_action_counts: { ...t.terrainActionCounts },
+          mound_count: t.terrainActionCounts.mound,
+          dig_count: t.terrainActionCounts.dig,
+          water_count: t.terrainActionCounts.water,
+          smooth_count: t.terrainActionCounts.smooth,
+          brush_size: brushSizeRef.current,
+          brush_strength: brushStrengthRef.current,
           bury_actions: t.buryActions.slice(),
           destructive_loops: t.destructiveLoops,
           undo_count: t.undoCount,
+          redo_count: t.redoCount,
+          mirror_count: t.mirrorCount,
+          process_snapshot_count: processPhotos.length,
           action_count: t.actionCount,
           first_action_at_sec: t.firstActionAt ? Math.max(0, Math.round((t.firstActionAt - t.pageStartedAt) / 1000)) : 0,
           last_action_at_sec: t.lastActionAt ? Math.max(0, Math.round((t.lastActionAt - startedAt) / 1000)) : 0,
@@ -2853,7 +3630,7 @@
           longest_pause_sec: longPauses.length ? Math.max(...longPauses) : 0,
           action_events: events.slice(-60)
         };
-      }, []);
+      }, [processPhotos.length]);
 
       const updateCamera = useCallback(() => {
         const camera = cameraRef.current;
@@ -2962,7 +3739,10 @@
         };
       }, []);
       const pushUndo = useCallback((snapshot) => {
-        if (snapshot) setUndoStack((stack) => [...stack, snapshot].slice(-20));
+        if (snapshot) {
+          setUndoStack((stack) => [...stack, snapshot].slice(-20));
+          setRedoStack([]);
+        }
       }, []);
       const restoreSnapshot = useCallback((snapshot) => {
         setItems(deepClone(snapshot.items || []));
@@ -2979,13 +3759,29 @@
           if (!stack.length) { showToast("暂无可撤销步骤"); return stack; }
           const next = [...stack];
           const snapshot = next.pop();
+          const current = makeSnapshot();
+          setRedoStack((redo) => [...redo, current].slice(-20));
           restoreSnapshot(snapshot);
           telemetryRef.current.undoCount += 1;
           noteAction("undo");
           showToast(`已撤销，剩余 ${next.length} 步`);
           return next;
         });
-      }, [restoreSnapshot, showToast]);
+      }, [makeSnapshot, noteAction, restoreSnapshot, showToast]);
+      const redo = useCallback(() => {
+        setRedoStack((stack) => {
+          if (!stack.length) { showToast("暂无可重做步骤"); return stack; }
+          const next = [...stack];
+          const snapshot = next.pop();
+          const current = makeSnapshot();
+          setUndoStack((undoItems) => [...undoItems, current].slice(-20));
+          restoreSnapshot(snapshot);
+          telemetryRef.current.redoCount += 1;
+          noteAction("redo");
+          showToast(`已重做，剩余 ${next.length} 步`);
+          return next;
+        });
+      }, [makeSnapshot, noteAction, restoreSnapshot, showToast]);
       const commitItems = useCallback((updater, message) => {
         const snapshot = makeSnapshot();
         setItems((current) => typeof updater === "function" ? updater(current) : updater);
@@ -3024,6 +3820,7 @@
         const group = new THREE.Group();
         const woodTexture = makeWoodTexture();
         const wood = new THREE.MeshStandardMaterial({ map: woodTexture, roughness: 0.64, metalness: 0.04 });
+        const innerWall = new THREE.MeshStandardMaterial({ color: "#183a58", roughness: 0.82, metalness: 0.08 });
         const railH = 46, railW = 52, baseTop = -18;
         const base = new THREE.Mesh(new THREE.BoxGeometry(WORLD.width + railW * 2, 40, WORLD.depth + railW * 2), wood);
         base.position.set(0, baseTop - 20, 0);
@@ -3040,6 +3837,18 @@
           const mesh = new THREE.Mesh(new THREE.BoxGeometry(...rail.size), wood);
           mesh.position.set(...rail.pos);
           mesh.castShadow = true; mesh.receiveShadow = true;
+          group.add(mesh);
+        });
+        const liner = 10;
+        const liners = [
+          { size: [liner, railH - 8, WORLD.depth], pos: [-WORLD.width / 2 + liner / 2, railY + 2, 0] },
+          { size: [liner, railH - 8, WORLD.depth], pos: [WORLD.width / 2 - liner / 2, railY + 2, 0] },
+          { size: [WORLD.width, railH - 8, liner], pos: [0, railY + 2, -WORLD.depth / 2 + liner / 2] },
+          { size: [WORLD.width, railH - 8, liner], pos: [0, railY + 2, WORLD.depth / 2 - liner / 2] }
+        ];
+        liners.forEach((entry) => {
+          const mesh = new THREE.Mesh(new THREE.BoxGeometry(...entry.size), innerWall);
+          mesh.position.set(...entry.pos);
           group.add(mesh);
         });
         scene.add(group);
@@ -3062,6 +3871,8 @@
         if (env.waterMaterial) env.waterMaterial.envMapIntensity = palette.waterEnv;
         if (light === "night") {
           env.sun.position.set(420, 680, -420);
+        } else if (light === "dusk") {
+          env.sun.position.set(-760, 360, 520);
         } else {
           env.sun.position.set(-420, 760, 360);
         }
@@ -3071,8 +3882,8 @@
         env.snow.object.visible = snowOn;
         env.rain.material.opacity = rainOn ? palette.particleOpacity * 0.78 : 0;
         env.snow.material.opacity = snowOn ? palette.particleOpacity : 0;
-        env.rain.material.color.set(light === "night" ? "#a9c3e2" : "#c4dcec");
-        env.snow.material.color.set(light === "night" ? "#dce7ff" : "#ffffff");
+        env.rain.material.color.set(light === "night" ? "#a9c3e2" : light === "dusk" ? "#e7b58f" : "#c4dcec");
+        env.snow.material.color.set(light === "night" ? "#dce7ff" : light === "dusk" ? "#ffe4ca" : "#ffffff");
       }, []);
 
       const initScene = useCallback(() => {
@@ -3244,12 +4055,11 @@
           const polar = clamp(state.polar, 0.18, 1.32);
           const azimuth = state.azimuth;
           const overlayPanels = window.innerWidth >= 1024;
-          const safeWidth = overlayPanels
-            ? Math.max(360, mount.clientWidth - 204 - 250 - 64)
-            : mount.clientWidth;
-          const safeAspect = safeWidth / Math.max(320, mount.clientHeight);
-          const previousAspect = camera.aspect;
-          camera.aspect = safeAspect;
+          const mountWidth = Math.max(320, mount.clientWidth);
+          const mountHeight = Math.max(320, mount.clientHeight);
+          const allowedX = overlayPanels ? 0.88 : 0.92;
+          const allowedY = 0.82;
+          camera.aspect = mountWidth / mountHeight;
           camera.updateProjectionMatrix();
           const corners = [];
           const railW = 58;
@@ -3273,16 +4083,17 @@
             );
             camera.lookAt(0, -24, 0);
             camera.updateMatrixWorld();
-            let maxNdc = 0;
+            let maxNdcX = 0;
+            let maxNdcY = 0;
             corners.forEach((corner) => {
               const projected = corner.clone().project(camera);
-              maxNdc = Math.max(maxNdc, Math.abs(projected.x), Math.abs(projected.y));
+              maxNdcX = Math.max(maxNdcX, Math.abs(projected.x));
+              maxNdcY = Math.max(maxNdcY, Math.abs(projected.y));
             });
-            if (maxNdc > 0.92) low = mid;
+            if (maxNdcX > allowedX || maxNdcY > allowedY) low = mid;
             else high = mid;
           }
           cameraBaseRef.current = high;
-          camera.aspect = previousAspect;
           camera.updateProjectionMatrix();
         };
 
@@ -3383,7 +4194,7 @@
             }
           }
           const size = 132 * item.scale;
-          sprite.scale.set(size, size, 1);
+          sprite.scale.set(size * (item.mirrored ? -1 : 1), size, 1);
           sprite.material.rotation = (item.rotation * Math.PI) / 180;
           sprite.position.set(item.x, heightAt(item.x, item.z) + size * 0.54, item.z);
         });
@@ -3434,7 +4245,7 @@
           }
           const distance = Math.hypot(x - sampleX, z - sampleZ);
           if (distance > radius) continue;
-          const influence = Math.pow(Math.cos((distance / radius) * Math.PI * 0.5), 1.35);
+          const influence = Math.pow(Math.cos((distance / radius) * Math.PI * 0.5), 1.35) * clamp(brushStrengthRef.current, 0.2, 1.8);
           base.setRGB(terrain.colors[i * 3], terrain.colors[i * 3 + 1], terrain.colors[i * 3 + 2]);
           if (active === "mound") {
             terrain.heights[i] = clamp(terrain.heights[i] + 5.6 * influence, -48, 110);
@@ -3479,8 +4290,9 @@
           return;
         }
         if (toolRef.current !== "select") {
-          if (["mound", "dig", "water"].includes(toolRef.current)) {
+          if (["mound", "dig", "water", "smooth"].includes(toolRef.current)) {
             telemetryRef.current.terrainStrokeCount += 1;
+            telemetryRef.current.terrainActionCounts[toolRef.current] += 1;
             noteAction("terrain");
           }
           const point = intersectTerrain(event.clientX, event.clientY);
@@ -3512,7 +4324,7 @@
         if (event.button !== 0) return;
         const target = event.target;
         if (!target || typeof target.closest !== "function") return;
-        if (target.closest(".sand-canvas, .inspector-bar, .stage-label")) return;
+        if (target.closest(".sand-canvas, .inspector-bar, .stage-label, .session-topbar")) return;
         setSelectedId(null);
       }, []);
       const onPointerMove = useCallback((event) => {
@@ -3618,6 +4430,11 @@
       }, [commitItems, showToast]);
       const rotateSelected = useCallback((degrees) => updateSelected((item) => ({ ...item, rotation: (item.rotation + degrees + 360) % 360 }), "已旋转 15°"), [updateSelected]);
       const scaleSelected = useCallback((delta) => updateSelected((item) => ({ ...item, scale: clamp(Number((item.scale + delta).toFixed(2)), 0.35, 3.2) }), "已调整大小"), [updateSelected]);
+      const mirrorSelected = useCallback(() => {
+        updateSelected((item) => ({ ...item, mirrored: !item.mirrored }), "已水平镜像");
+        telemetryRef.current.mirrorCount += 1;
+        noteAction("mirror");
+      }, [noteAction, updateSelected]);
       const deleteSelected = useCallback(() => {
         const selected = itemsRef.current.find((item) => item.id === selectedIdRef.current);
         if (!selected) { showToast("请先选中一个沙具"); return; }
@@ -3625,7 +4442,7 @@
         commitItems((current) => current.filter((item) => item.id !== selected.id), `已删除 ${selected.label}`);
         setSelectedId(null);
       }, [commitItems, showToast, noteItemDeleted]);
-      const clearAll = useCallback(() => {
+      const performClear = useCallback(() => {
         const snapshot = makeSnapshot();
         telemetryRef.current.itemDeletedTotal += itemsRef.current.length;
         noteAction("clear");
@@ -3642,8 +4459,16 @@
           updateTerrainGeometry();
         }
         pushUndo(snapshot);
-        showToast("已清空 3D 沙盘");
-      }, [makeSnapshot, pushUndo, showToast, updateTerrainGeometry]);
+        setClearConfirmOpen(false);
+        showToast("已清空沙盘");
+      }, [makeSnapshot, noteAction, pushUndo, showToast, updateTerrainGeometry]);
+      const clearAll = useCallback(() => {
+        if (!itemsRef.current.length && !(terrainRef.current && terrainRef.current.heights.some((value) => Math.abs(value) > 1))) {
+          showToast("沙盘已经是空的");
+          return;
+        }
+        setClearConfirmOpen(true);
+      }, [showToast]);
       const resetView = useCallback(() => {
         cameraStateRef.current = { distance: 1.0, azimuth: 0.015, polar: 0.78 };
         setViewMode("reference");
@@ -3664,7 +4489,7 @@
         const brushVisible = brushCursor && brushCursor.visible;
         if (selectionRing) selectionRing.visible = false;
         if (brushCursor) brushCursor.visible = false;
-        const exportWidth = 1800, exportHeight = 1140;
+        const exportWidth = 1600, exportHeight = 1200;
         renderer.setSize(exportWidth, exportHeight, false);
         camera.aspect = exportWidth / exportHeight;
         camera.updateProjectionMatrix();
@@ -3735,21 +4560,60 @@
         updateSelectionRing();
         return dataUrl;
       }, [updateSelectionRing, updateCamera]);
+      const captureProcessPhoto = useCallback(async () => {
+        if (processPhotos.length >= 6) {
+          showToast("过程快照最多保留 6 张");
+          return;
+        }
+        const dataUrl = renderExportImage();
+        if (!dataUrl) { showToast("画面尚未准备好"); return; }
+        const compressed = await downscaleDataUrl(dataUrl, 960, 0.76);
+        const photo = {
+          id: uid("photo"),
+          label: `过程快照 ${processPhotos.length + 1}`,
+          at_sec: Math.floor((Date.now() - telemetryRef.current.pageStartedAt) / 1000),
+          view_mode: viewModeRef.current,
+          light_mode: lightModeRef.current,
+          weather_mode: weatherModeRef.current,
+          item_count: itemsRef.current.length,
+          data_url: compressed
+        };
+        setProcessPhotos((current) => [...current, photo].slice(-6));
+        telemetryRef.current.snapshotCount += 1;
+        noteAction("snapshot");
+        showToast(`已拍摄过程快照 ${photo.label}`);
+      }, [noteAction, processPhotos.length, renderExportImage, showToast]);
       const buildExportPayload = useCallback((completion) => {
         const completionData = completion || {};
-        const currentItems = deepClone(itemsRef.current).map((item) => {
+        const rawItems = deepClone(itemsRef.current).map((item) => ({
+          ...item,
+          y: Number(heightAt(item.x, item.z).toFixed(2)),
+          grid_key: getGridKey(item.x, item.z)
+        }));
+        const spatial = buildSpatialRelations(rawItems);
+        const currentItems = spatial.items.map((item) => {
           const { image, ...rest } = item;
-          return {
-            ...rest,
-            y: Number(heightAt(item.x, item.z).toFixed(2)),
-            grid_key: getGridKey(item.x, item.z)
-          };
+          return rest;
         });
         const heights = terrainRef.current && terrainRef.current.heights ? terrainRef.current.heights : new Float32Array(0);
         const terrainMetrics = buildTerrainMetrics(terrainRef.current);
         const processTelemetry = buildProcessTelemetry();
+        const baseProfile = normaliseProfile(profile);
+        const completionStudent = completionData.student || {};
+        const student = {
+          ...baseProfile,
+          ...completionStudent,
+          academic_scores: {
+            ...baseProfile.academic_scores,
+            ...(completionStudent.academic_scores || {}),
+            subjects: {
+              ...(baseProfile.academic_scores.subjects || {}),
+              ...((completionStudent.academic_scores || {}).subjects || {})
+            }
+          }
+        };
         return {
-          schema_version: "1.0",
+          schema_version: "1.1",
           exported_at: new Date().toISOString(),
           view_mode: viewModeRef.current,
           renderer: "three.js-webgl-3d",
@@ -3759,19 +4623,32 @@
           heightmap: buildHeightmap(heights, WORLD.segX + 1, WORLD.segZ + 1, WORLD.width, WORLD.depth),
           terrain_metrics: terrainMetrics,
           items: currentItems,
+          spatial_relations: spatial.summary,
           representative_item_id: completionData.representativeId || null,
           representative_item_name: completionData.representativeName || null,
           representative_item_category: completionData.representativeCategory || null,
           sandplay_description: completionData.description || "",
-          self_narrative: completionData.selfNarrative || "",
-          teacher_observation: completionData.teacherObservation || "",
-          student: completionData.student || { name: "", student_no: "", grade_level: "初中", gender: "不透露" },
+          self_narrative: completionData.selfNarrative || baseProfile.self_narrative || "",
+          teacher_observation: completionData.teacherObservation || baseProfile.teacher_observation || "",
+          student,
           consent: Boolean(completionData.consent),
-          transcript_file_name: completionData.transcriptFile ? completionData.transcriptFile.name : null,
+          transcript_file_name: completionData.transcriptFile ? completionData.transcriptFile.name : (baseProfile.transcript_name || null),
           process_telemetry: processTelemetry,
+          process_snapshots: processPhotos.map((photo) => ({
+            id: photo.id,
+            label: photo.label,
+            at_sec: photo.at_sec,
+            view_mode: photo.view_mode,
+            light_mode: photo.light_mode,
+            weather_mode: photo.weather_mode,
+            item_count: photo.item_count,
+            data_url: photo.data_url
+          })),
           interaction_summary: {
             undo_steps_available: undoStack.length,
+            redo_steps_available: redoStack.length,
             brush_size: brushSizeRef.current,
+            brush_strength: brushStrengthRef.current,
             tool: toolRef.current,
             camera_distance: Number(cameraStateRef.current.distance.toFixed(2)),
             total_duration_sec: processTelemetry.total_duration_sec,
@@ -3779,11 +4656,14 @@
             item_deleted_total: processTelemetry.item_deleted_total,
             hesitation_count: processTelemetry.hesitation_count,
             terrain_stroke_count: processTelemetry.terrain_stroke_count,
+            terrain_action_counts: processTelemetry.terrain_action_counts,
             bury_actions: processTelemetry.bury_actions.length,
-            destructive_loops: processTelemetry.destructive_loops
+            destructive_loops: processTelemetry.destructive_loops,
+            process_snapshot_count: processPhotos.length,
+            ambient_mode: ambientMode
           }
         };
-      }, [heightAt, renderExportImage, undoStack.length, buildProcessTelemetry]);
+      }, [ambientMode, buildProcessTelemetry, heightAt, processPhotos, profile, redoStack.length, renderExportImage, undoStack.length]);
 
       const finishMaking = useCallback(() => {
         if (!itemsRef.current.length) { showToast("请先放入至少一件沙具，再结束制作"); return; }
@@ -3794,6 +4674,17 @@
       const submitCompletion = useCallback(async (completion) => {
         setSubmitting(true);
         setCompletionError("");
+        setProfile((current) => normaliseProfile({
+          ...current,
+          ...(completion.student || {}),
+          academic_scores: {
+            ...current.academic_scores,
+            ...((completion.student || {}).academic_scores || {})
+          },
+          self_narrative: completion.selfNarrative || current.self_narrative,
+          teacher_observation: completion.teacherObservation || current.teacher_observation,
+          transcript_name: completion.transcriptFile ? completion.transcriptFile.name : current.transcript_name
+        }));
         let basePayload = null;
         try {
           basePayload = buildExportPayload(completion);
@@ -3844,6 +4735,17 @@
       }, [buildExportPayload, showToast]);
 
       const skipCompletion = useCallback((completion) => {
+        setProfile((current) => normaliseProfile({
+          ...current,
+          ...(completion.student || {}),
+          academic_scores: {
+            ...current.academic_scores,
+            ...((completion.student || {}).academic_scores || {})
+          },
+          self_narrative: completion.selfNarrative || current.self_narrative,
+          teacher_observation: completion.teacherObservation || current.teacher_observation,
+          transcript_name: completion.transcriptFile ? completion.transcriptFile.name : current.transcript_name
+        }));
         const payload = buildExportPayload(completion);
         setExportPayload({ ...payload, report_status: "skipped" });
         setCompletionOpen(false);
@@ -3854,20 +4756,27 @@
 
       useEffect(() => {
         const onKeyDown = (event) => {
+          const tag = event.target && event.target.tagName ? event.target.tagName.toUpperCase() : "";
+          if (["INPUT", "TEXTAREA", "SELECT"].includes(tag) || (event.target && event.target.isContentEditable)) return;
           if (event.key === "Delete" || event.key === "Backspace") deleteSelected();
-          if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") { event.preventDefault(); undo(); }
+          if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
+            event.preventDefault();
+            if (event.shiftKey) redo(); else undo();
+          }
+          if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "y") { event.preventDefault(); redo(); }
           if (event.key.toLowerCase() === "q") rotateSelected(-15);
           if (event.key.toLowerCase() === "e") rotateSelected(15);
+          if (event.key.toLowerCase() === "m") mirrorSelected();
           if (event.key === "+" || event.key === "=") scaleSelected(0.1);
           if (event.key === "-" || event.key === "_") scaleSelected(-0.1);
         };
         window.addEventListener("keydown", onKeyDown);
         return () => window.removeEventListener("keydown", onKeyDown);
-      }, [deleteSelected, rotateSelected, scaleSelected, undo]);
+      }, [deleteSelected, mirrorSelected, redo, rotateSelected, scaleSelected, undo]);
 
       const selectedItem = useMemo(() => items.find((item) => item.id === selectedId) || null, [items, selectedId]);
 
-      return h("div", { className: `studio-app${lightMode === "night" ? " night-mode" : ""}` },
+      return h("div", { className: `studio-app${lightMode === "night" || lightMode === "dusk" ? " night-mode" : ""}${lightMode === "dusk" ? " dusk-mode" : ""}` },
         h("div", { className: `room-layer ${lightMode} ${weatherMode}`, "aria-hidden": "true" }),
         h("div", { className: `room-vignette ${lightMode} ${weatherMode}`, "aria-hidden": "true" }),
         h("header", { className: "studio-header" },
@@ -3888,6 +4797,10 @@
                 type: "button", onClick: () => setLightMode("day"), "aria-pressed": lightMode === "day",
                 className: `env-btn${lightMode === "day" ? " active" : ""}`
               }, "白天"),
+              h("button", {
+                type: "button", onClick: () => setLightMode("dusk"), "aria-pressed": lightMode === "dusk",
+                className: `env-btn${lightMode === "dusk" ? " active" : ""}`
+              }, "黄昏"),
               h("button", {
                 type: "button", onClick: () => setLightMode("night"), "aria-pressed": lightMode === "night",
                 className: `env-btn${lightMode === "night" ? " active" : ""}`
@@ -3923,76 +4836,22 @@
           h("aside", { className: "studio-panel rail-left" },
             h("div", { className: "panel-head" },
               h("div", null,
-                h("div", { className: "panel-kicker" }, "TERRAIN / 地形"),
-                h("h2", { className: "panel-title" }, "塑形工具")
-              ),
-              h("span", { className: "mode-state" },
-                h("i", { className: `mode-dot${tool === "select" ? "" : " draw"}` }),
-                tool === "select" ? "选择" : "绘制"
-              )
-            ),
-            h("div", { className: "tool-list" },
-              TOOLS.map((item) => h(ToolButton, { key: item.id, tool: item, active: tool === item.id, onClick: () => setTool(item.id) }))
-            ),
-            h("hr", { className: "rail-rule" }),
-            h("div", { className: "brush-head" },
-              h("span", { className: "micro-label" }, "笔刷直径"),
-              h("span", { className: "mono-value" }, `${brushSize} px`)
-            ),
-            h("input", {
-              type: "range", min: 40, max: 220, step: 2, value: brushSize,
-              onChange: (event) => setBrushSize(Number(event.target.value)),
-              className: "brush-range", "aria-label": "笔刷大小"
-            }),
-            h("div", { className: "brush-scale" }, h("span", null, "40"), h("span", null, "220")),
-            h("hr", { className: "rail-rule" }),
-            h("div", { className: "shortcuts" },
-              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "右键"), h("span", null, "拖拽环绕观察")),
-              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "滚轮"), h("span", null, "缩放 / 旋转沙具")),
-              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "Shift"), h("span", null, "配合滚轮旋转")),
-              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "Esc"), h("span", null, "取消沙具选中")),
-              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "Ctrl Z"), h("span", null, "撤销最近一步"))
-            )
-          ),
-          h("main", { className: "stage", onPointerDown: onStagePointerDown },
-            h("div", { className: "ghost-word", "aria-hidden": "true" }, "SAND"),
-            h("div", { className: "wood-shell" },
-              h("div", {
-                ref: mountRef,
-                onPointerDown, onPointerMove, onPointerUp, onPointerCancel: onPointerUp, onWheel, onPointerLeave,
-                onContextMenu: (event) => event.preventDefault(),
-                onDragOver: (event) => event.preventDefault(), onDrop,
-                className: "sand-canvas"
-              }),
-              h("div", { className: "stage-label" },
-                h("span", { className: "stage-dot" }),
-                h("span", { className: "panel-kicker" }, "SESSION 01"),
-                h("strong", null, `${items.length} 件沙具`),
-                h("span", { className: "stage-sep" }, "/"),
-                h("span", null, viewMode === "reference" ? "斜 45°" : "正 90°"),
-                h("span", { className: "stage-sep" }, "/"),
-                h("span", null, `${lightMode === "day" ? "白天" : "夜晚"} · ${weatherMode === "sunny" ? "晴天" : weatherMode === "rain" ? "下雨" : "下雪"}`)
-              ),
-              selectedItem ? h("div", { className: "inspector-bar" },
-                h("span", { className: "inspector-name" }, selectedItem.label),
-                h("button", { type: "button", title: "逆时针旋转", onClick: () => rotateSelected(-15), className: "inspector-btn" }, "↺"),
-                h("button", { type: "button", title: "顺时针旋转", onClick: () => rotateSelected(15), className: "inspector-btn" }, "↻"),
-                h("button", { type: "button", title: "缩小", onClick: () => scaleSelected(-0.1), className: "inspector-btn" }, "−"),
-                h("button", { type: "button", title: "放大", onClick: () => scaleSelected(0.1), className: "inspector-btn" }, "＋"),
-                h("button", { type: "button", title: "取消选中", onClick: () => setSelectedId(null), className: "inspector-btn inspector-close" }, "✕"),
-                h("button", { type: "button", onClick: deleteSelected, className: "inspector-delete" }, "移除")
-              ) : null
-            )
-          ),
-          h("aside", { className: "studio-panel rail-right" },
-            h("div", { className: "panel-head" },
-              h("div", null,
-                h("div", { className: "panel-kicker" }, "SPECIMENS / 沙具"),
-                h("h2", { className: "panel-title" }, "沙具标本")
+                h("div", { className: "panel-kicker" }, "SANDPLAY LIBRARY / 沙具库"),
+                h("h2", { className: "panel-title" }, "沙具抽屉")
               ),
               h("div", { className: "count-mark" }, String(visibleIcons.length), h("small", null, "件"))
             ),
             h("p", { className: "panel-note" }, `8 类器物 · 共 ${TEST_ICONS.length} 件`),
+            h("label", { className: "asset-search" },
+              h("span", null, "⌕"),
+              h("input", {
+                value: assetQuery,
+                onChange: (event) => setAssetQuery(event.target.value),
+                placeholder: "搜索名称、子类或心理意象",
+                "aria-label": "搜索沙具"
+              }),
+              assetQuery ? h("button", { type: "button", className: "utility-btn", onClick: () => setAssetQuery("") }, "清除") : null
+            ),
             h("div", { className: "specimen-taxonomy", role: "tablist", "aria-label": "沙具器物分类" },
               h("button", {
                 key: "all",
@@ -4017,28 +4876,131 @@
               ))
             ),
             h("div", { className: "specimen-grid scroll-soft", ref: specimenGridRef },
-              visibleIcons.map((item, index) => h(IconCard, { key: item.id || item.label, data: item, index: index + 1, onAdd: addTestItem }))
+              visibleIcons.length
+                ? visibleIcons.map((item, index) => h(IconCard, { key: item.id || item.label, data: item, index: index + 1, onAdd: addTestItem }))
+                : h("div", { className: "representative-empty" }, "没有匹配的沙具，换个关键词试试。")
+            ),
+            h("div", { className: "shortcuts" },
+              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "拖拽"), h("span", null, "拖入沙盘或点击放置")),
+              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "搜索"), h("span", null, "按名称 / 子类 / 意象检索"))
+            )
+          ),
+          h("main", { className: "stage", onPointerDown: onStagePointerDown },
+            h("div", { className: "ghost-word", "aria-hidden": "true" }, "SAND"),
+            h("div", { className: "session-topbar" },
+              h(TesteeCard, {
+                profile,
+                elapsed: elapsedSec,
+                itemCount: items.length,
+                photoCount: processPhotos.length,
+                onOpen: () => setProfileOpen(true)
+              }),
+              h("div", { className: "session-metrics" },
+                h("span", { className: "session-metric" }, h("b", null, formatDuration(elapsedSec)), "实时"),
+                h("span", { className: "session-metric" }, h("b", null, items.length), "件沙具"),
+                h("span", { className: "session-metric" }, h("b", null, processPhotos.length), "张快照"),
+                h("span", { className: "session-metric" }, h("b", null, `${WORLD.width}×${WORLD.depth}`), "4:3 沙箱")
+              ),
+              h("div", { className: "session-actions" },
+                h("button", { type: "button", className: `utility-btn${ambientMode === "white" ? " active" : ""}`, onClick: () => setAmbient(ambientMode === "white" ? "off" : "white") }, "白噪"),
+                h("button", { type: "button", className: `utility-btn${ambientMode === "music" ? " active" : ""}`, onClick: () => setAmbient(ambientMode === "music" ? "off" : "music") }, "轻音乐"),
+                h("button", { type: "button", className: "utility-btn photo", onClick: captureProcessPhoto }, `拍照 ${processPhotos.length}/6`),
+                h("button", { type: "button", className: "utility-btn", onClick: () => setHelpOpen(true) }, "说明"),
+                h("button", { type: "button", className: "finish-top", onClick: finishMaking }, "结束制作")
+              )
+            ),
+            h("div", { className: "wood-shell" },
+              h("div", {
+                ref: mountRef,
+                onPointerDown, onPointerMove, onPointerUp, onPointerCancel: onPointerUp, onWheel, onPointerLeave,
+                onContextMenu: (event) => event.preventDefault(),
+                onDragOver: (event) => event.preventDefault(), onDrop,
+                className: "sand-canvas"
+              })
+            )
+          ),
+          h("aside", { className: "studio-panel rail-right" },
+            h("div", { className: "panel-head" },
+              h("div", null,
+                h("div", { className: "panel-kicker" }, "TERRAIN / 地形"),
+                h("h2", { className: "panel-title" }, "塑形与微调")
+              ),
+              h("span", { className: "mode-state" },
+                h("i", { className: `mode-dot${tool === "select" ? "" : " draw"}` }),
+                tool === "select" ? "选择" : "绘制"
+              )
+            ),
+            h("div", { className: "tool-list" },
+              TOOLS.map((item) => h(ToolButton, { key: item.id, tool: item, active: tool === item.id, onClick: () => setTool(item.id) }))
+            ),
+            h("hr", { className: "rail-rule" }),
+            h("div", { className: "brush-head" },
+              h("span", { className: "micro-label" }, "笔刷直径"),
+              h("span", { className: "mono-value" }, `${brushSize} px`)
+            ),
+            h("input", {
+              type: "range", min: 40, max: 220, step: 2, value: brushSize,
+              onChange: (event) => setBrushSize(Number(event.target.value)),
+              className: "brush-range", "aria-label": "笔刷大小"
+            }),
+            h("div", { className: "brush-scale" }, h("span", null, "40"), h("span", null, "220")),
+            h("div", { className: "brush-row" },
+              h("span", { className: "micro-label" }, "笔刷力度"),
+              h("div", { className: "strength-steps" },
+                [0.4, 0.7, 1, 1.4].map((value) => h("button", {
+                  key: value, type: "button",
+                  className: brushStrength === value ? "active" : "",
+                  onClick: () => setBrushStrength(value)
+                }, value === 1 ? "标准" : `${Math.round(value * 100)}%`))
+              )
+            ),
+            h("hr", { className: "rail-rule" }),
+            h("div", { className: "selected-panel" },
+              h("div", { className: "selected-panel-head" },
+                h("strong", null, selectedItem ? selectedItem.label : "未选中沙具"),
+                h("small", null, selectedItem ? `${selectedItem.category || "未分类"}` : "点选沙盘内沙具")
+              ),
+              selectedItem ? h("div", { className: "selected-tools" },
+                h("button", { type: "button", title: "逆时针旋转", onClick: () => rotateSelected(-15) }, "↺"),
+                h("button", { type: "button", title: "顺时针旋转", onClick: () => rotateSelected(15) }, "↻"),
+                h("button", { type: "button", title: "缩小", onClick: () => scaleSelected(-0.1) }, "−"),
+                h("button", { type: "button", title: "放大", onClick: () => scaleSelected(0.1) }, "＋"),
+                h("button", { type: "button", title: "水平镜像", onClick: mirrorSelected }, "⇋"),
+                h("button", { type: "button", title: "取消选中", onClick: () => setSelectedId(null) }, "✕"),
+                h("button", { type: "button", className: "remove", onClick: deleteSelected, style: { gridColumn: "span 2" } }, "移除沙具")
+              ) : h("div", { className: "panel-note" }, "选中后可旋转、缩放、镜像与移除。")
             ),
             h("div", { className: "rail-actions" },
               h("div", { className: "action-row" },
-                h("button", { type: "button", onClick: undo, className: "ghost-btn" }, "撤销 ",
-                  h("span", { className: "mono-value" }, `${undoStack.length}/20`)
-                ),
-                h("button", { type: "button", onClick: clearAll, className: "ghost-danger" }, "清空")
+                h("button", { type: "button", onClick: undo, className: "ghost-btn" }, "撤销 ", h("span", { className: "mono-value" }, `${undoStack.length}/20`)),
+                h("button", { type: "button", onClick: redo, className: "ghost-btn" }, "重做 ", h("span", { className: "mono-value" }, `${redoStack.length}/20`))
               ),
-              h("button", { type: "button", onClick: finishMaking, className: "primary-btn" },
-                h("div", null,
-                  h("span", { className: "primary-label" }, "结束制作"),
-                  h("span", { className: "primary-meta" }, "代表沙具 · 沙盘描述 · 评估报告")
-                ),
-                h("span", { className: "primary-arrow" }, "↗")
-              )
+              h("button", { type: "button", onClick: clearAll, className: "ghost-danger" }, "清空沙盘（需二次确认）")
+            ),
+            h("hr", { className: "rail-rule" }),
+            h("div", { className: "shortcuts" },
+              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "右键"), h("span", null, "拖拽环绕观察")),
+              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "滚轮"), h("span", null, "缩放 / 旋转沙具")),
+              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "Ctrl Z"), h("span", null, "撤销；Shift 重做")),
+              h("div", { className: "shortcut-line" }, h("span", { className: "kbd" }, "M"), h("span", null, "水平镜像选中沙具"))
             )
           )
         ),
         toast ? h("div", { className: "toast" }, toast) : null,
+        profileOpen ? h(ProfileModal, {
+          profile,
+          onClose: () => setProfileOpen(false),
+          onSave: setProfile
+        }) : null,
+        helpOpen ? h(HelpModal, { onClose: () => setHelpOpen(false) }) : null,
+        clearConfirmOpen ? h(ClearConfirmModal, {
+          count: items.length,
+          onCancel: () => setClearConfirmOpen(false),
+          onConfirm: performClear
+        }) : null,
         completionOpen ? h(CompleteModal, {
           items: items,
+          profile,
           busy: submitting,
           error: completionError,
           onClose: () => { if (!submitting) { setCompletionOpen(false); setCompletionError(""); } },

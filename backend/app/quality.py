@@ -261,6 +261,29 @@ def grid_metrics(payload: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def structured_academic_scores(payload: dict[str, Any]) -> dict[str, Any]:
+    """工作台结构化录入的成绩，不依赖成绩单图片。"""
+    student = payload.get("student") if isinstance(payload.get("student"), dict) else {}
+    scores = student.get("academic_scores") if isinstance(student.get("academic_scores"), dict) else {}
+    if not scores:
+        return {}
+    subjects = scores.get("subjects") if isinstance(scores.get("subjects"), dict) else {}
+    cleaned: dict[str, float] = {}
+    for name, value in subjects.items():
+        number = _as_float(value)
+        if number is None or number < 0:
+            continue
+        cleaned[str(name).strip()] = number
+    result: dict[str, Any] = {
+        "exam_name": str(scores.get("exam_name") or "").strip(),
+        "exam_date": str(scores.get("exam_date") or "").strip(),
+        "total_score": _as_float(scores.get("total_score")),
+        "class_rank": str(scores.get("class_rank") or "").strip(),
+        "subjects": cleaned,
+    }
+    return result if (cleaned or result["total_score"] is not None) else {}
+
+
 def _has_scores(payload: dict[str, Any]) -> bool:
     text = str(payload.get("transcript_text") or "")
     if re.search(r"\d+(?:\.\d+)?\s*/\s*\d+(?:\.\d+)?|\d+(?:\.\d+)?\s*分", text):
@@ -270,7 +293,7 @@ def _has_scores(payload: dict[str, Any]) -> bool:
         for row in transcript.get("subjects") or []:
             if isinstance(row, dict) and row.get("score") is not None:
                 return True
-    return False
+    return bool(structured_academic_scores(payload))
 
 
 def _evidence_level(
@@ -482,4 +505,7 @@ def build_assessment_basis(payload: dict[str, Any], transcript_url: str | None =
         basis.append("制作过程操作数据")
     if transcript_url:
         basis.append("学习成绩单1张")
+    structured = structured_academic_scores(payload)
+    if structured:
+        basis.append("结构化考试成绩（受测者录入，待与成绩单核对）")
     return basis

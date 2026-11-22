@@ -390,6 +390,39 @@
   .report-row-bottom .status-pill { height: 21px; font-size: 8.5px; padding: 0 7px; }
   .report-row-bottom .level-pill { height: 21px; font-size: 8.5px; padding: 0 7px; }
 
+  .review-view .filter-strip { flex: none; margin: 0 0 12px; padding: 11px 14px; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(255, 253, 248, .55); box-shadow: var(--shadow-soft); }
+  .filter-strip-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .filter-strip-head b { font-family: var(--serif); font-size: 13px; white-space: nowrap; }
+  .filter-strip-head span { min-width: 0; color: var(--muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .filter-strip-fields { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)) auto; gap: 8px; align-items: end; }
+  .filter-strip-fields label { display: grid; gap: 4px; min-width: 0; color: var(--muted); font-size: 10px; }
+  .filter-strip-fields input { width: 100%; height: 32px; border: 1px solid var(--line); border-radius: 9px; background: rgba(255, 255, 255, .72); padding: 0 9px; color: var(--ink); font-size: 11px; outline: none; }
+  .filter-strip-fields input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(97, 125, 105, .12); }
+  .filter-strip-actions { display: flex; gap: 6px; }
+  .review-editor-shell { flex: none; margin: 0 14px 12px; max-height: 44vh; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(255, 253, 248, .72); padding: 12px; }
+  .review-editor-shell::-webkit-scrollbar { width: 6px; }
+  .review-editor-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+  .review-editor-head b { display: block; font-family: var(--serif); font-size: 13px; }
+  .review-editor-head small { display: block; margin-top: 3px; color: var(--muted); font-size: 9.5px; line-height: 1.5; }
+  .review-editor-badge { display: flex; align-items: center; gap: 6px; flex: none; }
+  .draft-badge { padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-solid); color: var(--muted); font-size: 9px; }
+  .draft-badge.dirty { border-color: #d8b384; background: #f7e8d0; color: #8a5a27; }
+  .draft-badge.muted { opacity: .7; }
+  .rev-pill { padding: 2px 8px; border-radius: 999px; background: var(--sage-soft); color: var(--sage-deep); font-size: 9px; }
+  .review-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .review-tab { padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255, 255, 255, .55); color: var(--ink-soft); font-size: 10px; }
+  .review-tab.active { border-color: var(--sage-dark); background: var(--sage-dark); color: #fff8e9; }
+  .review-editor-body { display: grid; gap: 9px; }
+  .review-card { padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 255, 255, .5); }
+  .review-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .review-card-head b { flex: none; font-size: 10px; color: var(--sage-deep); }
+  .review-label { display: grid; gap: 4px; margin-top: 7px; color: var(--muted); font-size: 9.5px; }
+  .review-input, .review-field { width: 100%; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-solid); padding: 7px 9px; color: var(--ink); font-size: 11px; line-height: 1.65; outline: none; resize: vertical; }
+  .review-input { height: 31px; padding: 0 9px; }
+  .review-input:focus, .review-field:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(97, 125, 105, .1); }
+  .review-editor-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 11px; padding-top: 10px; border-top: 1px dashed var(--line); }
+  .review-editor-tip { color: var(--muted); font-size: 9.5px; }
+  .review-editor-actions { display: flex; gap: 6px; flex: none; }
   .review-main { min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
   .review-toolbar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; border-bottom: 1px solid var(--line); background: rgba(255, 253, 248, .5); }
   .review-toolbar-left { min-width: 0; }
@@ -690,6 +723,8 @@
     .overview-grid, .review-layout { grid-template-columns: 1fr; }
     .review-side { max-height: 220px; }
     .review-actions { grid-template-columns: 1fr; }
+    .filter-strip-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .review-editor-foot { align-items: flex-start; flex-direction: column; }
     .action-buttons { justify-content: flex-end; }
     .review-summary { grid-template-columns: 1fr; }
     .review-summary > div:first-child { grid-row: auto; }
@@ -838,18 +873,33 @@
           </button>
         </div>
       </div>
+      <div class="filter-strip" id="reportFilterStrip">
+        <div class="filter-strip-head"><b>报告范围</b><span id="filterScope"></span></div>
+        <div class="filter-strip-fields">
+          <label>学校<input id="filterSchool" list="schoolOptions" placeholder="全部学校" autocomplete="off"><datalist id="schoolOptions"></datalist></label>
+          <label>班级<input id="filterClass" list="classOptions" placeholder="全部班级" autocomplete="off"><datalist id="classOptions"></datalist></label>
+          <label>年级<input id="filterGrade" list="gradeOptions" placeholder="全部年级" autocomplete="off"><datalist id="gradeOptions"></datalist></label>
+          <label>起始日期<input id="filterFrom" type="date"></label>
+          <label>截止日期<input id="filterTo" type="date"></label>
+          <div class="filter-strip-actions">
+            <button class="btn small soft" id="resetFilterBtn">重置</button>
+            <button class="btn small primary" id="applyFilterBtn">应用筛选</button>
+          </div>
+        </div>
+      </div>
       <div class="review-layout">
         <aside class="surface review-side">
           <div class="side-tools">
             <div class="search-field">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="6.2"/><path d="m16 16 3.2 3.2"/></svg>
-              <input id="reportSearch" placeholder="搜索学生 / 报告编号" autocomplete="off">
+              <input id="reportSearch" placeholder="搜索学生 / 学校 / 班级 / 报告编号" autocomplete="off">
             </div>
             <div class="filter-tabs" id="reportFilters">
               <button class="filter-tab active" data-filter="all">全部</button>
               <button class="filter-tab" data-filter="pending">待审核</button>
               <button class="filter-tab" data-filter="changes">待修订</button>
               <button class="filter-tab" data-filter="approved">已通过</button>
+              <button class="filter-tab" data-filter="rejected">已退回</button>
             </div>
           </div>
           <div class="review-list" id="reviewList"><div class="empty-table">正在加载报告…</div></div>
@@ -1007,8 +1057,14 @@
     detailError: "",
     reviewStatus: "pending",
     reviewNote: "",
+    reviewContext: null,
+    reviewDraft: null,
+    reviewDraftDirty: false,
+    reviewSection: "chapter_2_imagery",
     reportFilter: "all",
     reportSearch: "",
+    filters: { school: "", class_name: "", grade: "", date_from: "", date_to: "" },
+    facets: { schools: [], classes: [], grades: [] },
     userSearch: "",
     userRoleFilter: "all",
     userStatusFilter: "all",
@@ -1100,6 +1156,83 @@
     node.querySelector("span").textContent = label;
   }
 
+  function buildFilterQuery() {
+    const params = new URLSearchParams();
+    Object.entries(state.filters || {}).forEach(([key, value]) => {
+      if (String(value || "").trim()) params.set(key, String(value).trim());
+    });
+    const query = params.toString();
+    return query ? `&${query}` : "";
+  }
+
+  function fillFilterControls() {
+    const facets = state.facets || {};
+    const fill = (id, values) => {
+      const node = el(id);
+      if (!node) return;
+      node.innerHTML = (values || []).map((value) => `<option value="${esc(value)}"></option>`).join("");
+    };
+    fill("schoolOptions", facets.schools || []);
+    fill("classOptions", facets.classes || []);
+    fill("gradeOptions", facets.grades || []);
+    const values = state.filters || {};
+    if (el("filterSchool") && document.activeElement !== el("filterSchool")) el("filterSchool").value = values.school || "";
+    if (el("filterClass") && document.activeElement !== el("filterClass")) el("filterClass").value = values.class_name || "";
+    if (el("filterGrade") && document.activeElement !== el("filterGrade")) el("filterGrade").value = values.grade || "";
+    if (el("filterFrom") && document.activeElement !== el("filterFrom")) el("filterFrom").value = values.date_from || "";
+    if (el("filterTo") && document.activeElement !== el("filterTo")) el("filterTo").value = values.date_to || "";
+    const scope = state.stats && state.stats.scope;
+    if (el("filterScope")) {
+      el("filterScope").textContent = scope
+        ? `当前范围：${scope.school || "全部学校"} · ${scope.class_name || "全部班级"} · ${scope.grade || "全部年级"}${scope.date_from ? ` · ${scope.date_from} 起` : ""}${scope.date_to ? ` · 截至 ${scope.date_to}` : ""} · ${scope.total_reports} 份报告`
+        : "";
+    }
+  }
+
+  async function loadDashboard() {
+    const query = buildFilterQuery();
+    const [bootstrap, reports, stats] = await Promise.all([
+      api("/admin/bootstrap"),
+      api(`/admin/reports?limit=100${query}`),
+      api(`/admin/stats?${query.replace(/^&/, "")}`),
+    ]);
+    state.bootstrap = bootstrap;
+    state.roles = bootstrap.roles || [];
+    state.users = bootstrap.users || [];
+    state.reports = reports.reports || [];
+    state.facets = reports.facets || state.facets;
+    state.stats = stats;
+    fillFilterControls();
+  }
+
+  async function applyReportFilters(reset = false) {
+    state.filters = reset
+      ? { school: "", class_name: "", grade: "", date_from: "", date_to: "" }
+      : {
+          school: (el("filterSchool") || {}).value || "",
+          class_name: (el("filterClass") || {}).value || "",
+          grade: (el("filterGrade") || {}).value || "",
+          date_from: (el("filterFrom") || {}).value || "",
+          date_to: (el("filterTo") || {}).value || "",
+        };
+    try {
+      setSync(true, "筛选加载中…");
+      await loadDashboard();
+      const selectedStillExists = state.reports.some((item) => item.assessment_id === state.selectedId);
+      if (!selectedStillExists) {
+        state.selectedId = state.reports.length ? state.reports[0].assessment_id : null;
+        state.detail = null;
+        state.reviewContext = null;
+        state.reviewDraft = null;
+      }
+      renderAll();
+      if (state.view === "review") ensureDetail(true);
+      toast(reset ? "已重置筛选" : `已筛选 ${state.reports.length} 份报告`);
+    } catch (error) {
+      toast(`筛选失败：${error.message || error}`, true);
+    }
+  }
+
   async function boot() {
     const now = new Date();
     const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
@@ -1108,16 +1241,7 @@
     el("backToWorkbench").href = WORKBENCH_URL;
 
     try {
-      const [bootstrap, reports, stats] = await Promise.all([
-        api("/admin/bootstrap"),
-        api("/admin/reports?limit=100"),
-        api("/admin/stats"),
-      ]);
-      state.bootstrap = bootstrap;
-      state.roles = bootstrap.roles || [];
-      state.users = bootstrap.users || [];
-      state.reports = reports.reports || [];
-      state.stats = stats;
+      await loadDashboard();
       state.loading = false;
       renderRoleOptions("student");
       setSync(true, `已同步 · ${fmtTime(new Date().toISOString())}`);
@@ -1132,6 +1256,7 @@
   }
 
   function renderAll() {
+    fillFilterControls();
     renderKPIs();
     renderOverview();
     renderReportList();
@@ -1175,7 +1300,8 @@
     el("kpiHighRisk").textContent = summary ? summary.high_risk_reports : "—";
     el("kpiShares").textContent = summary ? summary.share_links : "—";
     if (summary) {
-      el("kpiReportsFoot").textContent = `覆盖 ${state.stats.grade_distribution.length} 个年级 · ${summary.total_items} 件沙具`;
+      const scope = state.stats.scope || {};
+      el("kpiReportsFoot").textContent = `${scope.school || "全部学校"} · ${scope.class_name || "全部班级"} · ${summary.total_items} 件沙具`;
       el("kpiPendingFoot").textContent = summary.pending_reviews ? "等待咨询师确认" : "队列已清空";
       el("kpiHighRiskFoot").textContent = summary.high_risk_reports ? "L2 及以上需关注" : "当前无重点线索";
       el("kpiSharesFoot").textContent = summary.share_links ? "家长端可访问" : "尚未生成分享";
@@ -1193,7 +1319,7 @@
         <span class="queue-bar ${esc(report.risk_level)}"></span>
         <span class="queue-main">
           <b>${esc(report.student_name)} <span class="level-pill ${esc(report.risk_level)}">${esc(report.risk_level)}</span></b>
-          <small>${esc(report.report_no)} · ${esc(text(report.grade_level, "年级未填"))} · ${esc(fmtTime(report.created_at))}</small>
+          <small>${esc([report.school_name, report.class_name, report.report_no, text(report.grade_level, "年级未填")].filter(Boolean).join(" · "))} · ${esc(fmtTime(report.created_at))}</small>
         </span>
         <span class="queue-right">
           <span class="status-pill ${esc(report.review_status)}">${statusText(report.review_status)}</span>
@@ -1240,7 +1366,7 @@
   }
 
   function statusText(status) {
-    return { pending: "待审核", changes: "待修订", approved: "已通过" }[status] || status;
+    return { pending: "待审核", changes: "待修订", approved: "已通过", rejected: "已退回" }[status] || status;
   }
   function riskText(level) {
     return { L1: "L1 平稳", L2: "L2 轻度关注", L3: "L3 中度关注", L4: "L4 重点关注" }[level] || level;
@@ -1251,7 +1377,7 @@
       if (state.reportFilter !== "all" && report.review_status !== state.reportFilter) return false;
       if (state.reportSearch.trim()) {
         const keyword = state.reportSearch.trim().toLowerCase();
-        return [report.student_name, report.student_no, report.report_no, report.representative_item_name]
+        return [report.student_name, report.student_no, report.report_no, report.representative_item_name, report.school_name, report.class_name, report.seat_no]
           .join(" ").toLowerCase().includes(keyword);
       }
       return true;
@@ -1267,7 +1393,7 @@
           <b>${esc(report.student_name)}</b>
           <time>${esc(fmtTime(report.created_at))}</time>
         </div>
-        <div class="report-row-no">${esc(report.report_no)} · ${esc(text(report.grade_level, "年级未填"))}</div>
+        <div class="report-row-no">${esc([report.school_name, report.class_name, text(report.grade_level, "年级未填"), report.report_no].filter(Boolean).join(" · "))}</div>
         <div class="report-row-bottom">
           <span class="status-pill ${esc(report.review_status)}">${statusText(report.review_status)}</span>
           <span class="level-pill ${esc(report.risk_level)}">${esc(report.risk_level)}</span>
@@ -1285,11 +1411,17 @@
     renderReportList();
     renderReviewDetail();
     try {
-      const detail = await api(`/reports/${encodeURIComponent(state.selectedId)}`);
+      const [detail, context] = await Promise.all([
+        api(`/reports/${encodeURIComponent(state.selectedId)}`),
+        api(`/admin/reports/${encodeURIComponent(state.selectedId)}/review-context`),
+      ]);
       state.detail = detail;
-      const brief = state.reports.find((item) => item.assessment_id === state.selectedId);
-      state.reviewStatus = brief ? brief.review_status : "pending";
-      state.reviewNote = brief ? brief.review_note || "" : "";
+      state.reviewContext = context;
+      state.reviewDraft = buildReviewDraft(context);
+      state.reviewDraftDirty = false;
+      const brief = state.reports.find((item) => item.assessment_id === state.selectedId) || null;
+      state.reviewStatus = context.review ? context.review.status : (brief ? brief.review_status : "pending");
+      state.reviewNote = context.review ? (context.review.note || "") : (brief ? brief.review_note || "" : "");
     } catch (error) {
       state.detailError = error.message || String(error);
       state.detail = null;
@@ -1312,7 +1444,7 @@
     const meta = report.meta || {};
     const sample = meta.sample_quality || {};
     const engine = String(meta.engine || brief.engine || "").toLowerCase();
-    const isDemo = engine === "demo" || (!engine && !meta.generation_usage);
+    const isDemo = engine === "demo" || meta.demo_report === true || (!engine && !meta.generation_usage);
     const level = String(brief.risk_level || "L1").toUpperCase();
     const levelClass = level.indexOf("L4") === 0 ? "risk-l4" : (level.indexOf("L3") === 0 ? "risk-l3" : "");
     const warnings = list(meta.quality_warnings).filter((item) => item && item.code !== "DEMO_ENGINE");
@@ -1351,6 +1483,187 @@
       </div>`;
   }
 
+  const REVIEW_SECTION_META = {
+    chapter_2_imagery: { label: "第二章 · 意象假设", hint: "只改探索性假设与核验问题，保留“非诊断”限定" },
+    chapter_6_interview: { label: "第六章 · 访谈建议", hint: "按受测者 / 家长 / 教师分组，问题一行一条" },
+    chapter_9_general_advice: { label: "第九章 · 总体建议", hint: "面向学生与家长的发展性行动建议，一行一条" },
+  };
+
+  function cloneJson(value) {
+    try { return JSON.parse(JSON.stringify(value || {})); } catch (e) { return {}; }
+  }
+
+  function extractEditable(report) {
+    const source = report || {};
+    const result = {};
+    Object.keys(REVIEW_SECTION_META).forEach((key) => {
+      if (source[key] && typeof source[key] === "object") result[key] = cloneJson(source[key]);
+    });
+    return result;
+  }
+
+  function buildReviewDraft(context) {
+    const ctx = context || {};
+    const source = (ctx.review && ctx.review.has_draft) ? ctx.draft_sections : ctx.effective_report;
+    return extractEditable(source);
+  }
+
+  function setDraftPath(target, path, value) {
+    const keys = String(path).split(".");
+    let node = target;
+    keys.forEach((key, index) => {
+      const last = index === keys.length - 1;
+      const nextKey = keys[index + 1];
+      const numeric = /^\d+$/.test(key);
+      if (last) {
+        node[key] = value;
+        return;
+      }
+      if (node[key] == null) node[key] = numeric || /^\d+$/.test(nextKey) ? [] : {};
+      node = node[key];
+    });
+  }
+
+  function getDraftPath(target, path) {
+    return String(path).split(".").reduce((node, key) => (node == null ? undefined : node[key]), target);
+  }
+
+  function reviewTextarea(path, value, rows = 3, kind = "text") {
+    return `<textarea class="review-field" data-review-path="${esc(path)}" data-review-kind="${esc(kind)}" rows="${rows}">${esc(value || "")}</textarea>`;
+  }
+
+  function renderChapter2Editor(draft) {
+    const themes = list((draft.chapter_2_imagery || {}).themes);
+    if (!themes.length) return '<div class="empty-table">AI 原稿没有第二章主题条目</div>';
+    return themes.map((theme, index) => `
+      <div class="review-card">
+        <div class="review-card-head"><b>假设 ${index + 1}</b><input class="review-input" data-review-path="themes.${index}.theme" value="${esc(theme.theme || "")}" placeholder="主题名称"></div>
+        <label class="review-label">探索性假设${reviewTextarea(`themes.${index}.hypothesis`, theme.hypothesis, 3)}</label>
+        <label class="review-label">替代解释${reviewTextarea(`themes.${index}.alternative_hypothesis`, theme.alternative_hypothesis, 3)}</label>
+        <label class="review-label">核验问题${reviewTextarea(`themes.${index}.verification_question`, theme.verification_question, 2)}</label>
+      </div>`).join("");
+  }
+
+  function renderChapter6Editor(draft) {
+    const items = list((draft.chapter_6_interview || {}).items);
+    if (!items.length) return '<div class="empty-table">AI 原稿没有访谈条目</div>';
+    return items.map((item, index) => `
+      <div class="review-card">
+        <div class="review-card-head"><b>访谈 ${index + 1}</b><input class="review-input" data-review-path="items.${index}.topic" value="${esc(item.topic || "")}" placeholder="访谈主题"></div>
+        <label class="review-label">访谈对象<input class="review-input" data-review-path="items.${index}.target" value="${esc(item.target || "")}" placeholder="受测者 / 家长 / 教师"></label>
+        <label class="review-label">问题清单（一行一条）${reviewTextarea(`items.${index}.questions`, list(item.questions).filter(Boolean).join("\n"), 3, "array")}</label>
+      </div>`).join("");
+  }
+
+  function renderChapter9Editor(draft) {
+    const chapter = draft.chapter_9_general_advice || {};
+    return `
+      <div class="review-card">
+        <label class="review-label">成长型思维（一行一条）${reviewTextarea("growth_mindset", list(chapter.growth_mindset).filter(Boolean).join("\n"), 4, "array")}</label>
+        <label class="review-label">优势迁移（一行一条）${reviewTextarea("strength_transfer", list(chapter.strength_transfer).filter(Boolean).join("\n"), 3, "array")}</label>
+        <label class="review-label">能力不等于标签（一行一条）${reviewTextarea("capability_not_label", list(chapter.capability_not_label).filter(Boolean).join("\n"), 3, "array")}</label>
+        <label class="review-label">免责说明${reviewTextarea("disclaimer", chapter.disclaimer, 2)}</label>
+      </div>`;
+  }
+
+  function renderReviewEditor() {
+    const context = state.reviewContext;
+    if (!context || !state.reviewDraft) {
+      return '<div class="review-editor"><div class="empty-table">正在载入可修订章节…</div></div>';
+    }
+    const section = state.reviewSection || "chapter_2_imagery";
+    const meta = context.review || {};
+    const badge = state.reviewDraftDirty
+      ? '<span class="draft-badge dirty">有未保存修改</span>'
+      : (meta.has_draft ? '<span class="draft-badge">草稿已保存</span>' : '<span class="draft-badge muted">尚未修改</span>');
+    const tabs = Object.entries(REVIEW_SECTION_META).map(([key, item]) => `
+      <button class="review-tab ${key === section ? "active" : ""}" data-review-section="${esc(key)}">${esc(item.label)}</button>`).join("");
+    const body = section === "chapter_6_interview"
+      ? renderChapter6Editor(state.reviewDraft)
+      : section === "chapter_9_general_advice"
+        ? renderChapter9Editor(state.reviewDraft)
+        : renderChapter2Editor(state.reviewDraft);
+    return `
+      <section class="review-editor">
+        <div class="review-editor-head">
+          <div>
+            <b>审核修订 · AI 原稿可编辑</b>
+            <small>${esc(REVIEW_SECTION_META[section].hint)}；仅第二、六、九章可修订，风险章保持 AI 原稿</small>
+          </div>
+          <div class="review-editor-badge">${badge}<span class="rev-pill">修订版本 v${Number(context.report_revision || 0)}</span></div>
+        </div>
+        <div class="review-tabs">${tabs}</div>
+        <div class="review-editor-body" id="reviewEditorBody">${body}</div>
+        <div class="review-editor-foot">
+          <span class="review-editor-tip">修改后可先保存草稿；审核通过时会自动应用当前草稿。</span>
+          <div class="review-editor-actions">
+            <button class="btn small soft" id="resetDraftBtn">还原为 AI 原稿</button>
+            <button class="btn small" id="saveDraftBtn">保存草稿</button>
+          </div>
+        </div>
+      </section>`;
+  }
+
+  function bindReviewEditor() {
+    const body = el("reviewEditorBody");
+    if (!body) return;
+    const markDirty = () => {
+      if (!state.reviewDraftDirty) {
+        state.reviewDraftDirty = true;
+        const badge = document.querySelector(".draft-badge");
+        if (badge) { badge.textContent = "有未保存修改"; badge.classList.add("dirty"); badge.classList.remove("muted"); }
+      }
+    };
+    body.querySelectorAll("[data-review-path]").forEach((input) => {
+      input.addEventListener("input", () => {
+        const kind = input.dataset.reviewKind;
+        const raw = input.value;
+        const value = kind === "array" ? raw.split("\n").map((line) => line.trim()).filter(Boolean) : raw;
+        setDraftPath(state.reviewDraft[state.reviewSection], input.dataset.reviewPath, value);
+        markDirty();
+      });
+    });
+    el("saveDraftBtn").addEventListener("click", saveReviewDraft);
+    el("resetDraftBtn").addEventListener("click", () => {
+      state.reviewDraft = extractEditable(state.reviewContext.ai_report);
+      state.reviewDraftDirty = true;
+      renderReviewDetail();
+    });
+    document.querySelectorAll("[data-review-section]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.reviewSection = button.dataset.reviewSection;
+        renderReviewDetail();
+      });
+    });
+  }
+
+  async function saveReviewDraft() {
+    const brief = state.reports.find((item) => item.assessment_id === state.selectedId);
+    if (!brief || !state.reviewDraft) return;
+    const button = el("saveDraftBtn");
+    if (button) { button.disabled = true; button.textContent = "保存中…"; }
+    try {
+      const result = await api(`/admin/reports/${encodeURIComponent(brief.assessment_id)}/review-draft`, {
+        method: "PUT",
+        body: JSON.stringify({ draft: state.reviewDraft, note: state.reviewNote || "", reviewer_id: "shen.lan" }),
+      });
+      state.reviewContext = { ...(state.reviewContext || {}), review: result.review, draft_sections: result.draft_sections };
+      state.reviewDraftDirty = false;
+      if (result.review && result.review.status) {
+        state.reviewStatus = result.review.status;
+        brief.review_status = result.review.status;
+      }
+      renderReviewDetail();
+      renderReportList();
+      renderNav();
+      toast("修订草稿已保存，审核通过时自动应用");
+    } catch (error) {
+      toast(`保存草稿失败：${error.message || error}`, true);
+    } finally {
+      if (button) { button.disabled = false; button.textContent = "保存草稿"; }
+    }
+  }
+
   function renderReviewDetail() {
     const main = el("reviewMain");
     const brief = state.reports.find((item) => item.assessment_id === state.selectedId) || null;
@@ -1381,11 +1694,15 @@
         </div>
         <div class="review-toolbar-right">
           <span class="status-pill ${esc(status)}">${statusText(status)}</span>
+          <button class="btn small soft" id="toggleEditorBtn">修订 AI 正文</button>
           <button class="btn small" id="openCounselorView">完整报告</button>
           <button class="btn small soft" id="openPublicView">家长版预览</button>
         </div>
       </div>
       ${renderReviewSummary(report, brief, status)}
+      <div class="review-editor-shell" id="reviewEditorShell" hidden>
+        ${renderReviewEditor()}
+      </div>
       <div class="paper-scroll" id="paperScroll">
         ${renderPaper(report, brief)}
       </div>
@@ -1534,6 +1851,20 @@
   function bindDetailActions() {
     const retry = el("retryDetail");
     if (retry) retry.addEventListener("click", () => ensureDetail(true));
+    const editorToggle = el("toggleEditorBtn");
+    const editorShell = el("reviewEditorShell");
+    if (editorToggle && editorShell) {
+      editorToggle.addEventListener("click", () => {
+        const open = editorShell.hasAttribute("hidden");
+        if (open) editorShell.removeAttribute("hidden");
+        else editorShell.setAttribute("hidden", "");
+        editorToggle.textContent = open ? "收起修订面板" : "修订 AI 正文";
+        if (open && editorShell.dataset.bound !== "1") {
+          editorShell.dataset.bound = "1";
+          bindReviewEditor();
+        }
+      });
+    }
     const note = el("reviewNote");
     if (note) note.addEventListener("input", () => { state.reviewNote = note.value; });
     const approve = el("approveBtn");
@@ -1585,14 +1916,28 @@
       return;
     }
     try {
+      const payload = { status, note, reviewer_id: "shen.lan" };
+      const hasDraft = Boolean(state.reviewContext && state.reviewContext.review && state.reviewContext.review.has_draft);
+      if (status === "approved" && state.reviewDraft && (state.reviewDraftDirty || hasDraft)) {
+        payload.draft = state.reviewDraft;
+      }
       const result = await api(`/admin/reports/${encodeURIComponent(brief.assessment_id)}/review`, {
         method: "POST",
-        body: JSON.stringify({ status, note, reviewer_id: "shen.lan" }),
+        body: JSON.stringify(payload),
       });
       state.reviewStatus = result.status;
       state.reviewNote = result.note || "";
+      state.reviewDraftDirty = false;
       brief.review_status = result.status;
       brief.review_note = result.note || "";
+      brief.report_revision = result.report_revision;
+      brief.has_review_draft = false;
+      if (result.review) state.reviewContext = { ...(state.reviewContext || {}), review: result.review, report_revision: result.report_revision };
+      if (status === "approved" && payload.draft) {
+        state.detail = null;
+        state.detailLoading = false;
+        await ensureDetail(true);
+      }
       if (state.stats && state.stats.summary) {
         state.stats.summary.pending_reviews = state.reports.filter((item) => item.review_status === "pending" || item.review_status === "changes").length;
         state.stats.summary.approved_reports = state.reports.filter((item) => item.review_status === "approved").length;
@@ -1984,13 +2329,27 @@
     if (!row) return;
     selectReport(row.dataset.reportId);
   });
+  const applyFilterBtn = el("applyFilterBtn");
+  if (applyFilterBtn) applyFilterBtn.addEventListener("click", () => applyReportFilters(false));
+  const resetFilterBtn = el("resetFilterBtn");
+  if (resetFilterBtn) resetFilterBtn.addEventListener("click", () => applyReportFilters(true));
+  ["filterSchool", "filterClass", "filterGrade", "filterFrom", "filterTo"].forEach((id) => {
+    const node = el(id);
+    if (node) node.addEventListener("keydown", (event) => { if (event.key === "Enter") applyReportFilters(false); });
+  });
   el("refreshReports").addEventListener("click", async () => {
     try {
-      const reports = await api("/admin/reports?limit=100");
+      const query = buildFilterQuery();
+      const [reports, stats] = await Promise.all([
+        api(`/admin/reports?limit=100${query}`),
+        api(`/admin/stats?${query.replace(/^&/, "")}`),
+      ]);
       state.reports = reports.reports || [];
+      state.facets = reports.facets || state.facets;
+      state.stats = stats;
+      fillFilterControls();
       await ensureDetail(true);
-      renderReportList();
-      renderOverview();
+      renderAll();
       toast("审核队列已刷新");
     } catch (error) {
       toast(`刷新失败：${error.message || error}`, true);

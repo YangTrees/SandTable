@@ -29,6 +29,7 @@ from .quality import (
     QUALITY_FLAG_META,
     build_assessment_basis,
     build_sample_quality,
+    structured_academic_scores,
     terrain_observation,
 )
 from .process_metrics import (
@@ -1802,14 +1803,27 @@ def normalize_meta(
         "disclaimer": "发展性心理评估参考·非临床诊断",
         "engine": engine,
         "engine_note": engine_note,
+        "demo_report": engine == "demo",
     })
     report["chapter_1_overview"]["sandplay_image_url"] = image_url
     chapter_4 = report["chapter_4_academic"]
+    structured_scores = structured_academic_scores(payload)
+    if structured_scores:
+        chapter_4["structured_scores"] = structured_scores
+        chapter_4["score_source"] = "structured_entry"
+        if not transcript_url:
+            note = "结构化成绩由受测者录入，待与成绩单核对。"
+            existing_notes = chapter_4.get("notes")
+            notes = existing_notes if isinstance(existing_notes, list) else ([existing_notes] if existing_notes else [])
+            if note not in notes:
+                notes.append(note)
+            chapter_4["notes"] = notes
     if transcript_url:
         chapter_4["transcript_provided"] = True
         chapter_4["transcript_image_url"] = transcript_url
+        chapter_4["score_source"] = "transcript_image" if not structured_scores else "mixed"
     else:
-        chapter_4["transcript_provided"] = False
+        chapter_4["transcript_provided"] = bool(structured_scores)
         chapter_4["transcript_image_url"] = ""
     apply_report_quality_gates(report, payload=payload, transcript_url=transcript_url)
     return report

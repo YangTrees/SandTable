@@ -4,7 +4,7 @@ import json
 from typing import Any
 
 from .process_metrics import build_process_metrics, process_telemetry
-from .quality import build_sample_quality
+from .quality import build_sample_quality, structured_academic_scores
 from .holistic import prompt_context as holistic_prompt_context
 from .theory import (
     CHAPTER_TITLES,
@@ -248,6 +248,7 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
 
     ctx = {
         "student": student,
+        "structured_academic_scores": structured_academic_scores(payload),
         "representative_item": {
             "id": payload.get("representative_item_id"),
             "name": payload.get("representative_item_name") or rep_item.get("label") or rep_item.get("name"),
@@ -363,6 +364,7 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
 - 若 `process_metrics.available=true`，chapter_3 必须写 `process_integration`：summary 点名至少两个与当前线索最相关的维度，referenced_dimensions 必须使用给定六维名称，notes 每个维度一条，写明过程指标支持、削弱或待核验了哪一部分；同时至少两个维度的 judgement 或 assessment_result 要引用过程指标。不得把过程数据只放在第一章。
 - 过程发现只能写成“过程层面的弱证据/待核验”，不得写“说明家庭关系整体正向、动力未耗竭、无选择困难、认可度高”等结论；低修改既可能是果断，也可能是回避深入，必须保留竞争假设。
 - 成绩单：如果提供了图片，先逐科读取满分、得分、得分率和等级；只读清晰可辨的数字。没有把握的科目 score/rate 填 null，grade 填“待核对”。
+- 结构化成绩：若 `structured_academic_scores.subjects` 非空，必须把它作为成绩依据写入 chapter_4_academic；`subject` 使用键名原值，`score` 使用录入值，`rate` 填 null，`grade` 按总分/单科分无法核算时填“待核对”；`total.score` 使用 `total_score`。同时在 `notes` 写明“结构化成绩由受测者录入，待与成绩单核对”；不得把这些数字说成从图片读取，也不得与成绩单图片冲突时擅自覆盖图片读数。
 - chapter_2 每个主题必须给出两个竞争性假设：hypothesis 写支持性/资源性解释，alternative_hypothesis 写防御、阻抗或发展滞后解释，verification_question 写一句能区分两者的访谈提问。不得只做单向积极美化。
 - chapter_7 不得仅凭一件沙具推断稳定人格特质或能力水平；每条优势必须能回到沙盘或自述中的具体行为线索，并写明证据边界。
 - 理论依据必须与结论真正相关，不要求每段罗列三本书；不得编造“某作者提出某跨领域结论”。chapter_3 的 `assessment_theory` 必须原样使用 `six_dimension_theory_map` 中该维度的固定理论；箱庭与荣格分析心理学只用于意象解码、边界防御、安全容器与动力源分析，不用于学科能力推断。

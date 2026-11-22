@@ -26,7 +26,7 @@ MULTIMODAL_API_KEY = _env("MULTIMODAL_API_KEY")
 MULTIMODAL_BASE_URL = _env("MULTIMODAL_BASE_URL", "https://api.openai.com/v1").rstrip("/")
 MULTIMODAL_MODEL = _env("MULTIMODAL_MODEL", "gpt-4o-mini")
 MULTIMODAL_TIMEOUT_SECONDS = int(_env("MULTIMODAL_TIMEOUT_SECONDS", "180"))
-ALLOW_DEMO_REPORT = _env("ALLOW_DEMO_REPORT", "true").lower() in {"1", "true", "yes", "on"}
+ALLOW_DEMO_REPORT = _env("ALLOW_DEMO_REPORT", "false").lower() in {"1", "true", "yes", "on"}
 CORS_ORIGINS = [item.strip() for item in _env("CORS_ORIGINS", "*").split(",") if item.strip()]
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)

@@ -1,17 +1,27 @@
 # SandTable · 心理沙盘 3D 工作台
 
-一个面向学校心理老师与咨询师的 3D 心理沙盘工作台：在浏览器中摆放沙具、塑形沙面、记录描述，提交后生成九章节发展性评估报告，并支持咨询师完整版与家长/学生脱敏版分享。
+面向学校心理老师与咨询师的 3D 心理沙盘工作台：在浏览器中摆放沙具、塑造地形、记录制作过程与描述，提交后生成九章节发展性评估报告；咨询师在管理后台审核、修订并生成家长 / 学生分享页。
 
 ## 功能
 
-- Three.js 3D 沙盘：堆沙、挖沙、挖水、抚平、旋转与缩放，导出高清沙盘图
-- 500 件沙具库：8 个器物分类 + 81 个子类 + 5 个临床主题标签，双轴 AND 组合筛选
-- 每件沙具统一 13 个字段：子类、资产组、具体释义、支持性假设、替代性假设、访谈核验问题、风险层级与空间角色；237 件带主题标签，263 件保持中性
-- 收尾流程：选择代表沙具、填写沙盘描述与可选教师观察，再提交报告
-- 九章节报告：六维分析、九维风险、访谈建议、生涯优势、训练模块
-- 认知维度证据门控：有自述/成绩/教师观察时不直接由空间分布推断学科能力；缺证时保留跨学科类比并标注“理论假说·待核实”
-- 管理后台：评估统计、审核队列、报告查看与分享二维码
-- 双版本报告：咨询师完整版与家长/学生脱敏版；风险章节仅咨询师可见
+- Three.js 3D 沙盘：固定 4:3（1200 × 900）沙箱，支持堆沙、挖沙、挖水、抚平、笔刷直径与力度、撤销 / 重做、沙具水平镜像
+- 500 件沙具库：按器物分类与子类检索，支持搜索、分类筛选和场景内微调
+- 工作台档案：学校、班级、座位号、联系方式、结构化成绩，以及学生姓名 / 学号 / 年级 / 性别；结构化成绩写入报告第四章，并注明“待与成绩单核对”
+- 制作过程记录：实时计时、过程快照（最多 6 张）、地形操作计数、空间关系、九宫格分布与留白估算
+- 收尾流程：选择代表沙具，填写沙盘描述、自我叙事与可选教师观察，确认后提交
+- 九章节报告：整体概览、意象假设、六维方向、学业表现、风险研判、访谈建议、生涯优势、训练模块、总体建议
+- 认知维度证据门控：有自述 / 成绩 / 教师观察时不直接由空间分布推断学科能力；缺证时标注“理论假说·待核实”
+- 管理后台：报告范围筛选、评估统计、审核队列、AI 正文修订草稿、审核通过后生成分享二维码
+- 双版本报告：咨询师完整版与家长 / 学生脱敏版；风险章节仅咨询师可见
+- Demo 报告显式标识，默认关闭（`ALLOW_DEMO_REPORT=false`）
+
+## 技术结构
+
+- 前端：单文件 HTML，React UMD + Babel 运行时编译，Three.js 渲染，无构建步骤
+- 后端：FastAPI + SQLAlchemy，开发环境默认 SQLite（`backend/data/sandplay.db`）
+- 鉴权：管理接口统一使用共享请求头 `X-Counselor-Token`；当前版本不区分多角色会话
+- 数据库四表：`assessments / report_reviews / share_links / admin_users`
+- 报告存储：评估正文在 `assessments.report_json`，AI 原稿与审核草稿在 `report_reviews`
 
 ## 目录
 
@@ -20,15 +30,13 @@ sandplay_workbench_react.html   前端 3D 工作台（单文件 React + Three.js
 report_viewer_v2.html           报告精排 H5 / A4 打印页
 report_viewer.html              旧入口，自动跳转到 v2
 admin_dashboard.html            管理后台
-backend/                        FastAPI + SQLite 后端
-assets/sandplay_miniatures_500.json   500 件沙具主数据（schema 1.1）
+backend/app/                    FastAPI 应用、数据模型、报告引擎
+backend/data/                   本地 SQLite 与上传文件（已忽略）
+assets/sandplay_miniatures_500.json   500 件沙具主数据
 assets/sandplay_miniatures_500.csv    500 行字段审计表
-scripts/unify_sandplay_taxonomy.py    旧 400 件子类/主题/双假设补齐与统计
-scripts/build_sandplay_library.py     运行时资产库构建与 schema 校验
 assets/generated/sandplay_library.js  运行时沙具库（内嵌 WebP）
-assets/generated/transparent/         600 组透明底 PNG / WebP 素材
-contracts/                      API 与数据库契约
-生成脚本（根目录 _*.py）        资产生成、修复与报告排版脚本
+assets/generated/transparent/         透明底 PNG / WebP 素材
+contracts/                      API 与数据库契约（与当前实现同步）
 ```
 
 ## 本地启动
@@ -36,7 +44,7 @@ contracts/                      API 与数据库契约
 ### 1. 后端
 
 ```powershell
-cd backend
+cd D:\PROJECTS\_AI\SandTable\backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -47,29 +55,44 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 健康检查：`http://127.0.0.1:8000/api/v1/health`
 
+首次启动会在 `backend/data/sandplay.db` 建表，并自动为历史库补齐新增列。
+
 ### 2. 前端静态服务
 
 ```powershell
-cd D:\AI\AI_SandBox
+cd D:\PROJECTS\_AI\SandTable
 python -m http.server 8765
 ```
 
-打开：`http://127.0.0.1:8765/sandplay_workbench_react.html`
+打开：
 
-也可以直接双击 `sandplay_workbench_react.html`，前端默认请求 `http://127.0.0.1:8000/api/v1`。
+- 工作台：`http://127.0.0.1:8765/sandplay_workbench_react.html`
+- 管理后台：`http://127.0.0.1:8765/admin_dashboard.html`
+
+前端默认请求 `http://127.0.0.1:8000/api/v1`；后端需允许跨域访问。
+
+## 主要接口
+
+- `POST /api/v1/assessments`：创建工作台评估并生成报告
+- `GET /api/v1/reports/{id}`：读取完整报告
+- `POST /api/v1/reports/{id}/share`：生成分享链接
+- `GET /api/v1/admin/bootstrap`：后台初始化数据
+- `GET /api/v1/admin/reports`：报告列表，支持 `school / class_name / grade / date_from / date_to / status / q`
+- `GET /api/v1/admin/stats`：统计，支持同一组范围筛选
+- `GET /api/v1/admin/reports/{id}/review-context`：AI 原稿、有效报告、草稿与预览
+- `PUT /api/v1/admin/reports/{id}/review-draft`：保存第二、六、九章修订草稿
+- `POST /api/v1/admin/reports/{id}/review`：审核通过 / 退回修订；通过时合并草稿并保留 AI 原稿
+
+详见 `contracts/02_api_contract.md`。
 
 ## 沙具素材
 
-仓库包含：
+- `assets/generated/transparent/`：透明底沙具素材，PNG 与 WebP 各一份
+- `assets/generated/sandplay_library.js`：运行时库，图片以 WebP data URI 内嵌
+- `assets/sandplay_miniatures_500.json`：沙具分类、子类、释义、支持性 / 替代性假设、访谈核验问题、风险层级与空间角色
+- `assets/sandplay_miniatures_500.csv`：500 行字段审计表
 
-- `assets/generated/transparent/`：600 组透明底沙具素材，PNG 与 WebP 各一份，约 116 MB
-- `assets/generated/sandplay_library.js`：运行时库，500 件沙具，含子类、主题、风险层级、空间角色与双假设；图片以 WebP data URI 内嵌
-- `assets/generated/previews/`：五个临床主题预览图
-- `assets/sandplay_miniatures_500.json`：器物分类、子类、临床主题、双假设与沙具元数据
-- `assets/sandplay_miniatures_500.csv`：500 行字段审计表，可按批次、主题、风险层级、子类筛选
-- `沙具JSON字段审计与优化说明_20261120.md`：旧 400 件与新增 100 件的字段对比及改造说明
-
-未提交 `assets/generated/white/`：这是生成阶段的白底原图，约 1.5 GB，运行时不需要；如需重新生成或重新抠图，请保留在本地。
+未提交 `assets/generated/white/`：生成阶段的白底原图体积较大，运行时不需要，保留在本地用于重新抠图。
 
 ## 隐私
 
@@ -84,4 +107,4 @@ python -m http.server 8765
 
 ## 说明
 
-报告为发展性心理评估参考，不是临床诊断；风险研判与访谈建议需由专业咨询师结合面谈、量表与教师/家长观察核实。
+报告为发展性心理评估参考，不是临床诊断；风险研判与访谈建议需由专业咨询师结合面谈、量表与教师 / 家长观察核实。

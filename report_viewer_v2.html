@@ -976,7 +976,7 @@
       const meta = report.meta || {};
       const academic = report.chapter_4_academic || {};
       const sample = meta.sample_quality || {};
-      const isDemo = String(meta.engine || "").toLowerCase() === "demo";
+      const isDemo = String(meta.engine || "").toLowerCase() === "demo" || meta.demo_report === true;
       const qualityWarnings = list(meta.quality_warnings)
         .filter((item) => item && (item.message || item.code))
         .filter((item) => String(item.code || "") !== "DEMO_ENGINE");

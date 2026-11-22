@@ -12,13 +12,18 @@ class StudentInfo(BaseModel):
     name: str = "匿名受测者"
     grade_level: str = "未填写"
     gender: str = "未填写"
+    school_name: str = ""
+    class_name: str = ""
+    seat_no: str = ""
+    contact_phone: str = ""
+    academic_scores: dict[str, Any] = Field(default_factory=dict)
 
 
 class HeightMap(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     width: float = 1200
-    depth: float = 760
+    depth: float = 900
     cols: int = Field(default=161, ge=2)
     rows: int = Field(default=101, ge=2)
     values: list[float] = Field(default_factory=list)
@@ -42,6 +47,7 @@ class AssessmentPayload(BaseModel):
     heightmap: HeightMap = Field(default_factory=HeightMap)
     terrain_metrics: dict[str, Any] = Field(default_factory=dict)
     process_telemetry: dict[str, Any] = Field(default_factory=dict)
+    process_snapshots: list[dict[str, Any]] = Field(default_factory=list)
     interaction_summary: dict[str, Any] = Field(default_factory=dict)
     representative_item_id: str = Field(min_length=1)
     representative_item_name: str = ""

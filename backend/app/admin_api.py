@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import copy
 import json
 import re
 from collections import Counter, defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -197,6 +198,14 @@ def _user_payload(user: AdminUser) -> dict[str, Any]:
     }
 
 
+def _parse_json_object(raw: str | None) -> dict[str, Any]:
+    try:
+        value = json.loads(raw or "{}")
+    except Exception:
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
 def _load_report(row: Assessment) -> dict[str, Any]:
     if not row.report_json:
         return {}
@@ -205,6 +214,96 @@ def _load_report(row: Assessment) -> dict[str, Any]:
         return value if isinstance(value, dict) else {}
     except Exception:
         return {}
+
+
+EDITABLE_REPORT_SECTIONS = {
+    "chapter_2_imagery": "第二章 · 探索性假设与核验问题",
+    "chapter_6_interview": "第六章 · 访谈问题",
+    "chapter_9_general_advice": "第九章 · 总体建议",
+}
+
+
+def _parse_date(value: str, end_of_day: bool = False) -> datetime | None:
+    value = str(value or "").strip()
+    if not value:
+        return None
+    try:
+        parsed = datetime.strptime(value, "%Y-%m-%d")
+    except ValueError:
+        return None
+    return parsed + timedelta(days=1) if end_of_day else parsed
+
+
+def _filtered_assessments(
+    db: Session,
+    *,
+    school: str = "",
+    class_name: str = "",
+    grade: str = "",
+    date_from: str = "",
+    date_to: str = "",
+):
+    query = db.query(Assessment).filter(Assessment.report_json.isnot(None))
+    if school.strip():
+        query = query.filter(Assessment.school_name == school.strip())
+    if class_name.strip():
+        query = query.filter(Assessment.class_name == class_name.strip())
+    if grade.strip():
+        query = query.filter(Assessment.grade_level == grade.strip())
+    start = _parse_date(date_from)
+    if start:
+        query = query.filter(Assessment.created_at >= start)
+    end = _parse_date(date_to, end_of_day=True)
+    if end:
+        query = query.filter(Assessment.created_at < end)
+    return query
+
+
+def _extract_editable_sections(payload: Any) -> dict[str, Any]:
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=422, detail="报告修订内容必须是 JSON 对象")
+    sections: dict[str, Any] = {}
+    for key in EDITABLE_REPORT_SECTIONS:
+        value = payload.get(key)
+        if isinstance(value, dict):
+            sections[key] = value
+    if not sections:
+        raise HTTPException(status_code=422, detail="未提交可编辑章节（第二、六、九章）")
+    return sections
+
+
+def _merge_editable_report(
+    original: dict[str, Any],
+    draft_sections: dict[str, Any],
+    *,
+    reviewer_id: str | None,
+    revision: int,
+    applied_at: str,
+) -> dict[str, Any]:
+    merged = copy.deepcopy(original)
+    for key, value in draft_sections.items():
+        if key in EDITABLE_REPORT_SECTIONS:
+            merged[key] = copy.deepcopy(value)
+    meta = merged.setdefault("meta", {})
+    meta["review_edited"] = True
+    meta["review_edited_sections"] = [key for key in EDITABLE_REPORT_SECTIONS if key in draft_sections]
+    meta["review_revision"] = revision
+    meta["review_applied_at"] = applied_at
+    meta["reviewer_id"] = reviewer_id or ""
+    return merged
+
+
+def _review_payload(review: ReportReview | None) -> dict[str, Any]:
+    return {
+        "status": review.status if review else "pending",
+        "note": review.note if review else "",
+        "reviewer_id": review.reviewer_id if review else None,
+        "draft_note": review.draft_note if review else "",
+        "has_draft": bool(review and review.draft_report_json) if review else False,
+        "draft_updated_at": iso_utc(review.draft_updated_at) if review and review.draft_updated_at else None,
+        "review_applied_at": iso_utc(review.review_applied_at) if review and review.review_applied_at else None,
+        "updated_at": iso_utc(review.updated_at) if review else None,
+    }
 
 
 def _risk_rank(level: str | None) -> int:
@@ -238,14 +337,22 @@ def _report_brief(row: Assessment, review: ReportReview | None, active_shares: i
         "student_no": row.student_no,
         "grade_level": row.grade_level,
         "gender": row.gender,
+        "school_name": getattr(row, "school_name", "") or "",
+        "class_name": getattr(row, "class_name", "") or "",
+        "seat_no": getattr(row, "seat_no", "") or "",
+        "contact_phone": getattr(row, "contact_phone", "") or "",
+        "academic_scores": _parse_json_object(getattr(row, "academic_scores_json", "{}")),
         "representative_item_name": row.representative_item_name,
         "created_at": iso_utc(row.created_at),
         "updated_at": iso_utc(row.updated_at),
+        "report_revision": int(getattr(row, "report_revision", 0) or 0),
         "generation_status": row.status,
         "engine": row.report_engine,
+        "demo_report": str(row.report_engine or "").lower() == "demo",
         "risk_level": _highest_risk(report),
         "review_status": review.status if review else "pending",
         "review_note": review.note if review else "",
+        "has_review_draft": bool(review and review.draft_report_json),
         "share_count": active_shares,
         "chapter_count": len([key for key in report.keys() if key.startswith("chapter_")]),
     }
@@ -383,14 +490,32 @@ async def list_reports(
     request: Request,
     q: str = "",
     status: str = "all",
+    school: str = "",
+    class_name: str = "",
+    grade: str = "",
+    date_from: str = "",
+    date_to: str = "",
     limit: int = 100,
     db: Session = Depends(get_db),
     _: None = Depends(require_admin),
 ):
-    query = db.query(Assessment).filter(Assessment.report_json.isnot(None))
-    rows = query.order_by(Assessment.created_at.desc()).limit(max(1, min(limit, 200))).all()
+    query = _filtered_assessments(
+        db,
+        school=school,
+        class_name=class_name,
+        grade=grade,
+        date_from=date_from,
+        date_to=date_to,
+    )
+    rows = query.order_by(Assessment.created_at.desc()).all()
     items = []
+    all_schools = set()
+    all_classes = set()
+    all_grades = set()
     for row in rows:
+        all_schools.add(getattr(row, "school_name", "") or "未填写")
+        all_classes.add(getattr(row, "class_name", "") or "未填写")
+        all_grades.add(row.grade_level or "未填写")
         review = db.get(ReportReview, row.id)
         shares = db.query(ShareLink).filter(ShareLink.assessment_id == row.id, ShareLink.revoked.is_(False)).count()
         brief = _report_brief(row, review, shares)
@@ -404,12 +529,119 @@ async def list_reports(
                     brief["student_no"],
                     brief["report_no"],
                     brief["representative_item_name"],
+                    brief["school_name"],
+                    brief["class_name"],
+                    brief["seat_no"],
                 ]
             ).lower()
             if keyword not in haystack:
                 continue
         items.append(brief)
-    return _ok(request, {"reports": items, "total": len(items)})
+    limited = items[: max(1, min(limit, 200))]
+    return _ok(
+        request,
+        {
+            "reports": limited,
+            "total": len(items),
+            "filters": {
+                "school": school,
+                "class_name": class_name,
+                "grade": grade,
+                "date_from": date_from,
+                "date_to": date_to,
+            },
+            "facets": {
+                "schools": sorted(all_schools),
+                "classes": sorted(all_classes),
+                "grades": sorted(all_grades),
+            },
+        },
+    )
+
+
+@router.get("/reports/{assessment_id}/review-context")
+async def report_review_context(
+    request: Request,
+    assessment_id: str,
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
+):
+    row = db.get(Assessment, assessment_id)
+    if not row or not row.report_json:
+        raise HTTPException(status_code=404, detail="报告不存在或尚未生成")
+    review = db.get(ReportReview, assessment_id)
+    effective = _load_report(row)
+    ai_report = effective
+    if review and review.ai_report_json:
+        try:
+            ai_report = json.loads(review.ai_report_json)
+        except Exception:
+            ai_report = effective
+    draft_sections: dict[str, Any] = {}
+    if review and review.draft_report_json:
+        try:
+            draft_sections = _extract_editable_sections(json.loads(review.draft_report_json))
+        except Exception:
+            draft_sections = {}
+    preview = _merge_editable_report(
+        ai_report,
+        draft_sections,
+        reviewer_id=review.reviewer_id if review else None,
+        revision=int(getattr(row, "report_revision", 0) or 0) + (1 if draft_sections else 0),
+        applied_at="",
+    ) if draft_sections else effective
+    return _ok(
+        request,
+        {
+            "assessment_id": assessment_id,
+            "report_revision": int(getattr(row, "report_revision", 0) or 0),
+            "review": _review_payload(review),
+            "editable_sections": [
+                {"key": key, "label": label} for key, label in EDITABLE_REPORT_SECTIONS.items()
+            ],
+            "ai_report": ai_report,
+            "effective_report": effective,
+            "draft_sections": draft_sections,
+            "preview_report": preview,
+        },
+    )
+
+
+@router.put("/reports/{assessment_id}/review-draft")
+async def save_review_draft(
+    request: Request,
+    assessment_id: str,
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
+):
+    row = db.get(Assessment, assessment_id)
+    if not row or not row.report_json:
+        raise HTTPException(status_code=404, detail="报告不存在或尚未生成")
+    body = await request.json()
+    draft = _extract_editable_sections(body.get("draft") or body.get("report") or {})
+    review = db.get(ReportReview, assessment_id)
+    if not review:
+        review = ReportReview(assessment_id=assessment_id)
+        db.add(review)
+    if not review.ai_report_json:
+        review.ai_report_json = row.report_json
+    review.draft_report_json = json.dumps(draft, ensure_ascii=False)
+    review.draft_note = str(body.get("note") or "").strip()
+    review.draft_updated_at = datetime.utcnow()
+    review.reviewer_id = str(body.get("reviewer_id") or review.reviewer_id or "").strip() or None
+    if review.status in {"pending", "approved"}:
+        review.status = "changes"
+    db.commit()
+    db.refresh(review)
+    return _ok(
+        request,
+        {
+            "assessment_id": assessment_id,
+            "review": _review_payload(review),
+            "draft_sections": draft,
+        },
+        "报告修订草稿已保存",
+    )
 
 
 @router.post("/reports/{assessment_id}/review")
@@ -424,17 +656,49 @@ async def review_report(
         raise HTTPException(status_code=404, detail="报告不存在或尚未生成")
     body = await request.json()
     status = str(body.get("status") or "pending").strip()
-    if status not in {"pending", "changes", "approved"}:
+    if status not in {"pending", "changes", "approved", "rejected"}:
         raise HTTPException(status_code=422, detail="审核状态无效")
     review = db.get(ReportReview, assessment_id)
     if not review:
         review = ReportReview(assessment_id=assessment_id)
         db.add(review)
+    if not review.ai_report_json:
+        review.ai_report_json = row.report_json
+
+    submitted_draft = body.get("draft") or body.get("report")
+    if submitted_draft:
+        draft_sections = _extract_editable_sections(submitted_draft)
+        review.draft_report_json = json.dumps(draft_sections, ensure_ascii=False)
+        review.draft_updated_at = datetime.utcnow()
+    draft_sections = {}
+    if review.draft_report_json:
+        try:
+            draft_sections = _extract_editable_sections(json.loads(review.draft_report_json))
+        except Exception:
+            draft_sections = {}
+
     review.status = status
     review.note = str(body.get("note") or "").strip()
     review.reviewer_id = str(body.get("reviewer_id") or "").strip() or None
+
+    if status == "approved" and draft_sections:
+        original = _load_report(row)
+        revision = int(getattr(row, "report_revision", 0) or 0) + 1
+        applied_at = iso_utc(datetime.utcnow())
+        effective = _merge_editable_report(
+            original,
+            draft_sections,
+            reviewer_id=review.reviewer_id,
+            revision=revision,
+            applied_at=applied_at,
+        )
+        row.report_json = json.dumps(effective, ensure_ascii=False)
+        row.report_revision = revision
+        review.review_applied_at = datetime.utcnow()
+        review.draft_report_json = None
     db.commit()
     db.refresh(review)
+    db.refresh(row)
     return _ok(
         request,
         {
@@ -442,6 +706,8 @@ async def review_report(
             "status": review.status,
             "note": review.note,
             "reviewer_id": review.reviewer_id,
+            "report_revision": int(getattr(row, "report_revision", 0) or 0),
+            "review": _review_payload(review),
             "updated_at": iso_utc(review.updated_at),
         },
         "审核状态已保存",
@@ -490,8 +756,24 @@ def _parse_grid(row: Assessment) -> dict[str, int]:
 
 
 @router.get("/stats")
-async def admin_stats(request: Request, db: Session = Depends(get_db), _: None = Depends(require_admin)):
-    rows = db.query(Assessment).filter(Assessment.report_json.isnot(None)).order_by(Assessment.created_at.desc()).all()
+async def admin_stats(
+    request: Request,
+    school: str = "",
+    class_name: str = "",
+    grade: str = "",
+    date_from: str = "",
+    date_to: str = "",
+    db: Session = Depends(get_db),
+    _: None = Depends(require_admin),
+):
+    rows = _filtered_assessments(
+        db,
+        school=school,
+        class_name=class_name,
+        grade=grade,
+        date_from=date_from,
+        date_to=date_to,
+    ).order_by(Assessment.created_at.desc()).all()
     risk_counts = Counter({"L1": 0, "L2": 0, "L3": 0, "L4": 0})
     high_risk = []
     item_counts: Counter[str] = Counter()
@@ -499,6 +781,8 @@ async def admin_stats(request: Request, db: Session = Depends(get_db), _: None =
     grid_counts: Counter[str] = Counter()
     module_counts: Counter[str] = Counter()
     grade_counts: Counter[str] = Counter()
+    school_counts: Counter[str] = Counter()
+    class_counts: Counter[str] = Counter()
     total_items = 0
 
     for row in rows:
@@ -516,6 +800,8 @@ async def admin_stats(request: Request, db: Session = Depends(get_db), _: None =
                 }
             )
         grade_counts[row.grade_level or "未填写"] += 1
+        school_counts[getattr(row, "school_name", "") or "未填写"] += 1
+        class_counts[getattr(row, "class_name", "") or "未填写"] += 1
 
         items = _parse_items(row)
         total_items += len(items)
@@ -560,7 +846,14 @@ async def admin_stats(request: Request, db: Session = Depends(get_db), _: None =
         elif review.status == "approved":
             approved += 1
 
-    share_count = db.query(ShareLink).filter(ShareLink.revoked.is_(False)).count()
+    assessment_ids = [row.id for row in rows]
+    share_count = 0
+    if assessment_ids:
+        share_count = (
+            db.query(ShareLink)
+            .filter(ShareLink.revoked.is_(False), ShareLink.assessment_id.in_(assessment_ids))
+            .count()
+        )
     high_risk.sort(key=lambda item: (_risk_rank(item["risk_level"]), item["created_at"]), reverse=True)
 
     return _ok(
@@ -602,5 +895,21 @@ async def admin_stats(request: Request, db: Session = Depends(get_db), _: None =
                 {"name": name, "value": count}
                 for name, count in grade_counts.most_common()
             ],
+            "class_distribution": [
+                {"name": name, "value": count}
+                for name, count in class_counts.most_common()
+            ],
+            "school_distribution": [
+                {"name": name, "value": count}
+                for name, count in school_counts.most_common()
+            ],
+            "scope": {
+                "school": school,
+                "class_name": class_name,
+                "grade": grade,
+                "date_from": date_from,
+                "date_to": date_to,
+                "total_reports": len(rows),
+            },
         },
     )
