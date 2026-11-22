@@ -1220,6 +1220,240 @@
       .report-overview { padding-right: 0; }
       .report-dimension-grid, .report-subject-grid { grid-template-columns: 1fr; }
     }
+    /* ===== ambient environment controls: light / weather ===== */
+    .env-group {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 5px;
+      border: 1px solid rgba(255, 255, 255, .5);
+      border-radius: 999px;
+      background: var(--glass-bg);
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(22px) saturate(1.5);
+      -webkit-backdrop-filter: blur(22px) saturate(1.5);
+      flex: none;
+    }
+    .env-caption {
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: .12em;
+      color: rgba(30, 30, 32, .46);
+      text-transform: uppercase;
+      padding: 0 2px;
+      white-space: nowrap;
+    }
+    .env-switch { display: inline-flex; align-items: center; gap: 2px; }
+    .env-divider {
+      width: 1px;
+      height: 20px;
+      margin: 0 3px;
+      background: rgba(255, 255, 255, .62);
+      box-shadow: 1px 0 0 rgba(30, 30, 32, .08);
+    }
+    .env-btn {
+      height: 30px;
+      min-width: 34px;
+      padding: 0 9px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(30, 30, 32, .64);
+      font-family: "Inter", var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background .3s cubic-bezier(.2, .8, .2, 1), color .3s cubic-bezier(.2, .8, .2, 1), box-shadow .3s cubic-bezier(.2, .8, .2, 1);
+    }
+    .env-btn:hover { color: #111; background: rgba(255, 255, 255, .3); }
+    .env-btn.active {
+      background: rgba(255, 255, 255, .92);
+      color: #111;
+      font-weight: 600;
+      box-shadow: 0 4px 14px -6px rgba(0, 0, 0, .3);
+    }
+    .studio-app.night-mode .env-btn.active {
+      background: #202633;
+      color: #fff;
+      box-shadow: 0 4px 16px -6px rgba(5, 9, 18, .72);
+    }
+    .studio-app.night-mode .env-btn:not(.active) {
+      color: rgba(240, 246, 255, .7);
+    }
+    .studio-app.night-mode .env-btn:not(.active):hover {
+      color: #fff;
+      background: rgba(255, 255, 255, .13);
+    }
+    .studio-app.night-mode .env-caption {
+      color: rgba(226, 235, 250, .55);
+    }
+    .studio-app.night-mode .env-divider {
+      background: rgba(255, 255, 255, .26);
+      box-shadow: 1px 0 0 rgba(0, 0, 0, .16);
+    }
+    .studio-app.night-mode .seg-btn:not(.active) {
+      color: rgba(240, 246, 255, .7);
+    }
+    .studio-app.night-mode .seg-btn:not(.active):hover {
+      color: #fff;
+    }
+    .studio-app.night-mode .brand-title,
+    .studio-app.night-mode .panel-title,
+    .studio-app.night-mode .count-mark,
+    .studio-app.night-mode .mono-value {
+      color: #f6f9ff;
+    }
+    .studio-app.night-mode .brand-eyebrow,
+    .studio-app.night-mode .brand-sub,
+    .studio-app.night-mode .panel-kicker,
+    .studio-app.night-mode .panel-note,
+    .studio-app.night-mode .micro-label,
+    .studio-app.night-mode .shortcuts,
+    .studio-app.night-mode .brush-scale,
+    .studio-app.night-mode .mode-state,
+    .studio-app.night-mode .stage-label,
+    .studio-app.night-mode .stage-sep,
+    .studio-app.night-mode .specimen-index {
+      color: rgba(236, 243, 255, .58);
+    }
+    .studio-app.night-mode .stage-label strong,
+    .studio-app.night-mode .tool-btn:not(.active),
+    .studio-app.night-mode .tool-btn:not(.active) .tool-label,
+    .studio-app.night-mode .specimen-label {
+      color: rgba(242, 247, 255, .88);
+    }
+    .studio-app.night-mode .tool-btn:not(.active) .tool-hint {
+      color: rgba(232, 240, 255, .5);
+    }
+    .studio-app.night-mode .tool-btn:not(.active) .tool-glyph {
+      color: rgba(236, 243, 255, .62);
+    }
+    .studio-app.night-mode .stage-dot {
+      background: #f6f9ff;
+    }
+    .studio-app.night-mode .mode-dot:not(.draw) {
+      background: rgba(240, 246, 255, .52);
+    }
+    .studio-app.night-mode .taxon-chip:not(.active) {
+      color: rgba(238, 244, 255, .76);
+      border-color: rgba(255, 255, 255, .28);
+      background: rgba(255, 255, 255, .1);
+    }
+    .studio-app.night-mode .taxon-chip.theme-chip:not(.active) {
+      color: rgba(255, 235, 214, .8);
+      border-color: rgba(255, 228, 204, .24);
+      background: rgba(255, 255, 255, .08);
+    }
+    .studio-app.night-mode .taxon-chip:not(.active):hover {
+      color: #fff;
+      border-color: rgba(255, 255, 255, .62);
+    }
+    .studio-app.night-mode .ghost-btn {
+      color: rgba(240, 246, 255, .78);
+      border-color: rgba(255, 255, 255, .32);
+      background: rgba(255, 255, 255, .1);
+    }
+    .studio-app.night-mode .ghost-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, .24);
+    }
+    .studio-app.night-mode .ghost-danger {
+      color: #e9a09a;
+      border-color: rgba(233, 160, 154, .32);
+    }
+    .room-layer {
+      transition: filter .55s ease;
+    }
+    .room-layer::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: transparent;
+      transition: background .55s ease;
+    }
+    .room-layer.night {
+      filter: blur(2.8px) saturate(.56) brightness(.38) hue-rotate(192deg);
+    }
+    .room-layer.rain {
+      filter: blur(3.2px) saturate(.62) brightness(.74);
+    }
+    .room-layer.snow {
+      filter: blur(3.2px) saturate(.56) brightness(1.08);
+    }
+    .room-layer.night.rain {
+      filter: blur(3.2px) saturate(.46) brightness(.32) hue-rotate(192deg);
+    }
+    .room-layer.night.snow {
+      filter: blur(3.2px) saturate(.5) brightness(.42) hue-rotate(192deg);
+    }
+    .room-layer.night::after {
+      background: radial-gradient(80% 72% at 54% 40%, rgba(94, 122, 171, .18), rgba(6, 11, 22, .56) 74%);
+    }
+    .room-layer.rain::after {
+      background: linear-gradient(180deg, rgba(46, 68, 82, .2), rgba(22, 34, 44, .4));
+      mix-blend-mode: multiply;
+    }
+    .room-layer.snow::after {
+      background: linear-gradient(180deg, rgba(241, 249, 255, .16), rgba(209, 226, 236, .28));
+    }
+    .room-layer.night.rain::after {
+      background: linear-gradient(180deg, rgba(19, 32, 43, .32), rgba(5, 10, 18, .6));
+      mix-blend-mode: multiply;
+    }
+    .room-layer.night.snow::after {
+      background: linear-gradient(180deg, rgba(148, 170, 199, .14), rgba(16, 25, 40, .42));
+    }
+    .room-vignette {
+      transition: background .55s ease;
+    }
+    .room-vignette.night {
+      background:
+        radial-gradient(68% 58% at 50% 44%, rgba(72, 92, 136, .1), rgba(3, 7, 15, .58)),
+        linear-gradient(180deg, rgba(9, 15, 28, .28), transparent 34%, rgba(2, 5, 12, .5));
+    }
+    .room-vignette.rain {
+      background:
+        radial-gradient(70% 60% at 50% 45%, rgba(210, 226, 233, .06), rgba(32, 45, 54, .26)),
+        linear-gradient(180deg, rgba(52, 72, 84, .16), transparent 34%, rgba(20, 32, 41, .26));
+    }
+    .room-vignette.snow {
+      background:
+        radial-gradient(70% 60% at 50% 45%, rgba(255, 255, 255, .16), rgba(132, 154, 169, .2)),
+        linear-gradient(180deg, rgba(244, 250, 255, .14), transparent 34%, rgba(169, 190, 204, .18));
+    }
+    .room-vignette.night.rain {
+      background:
+        radial-gradient(68% 58% at 50% 44%, rgba(55, 77, 108, .12), rgba(2, 6, 13, .64)),
+        linear-gradient(180deg, rgba(9, 17, 27, .34), transparent 34%, rgba(1, 4, 9, .54));
+    }
+    .room-vignette.night.snow {
+      background:
+        radial-gradient(68% 58% at 50% 44%, rgba(98, 122, 164, .14), rgba(2, 7, 16, .58)),
+        linear-gradient(180deg, rgba(18, 28, 45, .3), transparent 34%, rgba(1, 4, 10, .5));
+    }
+    @media (min-width: 1024px) {
+      .env-group {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 1;
+      }
+    }
+    @media (max-width: 1023px) {
+      .studio-header { flex-wrap: wrap; row-gap: 8px; }
+      .env-group { order: 2; margin-left: auto; }
+      .view-group { order: 3; width: 100%; justify-content: flex-end; }
+    }
+    @media (max-width: 680px) {
+      .studio-header { gap: 8px; }
+      .env-group { padding: 3px; gap: 2px; }
+      .env-caption { display: none; }
+      .env-divider { height: 18px; margin: 0 1px; }
+      .env-btn { min-width: 30px; padding: 0 7px; font-size: 10px; height: 28px; }
+    }
   </style>
 </head>
 <body>
@@ -1796,6 +2030,169 @@
       cube.encoding = THREE.sRGBEncoding;
       return cube;
     }
+    function resolveEnvironmentPalette(light, weather) {
+      const night = light === "night";
+      if (night && weather === "rain") {
+        return {
+          ambientSky: "#52688f", ambientGround: "#101722", ambientIntensity: 0.26,
+          sunColor: "#879fe6", sunIntensity: 0.18, fillColor: "#3f5f92", fillIntensity: 0.22,
+          exposure: 0.68, waterEnv: 0.18, particleOpacity: 0.34
+        };
+      }
+      if (night && weather === "snow") {
+        return {
+          ambientSky: "#8ea2c8", ambientGround: "#232a36", ambientIntensity: 0.38,
+          sunColor: "#b9c8ff", sunIntensity: 0.32, fillColor: "#6f8dc0", fillIntensity: 0.26,
+          exposure: 0.82, waterEnv: 0.22, particleOpacity: 0.88
+        };
+      }
+      if (night) {
+        return {
+          ambientSky: "#6c82b0", ambientGround: "#151b27", ambientIntensity: 0.3,
+          sunColor: "#9fb7ff", sunIntensity: 0.24, fillColor: "#4f6dab", fillIntensity: 0.18,
+          exposure: 0.76, waterEnv: 0.2, particleOpacity: 0.6
+        };
+      }
+      if (weather === "rain") {
+        return {
+          ambientSky: "#dbe8f0", ambientGround: "#6d675f", ambientIntensity: 0.46,
+          sunColor: "#e6eef4", sunIntensity: 0.38, fillColor: "#9dc2d8", fillIntensity: 0.32,
+          exposure: 0.84, waterEnv: 0.3, particleOpacity: 0.44
+        };
+      }
+      if (weather === "snow") {
+        return {
+          ambientSky: "#fbfdff", ambientGround: "#b8b0a4", ambientIntensity: 0.64,
+          sunColor: "#fff5df", sunIntensity: 0.55, fillColor: "#d5edff", fillIntensity: 0.36,
+          exposure: 1.04, waterEnv: 0.24, particleOpacity: 0.9
+        };
+      }
+      return {
+        ambientSky: "#fff8e8", ambientGround: "#a57a48", ambientIntensity: 0.58,
+        sunColor: "#fff0c8", sunIntensity: 0.86, fillColor: "#bde7ff", fillIntensity: 0.22,
+        exposure: 0.96, waterEnv: 0.42, particleOpacity: 0.6
+      };
+    }
+    function createRainField() {
+      const count = 700;
+      const positions = new Float32Array(count * 6);
+      const drops = [];
+      const respawn = (drop, initial = false) => {
+        drop.x = (Math.random() - 0.5) * 1500;
+        drop.y = initial ? Math.random() * 620 - 40 : 600 + Math.random() * 80;
+        drop.z = (Math.random() - 0.5) * 1050;
+        drop.len = 15 + Math.random() * 30;
+        drop.speed = 480 + Math.random() * 300;
+      };
+      for (let i = 0; i < count; i += 1) {
+        const drop = {};
+        respawn(drop, true);
+        drops.push(drop);
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      const material = new THREE.LineBasicMaterial({
+        color: "#c4dcec", transparent: true, opacity: 0.42, depthWrite: false, toneMapped: false
+      });
+      const object = new THREE.LineSegments(geometry, material);
+      object.frustumCulled = false;
+      object.renderOrder = 6;
+      const update = (delta) => {
+        if (!object.visible) return;
+        for (let i = 0; i < count; i += 1) {
+          const drop = drops[i];
+          drop.y -= drop.speed * delta;
+          if (drop.y < -60) respawn(drop, false);
+          const offset = i * 6;
+          positions[offset] = drop.x;
+          positions[offset + 1] = drop.y;
+          positions[offset + 2] = drop.z;
+          positions[offset + 3] = drop.x - 4;
+          positions[offset + 4] = drop.y - drop.len;
+          positions[offset + 5] = drop.z;
+        }
+        geometry.attributes.position.needsUpdate = true;
+      };
+      return { object, material, update };
+    }
+    function makeSnowflakeTexture() {
+      const size = 64;
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      const glow = ctx.createRadialGradient(32, 32, 2, 32, 32, 30);
+      glow.addColorStop(0, "rgba(255,255,255,1)");
+      glow.addColorStop(0.32, "rgba(255,255,255,.92)");
+      glow.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, size, size);
+      ctx.strokeStyle = "rgba(255,255,255,.85)";
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 6; i += 1) {
+        const angle = (Math.PI / 3) * i;
+        ctx.beginPath();
+        ctx.moveTo(32, 32);
+        ctx.lineTo(32 + Math.cos(angle) * 22, 32 + Math.sin(angle) * 22);
+        ctx.stroke();
+      }
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      return texture;
+    }
+    function createSnowField() {
+      const count = 560;
+      const positions = new Float32Array(count * 3);
+      const flakes = [];
+      const respawn = (flake, initial = false) => {
+        flake.x = (Math.random() - 0.5) * 1500;
+        flake.y = initial ? Math.random() * 620 - 40 : 600 + Math.random() * 80;
+        flake.z = (Math.random() - 0.5) * 1050;
+        flake.speed = 55 + Math.random() * 95;
+        flake.phase = Math.random() * Math.PI * 2;
+        flake.size = 7 + Math.random() * 9;
+      };
+      for (let i = 0; i < count; i += 1) {
+        const flake = {};
+        respawn(flake, true);
+        flakes.push(flake);
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      const material = new THREE.PointsMaterial({
+        color: "#ffffff", size: 11, map: makeSnowflakeTexture(), transparent: true,
+        opacity: 0.88, depthWrite: false, sizeAttenuation: true, toneMapped: false
+      });
+      const object = new THREE.Points(geometry, material);
+      object.frustumCulled = false;
+      object.renderOrder = 7;
+      let elapsed = 0;
+      const update = (delta) => {
+        if (!object.visible) return;
+        elapsed += delta;
+        for (let i = 0; i < count; i += 1) {
+          const flake = flakes[i];
+          flake.y -= flake.speed * delta;
+          flake.x += Math.sin(elapsed * 0.65 + flake.phase) * 0.55 * delta * 10;
+          if (flake.y < -60) respawn(flake, false);
+          const offset = i * 3;
+          positions[offset] = flake.x;
+          positions[offset + 1] = flake.y;
+          positions[offset + 2] = flake.z;
+        }
+        geometry.attributes.position.needsUpdate = true;
+      };
+      return { object, material, update };
+    }
+    function exportBackdrop(light, weather) {
+      const night = light === "night";
+      if (night && weather === "rain") return ["#162333", "#1c2a38", "#14212e", "#0b141d"];
+      if (night && weather === "snow") return ["#26344d", "#33465f", "#2a3a50", "#1a2537"];
+      if (night) return ["#1b2740", "#24314d", "#1b2b40", "#111b2b"];
+      if (weather === "rain") return ["#dfe5e8", "#c8d2d8", "#9fb0b8", "#748994"];
+      if (weather === "snow") return ["#fbfdff", "#eef4f7", "#dfeaf0", "#cbdcdf"];
+      return ["#f3e7d3", "#e9eadf", "#d5dfda", "#c5d2d0"];
+    }
     function makeTableTexture() {
       const canvas = document.createElement("canvas");
       canvas.width = 1024; canvas.height = 1024;
@@ -2324,6 +2721,9 @@
       const brushCursorRef = useRef(null);
       const waterNormalRef = useRef(null);
       const waterColorRef = useRef(null);
+      const envRef = useRef(null);
+      const lightModeRef = useRef("day");
+      const weatherModeRef = useRef("sunny");
       const brushPointRef = useRef(null);
       const raycasterRef = useRef(new THREE.Raycaster());
       const pointerRef = useRef(new THREE.Vector2());
@@ -2355,6 +2755,8 @@
       const [tool, setTool] = useState("select");
       const [brushSize, setBrushSize] = useState(96);
       const [viewMode, setViewMode] = useState("reference");
+      const [lightMode, setLightMode] = useState("day");
+      const [weatherMode, setWeatherMode] = useState("sunny");
       const [undoStack, setUndoStack] = useState([]);
       const [exportPayload, setExportPayload] = useState(null);
       const [exportModalOpen, setExportModalOpen] = useState(false);
@@ -2712,6 +3114,36 @@
         scene.add(group);
       }, []);
 
+      const applyEnvironment = useCallback((light, weather) => {
+        lightModeRef.current = light;
+        weatherModeRef.current = weather;
+        const env = envRef.current;
+        if (!env) return;
+        const palette = resolveEnvironmentPalette(light, weather);
+        env.ambient.color.set(palette.ambientSky);
+        env.ambient.groundColor.set(palette.ambientGround);
+        env.ambient.intensity = palette.ambientIntensity;
+        env.sun.color.set(palette.sunColor);
+        env.sun.intensity = palette.sunIntensity;
+        env.fill.color.set(palette.fillColor);
+        env.fill.intensity = palette.fillIntensity;
+        env.renderer.toneMappingExposure = palette.exposure;
+        if (env.waterMaterial) env.waterMaterial.envMapIntensity = palette.waterEnv;
+        if (light === "night") {
+          env.sun.position.set(420, 680, -420);
+        } else {
+          env.sun.position.set(-420, 760, 360);
+        }
+        const rainOn = weather === "rain";
+        const snowOn = weather === "snow";
+        env.rain.object.visible = rainOn;
+        env.snow.object.visible = snowOn;
+        env.rain.material.opacity = rainOn ? palette.particleOpacity * 0.78 : 0;
+        env.snow.material.opacity = snowOn ? palette.particleOpacity : 0;
+        env.rain.material.color.set(light === "night" ? "#a9c3e2" : "#c4dcec");
+        env.snow.material.color.set(light === "night" ? "#dce7ff" : "#ffffff");
+      }, []);
+
       const initScene = useCallback(() => {
         const mount = mountRef.current;
         if (!mount || rendererRef.current) return;
@@ -2857,9 +3289,24 @@
         scene.add(brushCursor);
         brushCursorRef.current = brushCursor;
 
+        const rainField = createRainField();
+        const snowField = createSnowField();
+        rainField.object.visible = false;
+        snowField.object.visible = false;
+        scene.add(rainField.object);
+        scene.add(snowField.object);
+        const envClock = new THREE.Clock();
+
         rendererRef.current = renderer;
         sceneRef.current = scene;
         cameraRef.current = camera;
+        envRef.current = {
+          renderer, ambient, sun, fill,
+          rain: rainField, snow: snowField,
+          waterMaterial: waterSurface.material,
+          clock: envClock
+        };
+        applyEnvironment(lightModeRef.current, weatherModeRef.current);
 
         const fitCameraDistance = () => {
           const state = cameraStateRef.current;
@@ -2923,6 +3370,8 @@
         observer.observe(mount);
 
         const animate = () => {
+          const environment = envRef.current;
+          const delta = environment ? Math.min(environment.clock.getDelta(), 0.05) : 0.016;
           const orbitTarget = orbitTargetRef.current;
           if (orbitTarget) {
             const state = cameraStateRef.current;
@@ -2949,6 +3398,10 @@
             waterNormal.offset.y = (waterNormal.offset.y + 0.00055) % 1;
           }
           updateSelectionRing();
+          if (environment) {
+            environment.rain.update(delta);
+            environment.snow.update(delta);
+          }
           renderer.render(scene, camera);
           renderer.__frame = requestAnimationFrame(animate);
         };
@@ -2960,12 +3413,16 @@
           renderer.dispose();
           mount.removeChild(renderer.domElement);
         };
-      }, [createTerrain, createTray, updateCamera, updateSelectionRing, updateTerrainGeometry]);
+      }, [applyEnvironment, createTerrain, createTray, updateCamera, updateSelectionRing, updateTerrainGeometry]);
 
       useEffect(() => {
         const cleanup = initScene();
         return cleanup;
       }, [initScene]);
+
+      useEffect(() => {
+        applyEnvironment(lightMode, weatherMode);
+      }, [applyEnvironment, lightMode, weatherMode, sceneReady]);
 
       useEffect(() => {
         const scene = sceneRef.current;
@@ -3326,13 +3783,16 @@
         output.height = source.height;
         const outputContext = output.getContext("2d");
         const backdrop = outputContext.createLinearGradient(0, 0, output.width, output.height);
-        backdrop.addColorStop(0, "#f3e7d3");
-        backdrop.addColorStop(0.44, "#e9eadf");
-        backdrop.addColorStop(0.72, "#d5dfda");
-        backdrop.addColorStop(1, "#c5d2d0");
+        const backdropColors = exportBackdrop(lightModeRef.current, weatherModeRef.current);
+        backdrop.addColorStop(0, backdropColors[0]);
+        backdrop.addColorStop(0.44, backdropColors[1]);
+        backdrop.addColorStop(0.72, backdropColors[2]);
+        backdrop.addColorStop(1, backdropColors[3]);
         outputContext.fillStyle = backdrop;
         outputContext.fillRect(0, 0, output.width, output.height);
-        outputContext.filter = "saturate(1.06) contrast(1.04)";
+        outputContext.filter = lightModeRef.current === "night"
+          ? "saturate(.95) contrast(1.06)"
+          : "saturate(1.06) contrast(1.04)";
         outputContext.drawImage(source, 0, 0);
         const dataUrl = output.toDataURL("image/png");
         renderer.setSize(oldSize.x, oldSize.y, false);
@@ -3476,9 +3936,9 @@
 
       const selectedItem = useMemo(() => items.find((item) => item.id === selectedId) || null, [items, selectedId]);
 
-      return h("div", { className: "studio-app" },
-        h("div", { className: "room-layer", "aria-hidden": "true" }),
-        h("div", { className: "room-vignette", "aria-hidden": "true" }),
+      return h("div", { className: `studio-app${lightMode === "night" ? " night-mode" : ""}` },
+        h("div", { className: `room-layer ${lightMode} ${weatherMode}`, "aria-hidden": "true" }),
+        h("div", { className: `room-vignette ${lightMode} ${weatherMode}`, "aria-hidden": "true" }),
         h("header", { className: "studio-header" },
           h("div", { className: "brand" },
             h("div", { className: "brand-seal" }, "心"),
@@ -3488,6 +3948,35 @@
                 h("h1", { className: "brand-title" }, "心理沙盘"),
                 h("p", { className: "brand-sub" }, "学习动力发展性评估 · 3D 箱庭操作台")
               )
+            )
+          ),
+          h("div", { className: "env-group", role: "group", "aria-label": "环境设置" },
+            h("span", { className: "env-caption" }, "光照"),
+            h("div", { className: "env-switch" },
+              h("button", {
+                type: "button", onClick: () => setLightMode("day"), "aria-pressed": lightMode === "day",
+                className: `env-btn${lightMode === "day" ? " active" : ""}`
+              }, "白天"),
+              h("button", {
+                type: "button", onClick: () => setLightMode("night"), "aria-pressed": lightMode === "night",
+                className: `env-btn${lightMode === "night" ? " active" : ""}`
+              }, "夜晚")
+            ),
+            h("span", { className: "env-divider", "aria-hidden": "true" }),
+            h("span", { className: "env-caption" }, "天气"),
+            h("div", { className: "env-switch" },
+              h("button", {
+                type: "button", onClick: () => setWeatherMode("sunny"), "aria-pressed": weatherMode === "sunny",
+                className: `env-btn${weatherMode === "sunny" ? " active" : ""}`
+              }, "晴天"),
+              h("button", {
+                type: "button", onClick: () => setWeatherMode("rain"), "aria-pressed": weatherMode === "rain",
+                className: `env-btn${weatherMode === "rain" ? " active" : ""}`
+              }, "下雨"),
+              h("button", {
+                type: "button", onClick: () => setWeatherMode("snow"), "aria-pressed": weatherMode === "snow",
+                className: `env-btn${weatherMode === "snow" ? " active" : ""}`
+              }, "下雪")
             )
           ),
           h("div", { className: "view-group" },
@@ -3549,7 +4038,9 @@
                 h("span", { className: "panel-kicker" }, "SESSION 01"),
                 h("strong", null, `${items.length} 件沙具`),
                 h("span", { className: "stage-sep" }, "/"),
-                h("span", null, viewMode === "reference" ? "斜 45°" : "正 90°")
+                h("span", null, viewMode === "reference" ? "斜 45°" : "正 90°"),
+                h("span", { className: "stage-sep" }, "/"),
+                h("span", null, `${lightMode === "day" ? "白天" : "夜晚"} · ${weatherMode === "sunny" ? "晴天" : weatherMode === "rain" ? "下雨" : "下雪"}`)
               ),
               selectedItem ? h("div", { className: "inspector-bar" },
                 h("span", { className: "inspector-name" }, selectedItem.label),
