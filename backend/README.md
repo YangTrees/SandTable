@@ -55,7 +55,7 @@ localStorage.setItem("sandplay_report_api", "http://192.168.1.10:8000/api/v1")
 
 创建评估的 multipart 字段：
 
-- `payload`：JSON 字符串，核心字段 `student`、`items`、`grid_distribution`、`heightmap`、`representative_item_id`、`representative_item_name`、`sandplay_description`、`self_narrative`、`teacher_observation`、`consent`；
+- `payload`：JSON 字符串，核心字段 `student`、`items`、`grid_distribution`、`heightmap`、`representative_item_id`、`representative_item_name`、`self_image`、`self_image_note`、`sandplay_description`、`self_narrative`、`teacher_observation`、`consent`；
 - `sandplay_image`：必传，前端导出的沙盘 PNG；
 - `transcript_image`：可选，成绩单图片。
 
@@ -80,6 +80,9 @@ localStorage.setItem("sandplay_report_api", "http://192.168.1.10:8000/api/v1")
 - 六维必须 6 项：全学科认知诊断、文理选科适配、兴趣特长与潜能、升学与学业规划、家庭生态协同、综合动力重塑；
 - 风险必须 9 项：抑郁、焦虑、学习压力感、学习倦怠、强迫、偏执、敌对、人际关系敏感、自我伤害倾向；
 - 训练模块必须 6 项，顺序固定；
+- 自我像为独立字段，不要求出现在 `items[].id`，只进入第二章意象假设与访谈，不直接参与九维风险分级；
+- 风险硬门控：单件非死亡类高危沙具 → `L3_ORANGE`；死亡类符号、两件及以上高危沙具、明确的负向文本或掩埋/破坏过程 → `L4_RED`；
+- 视觉高危物体单独筛查：单件枪械/刀具/血/伤/排泄物等 `high` 物体 → L3；尸体/悬吊/两件及以上 → L4；军事/警察/博物馆/玩具陈列或厕所/医疗语境最多 `watch`；
 - 不满足时多模态报告会失败降级（`ALLOW_DEMO_REPORT=false` 时直接报错）。
 
 理论依据使用张日昇《箱庭疗法》、申荷永《心理分析：理解与体验》、申荷永《荣格与分析心理学》的概念转述与书目署名，不伪造原文引语或页码。认知维度有自述、成绩或教师观察时，不以箱庭空间分布直接推断学科能力；缺少这些材料时，跨域理论类比必须标为“理论假说·待核实”。

@@ -476,12 +476,15 @@
     .stage-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); flex: none; }
     .stage-sep { color: rgba(46,52,47,.34); }
     .inspector-bar {
-      position: absolute;
-      left: 50%; bottom: 18px;
-      transform: translateX(-50%);
+      position: relative;
+      left: auto; bottom: auto;
+      transform: none;
+      align-self: center;
+      flex: 0 0 auto;
       display: flex;
       align-items: center;
       gap: 2px;
+      max-width: 100%;
       padding: 5px 6px 5px 10px;
       border: 1px solid rgba(255,255,255,.12);
       border-radius: 3px;
@@ -609,8 +612,8 @@
       .view-group { width: 100%; justify-content: space-between; }
       .workspace { display: flex; flex-direction: column; gap: 12px; }
       .stage { order: 1; }
-      .rail-left { order: 2; width: 100%; }
-      .rail-right { order: 3; width: 100%; min-height: 360px; }
+      .rail-left { order: 3; width: 100%; }
+      .rail-right { order: 2; width: 100%; min-height: 360px; }
       .specimen-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); max-height: 46vh; }
       .wood-shell { min-height: 520px; }
       .sand-canvas { min-height: 480px; }
@@ -1431,7 +1434,8 @@
         position: absolute;
         inset: 86px 18px 18px;
         display: grid;
-        grid-template-columns: minmax(230px, 292px) minmax(0, 1fr) 264px;
+        /* 原版顺序：地形在左、沙盘居中、沙具库在右 */
+        grid-template-columns: 264px minmax(0, 1fr) minmax(250px, 300px);
         gap: 14px;
         padding: 0;
         min-height: 0;
@@ -1450,7 +1454,7 @@
         overflow: hidden;
         z-index: 12;
       }
-      .rail-left { order: 1; display: flex; flex-direction: column; min-height: 0; }
+      .rail-left { order: 3; display: flex; flex-direction: column; min-height: 0; }
       .stage {
         position: relative;
         inset: auto;
@@ -1458,17 +1462,19 @@
         min-height: 0;
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
         justify-content: flex-start;
         gap: 8px;
+        overflow: hidden;
       }
-      .rail-right { order: 3; overflow: auto; }
+      .rail-right { order: 1; overflow: auto; }
       .wood-shell {
-        width: min(100%, calc((100vh - 218px) * 4 / 3));
+        width: 100%;
         height: auto;
-        aspect-ratio: 4 / 3;
-        max-height: 100%;
-        margin: auto;
+        flex: 1 1 0;
+        min-height: 0;
+        max-height: none;
+        margin: 0;
       }
       .sand-canvas { height: 100%; min-height: 0; }
       .specimen-grid { max-height: none; flex: 1; }
@@ -1496,6 +1502,8 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 10px;
+      row-gap: 6px;
+      flex-wrap: wrap;
       flex: 0 0 auto;
       pointer-events: none;
     }
@@ -1565,6 +1573,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      margin-left: auto;
       padding: 5px;
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, .52);
@@ -1759,6 +1768,70 @@
       .score-meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .score-subject-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
+    /* ===== 2026-11-22: 舞台整屏铺底，左右栏浮在其上 ===== */
+    @media (min-width: 1024px) {
+      .workspace {
+        position: absolute;
+        inset: 86px 18px 18px;
+        display: block;
+        padding: 0;
+        min-height: 0;
+        z-index: 10;
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 6px;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .rail-left,
+      .rail-right {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: auto;
+        right: auto;
+        width: 264px;
+        max-height: none;
+        min-height: 0;
+        overflow: auto;
+        z-index: 20;
+      }
+      .rail-left { right: 0; width: 300px; display: flex; flex-direction: column; }
+      .rail-right { left: 0; width: 264px; display: flex; flex-direction: column; }
+      .session-topbar {
+        width: auto;
+        margin: 0 318px 0 282px;
+        flex: 0 0 auto;
+      }
+      .wood-shell {
+        width: 100%;
+        height: auto;
+        flex: 1 1 0;
+        min-height: 0;
+        max-height: none;
+        margin: 0;
+      }
+      .sand-canvas {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+      }
+      .inspector-bar {
+        position: absolute;
+        left: 50%;
+        bottom: 14px;
+        transform: translateX(-50%);
+        align-self: auto;
+        margin: 0;
+        z-index: 40;
+      }
+    }
 </style>
 </head>
 <body>
@@ -1769,9 +1842,8 @@
     const h = React.createElement;
 
     const WORLD = { width: 1200, depth: 900, segX: 160, segZ: 100 };
-    const REPORT_API_BASE = (window.localStorage.getItem("sandplay_report_api") || "http://127.0.0.1:8000/api/v1").replace(/\/$/, "");
-    const BACKEND_ORIGIN_PORTS = ["8000", "80", "443", ""];
-    const REPORT_VIEWER_PAGE = (location.protocol.indexOf("http") === 0 && BACKEND_ORIGIN_PORTS.includes(location.port))
+    const REPORT_API_BASE = (window.localStorage.getItem("sandplay_report_api") || (location.protocol.indexOf("http") === 0 ? `${location.origin}/api/v1` : "http://127.0.0.1:8000/api/v1")).replace(/\/$/, "");
+    const REPORT_VIEWER_PAGE = location.protocol.indexOf("http") === 0
       ? `${location.origin}/report-viewer`
       : "report_viewer_v2.html";
     const GRID_KEYS = [
@@ -1858,6 +1930,7 @@
         grade_level: "初中",
         gender: "不透露",
         academic_scores: { exam_name: "", exam_date: "", total_score: "", class_rank: "", subjects: {} },
+        self_image: "",
         self_narrative: "",
         teacher_observation: "",
         transcript_name: ""
@@ -2945,6 +3018,7 @@
       const [stage, setStage] = React.useState("representative");
       const [representativeId, setRepresentativeId] = React.useState(items[0] ? items[0].id : "");
       const [description, setDescription] = React.useState("");
+      const [selfImage, setSelfImage] = React.useState(() => (profile && profile.self_image) || "");
       const [selfNarrative, setSelfNarrative] = React.useState(() => (profile && profile.self_narrative) || "");
       const [teacherObservation, setTeacherObservation] = React.useState(() => (profile && profile.teacher_observation) || "");
       const [student, setStudent] = React.useState(() => normaliseProfile(profile));
@@ -2976,6 +3050,7 @@
           representativeName: representative.label,
           representativeCategory: representative.category,
           description: description.trim(),
+          selfImage: selfImage.trim(),
           selfNarrative: selfNarrative.trim(),
           teacherObservation: teacherObservation.trim(),
           student: normaliseProfile(student),
@@ -2989,6 +3064,7 @@
           representativeName: representative ? representative.label : (items[0] ? items[0].label : ""),
           representativeCategory: representative ? representative.category : "未分类",
           description: description.trim(),
+          selfImage: selfImage.trim(),
           selfNarrative: selfNarrative.trim(),
           teacherObservation: teacherObservation.trim(),
           student: normaliseProfile(student),
@@ -3043,6 +3119,15 @@
                 ),
                 h("button", { type: "button", className: "mini-btn", onClick: () => setStage("representative") }, "重选")
               ) : null,
+              h("div", { className: "finish-field" },
+                h("label", null, "自我像（可选）"),
+                h("input", {
+                  type: "text", value: selfImage, maxLength: 60,
+                  onChange: (event) => setSelfImage(event.target.value),
+                  placeholder: "例如：一棵树、一个蹲着的人、一盏灯……"
+                }),
+                h("span", { className: "counter" }, `${selfImage.length} / 60 · 仅用于访谈假设，不直接决定风险等级`)
+              ),
               h("div", { className: "finish-field" },
                 h("label", null, "沙盘描述（必填，不少于 10 字）"),
                 h("textarea", {
@@ -3207,7 +3292,7 @@
           ),
           h("div", { className: "export-body" },
             h("div", { className: "space-y-3" },
-              payload.server_error ? h("div", { className: "finish-error" }, "报告暂时没有生成，作品图已保留。请稍后重试。") : null,
+              payload.server_error ? h("div", { className: "finish-error" }, "报告暂未生成，作品图仅保留在当前页面。请先保存作品图，再重试。") : null,
               h("img", { src: payload.canvas_image_base64, alt: "沙盘作品高清图", className: "export-image" }),
               h("div", { className: "stat-grid" },
                 h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleCount), h("div", { className: "stat-label" }, "沙具数")),
@@ -3249,7 +3334,7 @@
                 )
               ) : h("div", { className: "report-placeholder" },
                 h("strong", null, "本次未生成评估报告"),
-                h("p", null, "你已保留本次沙盘作品。回到完成页补充代表沙具与描述后，可以生成完整的发展性评估报告。"),
+                h("p", null, "作品图仅保留在当前页面，刷新或关闭页面后会丢失。请先保存作品图，再重试。"),
                 h("small", null, "作品图片与空间统计已保留")
               ),
               h("div", { className: "export-actions" },
@@ -4057,7 +4142,8 @@
           const overlayPanels = window.innerWidth >= 1024;
           const mountWidth = Math.max(320, mount.clientWidth);
           const mountHeight = Math.max(320, mount.clientHeight);
-          const allowedX = overlayPanels ? 0.88 : 0.92;
+          const clearRatio = (mountWidth - 600) / mountWidth;
+          const allowedX = overlayPanels ? clamp(clearRatio, 0.42, 0.88) : 0.92;
           const allowedY = 0.82;
           camera.aspect = mountWidth / mountHeight;
           camera.updateProjectionMatrix();
@@ -4627,6 +4713,7 @@
           representative_item_id: completionData.representativeId || null,
           representative_item_name: completionData.representativeName || null,
           representative_item_category: completionData.representativeCategory || null,
+          self_image: completionData.selfImage || "",
           sandplay_description: completionData.description || "",
           self_narrative: completionData.selfNarrative || baseProfile.self_narrative || "",
           teacher_observation: completionData.teacherObservation || baseProfile.teacher_observation || "",
@@ -4682,6 +4769,7 @@
             ...((completion.student || {}).academic_scores || {})
           },
           self_narrative: completion.selfNarrative || current.self_narrative,
+          self_image: completion.selfImage || current.self_image,
           teacher_observation: completion.teacherObservation || current.teacher_observation,
           transcript_name: completion.transcriptFile ? completion.transcriptFile.name : current.transcript_name
         }));
@@ -4726,9 +4814,10 @@
         } catch (error) {
           const message = String(error && error.message ? error.message : error);
           console.error("提交沙盘报告失败", error);
-          setCompletionError("报告暂时没有生成，请稍后重试。本次沙盘作品已保留。");
+          setCompletionError(`报告生成失败：${message}。请勿刷新页面；请先保存作品图后再重试。`);
           setExportPayload(basePayload ? { ...basePayload, server_error: message, report_status: "failed" } : { server_error: message, report_status: "failed" });
-          showToast("报告暂未生成，已保留本次沙盘作品");
+          if (basePayload) setExportModalOpen(true);
+          showToast("报告未生成，请先保存作品图");
         } finally {
           setSubmitting(false);
         }
@@ -4743,6 +4832,7 @@
             ...((completion.student || {}).academic_scores || {})
           },
           self_narrative: completion.selfNarrative || current.self_narrative,
+          self_image: completion.selfImage || current.self_image,
           teacher_observation: completion.teacherObservation || current.teacher_observation,
           transcript_name: completion.transcriptFile ? completion.transcriptFile.name : current.transcript_name
         }));
@@ -4898,8 +4988,7 @@
               h("div", { className: "session-metrics" },
                 h("span", { className: "session-metric" }, h("b", null, formatDuration(elapsedSec)), "实时"),
                 h("span", { className: "session-metric" }, h("b", null, items.length), "件沙具"),
-                h("span", { className: "session-metric" }, h("b", null, processPhotos.length), "张快照"),
-                h("span", { className: "session-metric" }, h("b", null, `${WORLD.width}×${WORLD.depth}`), "4:3 沙箱")
+                h("span", { className: "session-metric" }, h("b", null, processPhotos.length), "张快照")
               ),
               h("div", { className: "session-actions" },
                 h("button", { type: "button", className: `utility-btn${ambientMode === "white" ? " active" : ""}`, onClick: () => setAmbient(ambientMode === "white" ? "off" : "white") }, "白噪"),
@@ -4917,7 +5006,17 @@
                 onDragOver: (event) => event.preventDefault(), onDrop,
                 className: "sand-canvas"
               })
-            )
+            ),
+            selectedItem ? h("div", { className: "inspector-bar" },
+              h("span", { className: "inspector-name" }, selectedItem.label),
+              h("button", { type: "button", title: "逆时针旋转", onClick: () => rotateSelected(-15), className: "inspector-btn" }, "↺"),
+              h("button", { type: "button", title: "顺时针旋转", onClick: () => rotateSelected(15), className: "inspector-btn" }, "↻"),
+              h("button", { type: "button", title: "水平镜像", onClick: mirrorSelected, className: "inspector-btn" }, "⇋"),
+              h("button", { type: "button", title: "缩小", onClick: () => scaleSelected(-0.1), className: "inspector-btn" }, "−"),
+              h("button", { type: "button", title: "放大", onClick: () => scaleSelected(0.1), className: "inspector-btn" }, "＋"),
+              h("button", { type: "button", title: "取消选中", onClick: () => setSelectedId(null), className: "inspector-btn" }, "✕"),
+              h("button", { type: "button", onClick: deleteSelected, className: "inspector-delete" }, "移除")
+            ) : null
           ),
           h("aside", { className: "studio-panel rail-right" },
             h("div", { className: "panel-head" },
@@ -4955,21 +5054,6 @@
               )
             ),
             h("hr", { className: "rail-rule" }),
-            h("div", { className: "selected-panel" },
-              h("div", { className: "selected-panel-head" },
-                h("strong", null, selectedItem ? selectedItem.label : "未选中沙具"),
-                h("small", null, selectedItem ? `${selectedItem.category || "未分类"}` : "点选沙盘内沙具")
-              ),
-              selectedItem ? h("div", { className: "selected-tools" },
-                h("button", { type: "button", title: "逆时针旋转", onClick: () => rotateSelected(-15) }, "↺"),
-                h("button", { type: "button", title: "顺时针旋转", onClick: () => rotateSelected(15) }, "↻"),
-                h("button", { type: "button", title: "缩小", onClick: () => scaleSelected(-0.1) }, "−"),
-                h("button", { type: "button", title: "放大", onClick: () => scaleSelected(0.1) }, "＋"),
-                h("button", { type: "button", title: "水平镜像", onClick: mirrorSelected }, "⇋"),
-                h("button", { type: "button", title: "取消选中", onClick: () => setSelectedId(null) }, "✕"),
-                h("button", { type: "button", className: "remove", onClick: deleteSelected, style: { gridColumn: "span 2" } }, "移除沙具")
-              ) : h("div", { className: "panel-note" }, "选中后可旋转、缩放、镜像与移除。")
-            ),
             h("div", { className: "rail-actions" },
               h("div", { className: "action-row" },
                 h("button", { type: "button", onClick: undo, className: "ghost-btn" }, "撤销 ", h("span", { className: "mono-value" }, `${undoStack.length}/20`)),

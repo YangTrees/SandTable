@@ -99,6 +99,18 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
                 "symbol_meaning": "string：上述整体符号可能表达的语义",
                 "risk_level": "none|watch|high",
                 "risk_evidence": "string：为什么该整体构图属于/不属于高风险",
+                "visual_risk_objects": [{
+                    "type": "firearm|knife|explosive|corpse|excrement|blood|wound|hanging|other",
+                    "label": "string：清晰可辨的物体名称",
+                    "location": "string：画面分区/相对位置",
+                    "orientation": "string：朝向，尤其枪口/刀尖指向",
+                    "person_relation": "string：与人物距离、是否指向/接触/压住人物",
+                    "scene_context": "string：军事/警察/医疗/卫生/冲突/陈列/不明等",
+                    "severity": "none|watch|high",
+                    "evidence": "string：可见证据，不猜测",
+                }],
+                "visual_risk_level": "none|watch|high",
+                "visual_risk_summary": "string：视觉高危物体的语境化结论",
                 "confidence": "high|medium|low",
             },
             "process_analysis": {
@@ -116,6 +128,14 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
         "chapter_2_imagery": {
             "title": CHAPTER_TITLES["chapter_2_imagery"],
             "disclaimer": "以下为探索性假设，需访谈确认，非临床诊断",
+            "self_image": {
+                "name": "string：受测者选择的自我像；未提供时为空字符串",
+                "note": "string：受测者对自我像的补充说明；没有则为空",
+                "hypothesis": "string：自我像可能表达的自我定位/状态/愿望，必须写探索性假设",
+                "alternative_hypothesis": "string：至少一种竞争性解释",
+                "verification_question": "string：用“你”直接开口的核验问题",
+                "risk_boundary": "自我像仅用于访谈假设，不直接决定风险等级",
+            },
             "themes": [{
                 "theme": "string",
                 "symbols": ["string"],
@@ -262,6 +282,14 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
             "alternative_hypothesis": rep_item.get("alternative_hypothesis"),
             "verification_question": rep_item.get("verification_question"),
         },
+        "self_image": {
+            "name": str(payload.get("self_image") or "").strip(),
+            "note": str(payload.get("self_image_note") or "").strip(),
+            "relation_to_representative_item": (
+                "独立字段：自我像是受测者对此刻自己的表征，不等同于代表沙具；"
+                "仅进入意象假设与访谈，不直接参与风险分级。"
+            ),
+        },
         "sandplay_description": payload.get("sandplay_description"),
         "self_narrative": payload.get("self_narrative"),
         "teacher_observation": payload.get("teacher_observation"),
@@ -358,6 +386,7 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
 - 每个沙具结论必须至少有一条来自沙盘描述、代表沙具、九宫格、地形高度或成绩单的佐证；没有对应输入时不得写“有该数据”。
 - chapter_1 `scene_imagery` 必须以沙盘实拍图和 `terrain_observation`/`heightmap_*` 为准：先描述实际可见的沙面、沙丘、凹陷或水域，再写受测者赋予的含义。`terrain_text_mismatch=true` 时，客户端 `terrain_metrics.terrain_summary` 只能写成“受测者将沙面局部起伏定义为水域/地形”，不得写成画面中已出现大面积水域、湖泊或深谷；不得脑补实拍与地形指标中不存在的元素。同一段内不得同时出现“明显水域塑形”和“轻度塑形”两种互相矛盾的定性。
 - 必须先做整体构图判读，再看单个沙具：`chapter_1.holistic_visual_check` 是必填字段。如果沙面、水域、沙丘、沙具排列或留白共同构成可读文字/符号（尤其“死”“亡”“自杀”“绝”“杀”“丧”“葬”“墓”“SOS”“求救”），必须在 `readable_text` 中原样转录，`risk_level` 写 `high`。不能因为单个沙具都是正常家庭人物，就把整体高危文字降为 L1/L2。服务端给出的 `holistic_screen` 是同一张图的独立安全筛查；`holistic_screen.risk_level=high` 或 `readable_text` 含高危字词时，以它为准，不得覆盖为 none/watch。
+- 视觉高危物体单独写入 `chapter_1.holistic_visual_check.visual_risk_objects`，不得只凭“有枪/有刀”就写敌对或 L4。必须给出位置、朝向、与人物关系、场景语境和 severity：枪口/刀尖指向人物、武器压住倒地人形、尸体、人物身上的血/开放伤口、上吊/悬吊、涂抹到人物/食物上的排泄物才写 high；军事/警察/博物馆/玩具陈列中的武器、厕所中的排泄物、医疗场景中的血迹最多写 watch；普通卫生设施、装饰性武器且无人物冲突写 none。看不清、无法判断关系时写 watch，不写 high。服务端 `visual_risk_level` 与 `visual_risk_objects` 是同一张图的独立安全筛查，不得把 high 覆盖为 none。
 - 整体构图高危文字的原文只写入 `chapter_1.holistic_visual_check` 和 `chapter_5_risk`；`scene_imagery`、第二章、第七至九章如需提及，只能写“整体构图出现需专业核查的高危文字/符号”，不得把具体字词复制到家长/学生可见的叙述段落。
 - 当整体构图命中高危文字/符号时，`chapter_5_risk` 的“自我伤害倾向”维度至少写 L3，并在 `judgement` 与 `evidence` 中写明整体构图证据；若服务端将其抬升为 L4，以服务端 `priority_banner` 和第五章总等级为准。
 - chapter_1 `process_analysis` 必须读取 `process_metrics` 和 `process_telemetry` 的原始值：pace 必须引用总耗时、放入件数、每件秒数或动作密度；revision 必须引用删除/撤回、拖拽、撤销；terrain_control 必须引用推沙/挖水笔数及占比。不得只复述数字，必须用箱庭理论解释制作节奏、修改犹豫、主动塑形与控制感，并在 integrated_finding 中与场景意象、核心主题和六维假设相互校验。`process_metrics.available=false` 时 available 写 false，不得编造耗时或动作。若 `bury_count` 或 `destructive_loops` 非 0，必须写明优先风险核查。
@@ -366,6 +395,8 @@ def build_user_prompt(payload: dict[str, Any], image_url: str | None, transcript
 - 成绩单：如果提供了图片，先逐科读取满分、得分、得分率和等级；只读清晰可辨的数字。没有把握的科目 score/rate 填 null，grade 填“待核对”。
 - 结构化成绩：若 `structured_academic_scores.subjects` 非空，必须把它作为成绩依据写入 chapter_4_academic；`subject` 使用键名原值，`score` 使用录入值，`rate` 填 null，`grade` 按总分/单科分无法核算时填“待核对”；`total.score` 使用 `total_score`。同时在 `notes` 写明“结构化成绩由受测者录入，待与成绩单核对”；不得把这些数字说成从图片读取，也不得与成绩单图片冲突时擅自覆盖图片读数。
 - chapter_2 每个主题必须给出两个竞争性假设：hypothesis 写支持性/资源性解释，alternative_hypothesis 写防御、阻抗或发展滞后解释，verification_question 写一句能区分两者的访谈提问。不得只做单向积极美化。
+- `self_image` 是独立于代表沙具的自我像输入：有值时，chapter_2 必须写 `self_image` 对象，说明它可能表达的自我定位/状态/愿望，并给出竞争性解释和用“你”开头的核验问题；自我像只进入意象假设与访谈，不得单凭自我像抬高任何风险维度或触发 L3/L4。无值时 `self_image.name` 为空字符串，不得编造。
+- 单个非死亡类高危沙具（如坦克/战车/匕首/铁牢笼）不足以直接写 L4，最高写 L3，并保留“需人工复核场景语境”的边界；只有死亡类符号（骷髅/墓碑/棺材/尸体/遗照/坟墓）、两件及以上高危沙具、明确的负向文本或破坏/掩埋过程，才可写 L4。军事、警察、博物馆、玩具或城市场景中的武器模型，不得仅凭武器类别写敌对或高危，必须结合朝向、人物关系与语境。
 - chapter_7 不得仅凭一件沙具推断稳定人格特质或能力水平；每条优势必须能回到沙盘或自述中的具体行为线索，并写明证据边界。
 - 理论依据必须与结论真正相关，不要求每段罗列三本书；不得编造“某作者提出某跨领域结论”。chapter_3 的 `assessment_theory` 必须原样使用 `six_dimension_theory_map` 中该维度的固定理论；箱庭与荣格分析心理学只用于意象解码、边界防御、安全容器与动力源分析，不用于学科能力推断。
 - chapter_3 六个维度必须全部生成，不得因缺少成绩单、访谈或量表而只写“无足够线索/无法判定/暂不判断”。必须从九宫格占据与留白、对称/分区/边界、地形塑形、主要沙具类别与主题、代表沙具、受测者自述和教师观察中组织证据：例如由压力/阴影主题推导认知负荷与专注带宽，由空间规整度与地形构建推导思维风格与学习策略，由家庭/支持意象推导学习动力来源。每条 `conclusion` 末尾必须写“以上为基于沙盘与现有线索的探索性推断，需结合后续成绩与访谈核验”。`has_transcript=false` 或 `has_interview_evidence=false` 时，置信度只能为“中”或“低”，不得为“高”。

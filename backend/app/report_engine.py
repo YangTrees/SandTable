@@ -23,6 +23,9 @@ from .holistic import (
     is_high_risk,
     normalize_screen,
     screen_triggers,
+    visual_high_objects,
+    visual_risk_triggers,
+    visual_watch_objects,
 )
 from .prompt import SYSTEM_PROMPT, build_user_prompt
 from .quality import (
@@ -49,7 +52,7 @@ from .theory import (
     SIX_DIMENSIONS,
     TRAINING_MODULES,
 )
-from .utils import clean_json_text
+from .utils import clean_json_text, parse_json_object
 
 
 def _data_uri(content: bytes, filename: str | None) -> str:
@@ -1117,6 +1120,37 @@ def _merge_holistic_screen(report: dict[str, Any], screen: dict[str, Any] | None
             merged["risk_level"] = "high"
         elif not str(merged.get("risk_level") or "").strip():
             merged["risk_level"] = screen_level or "none"
+        visual_objects = [
+            item for item in (screen.get("visual_risk_objects") or [])
+            if isinstance(item, dict)
+        ]
+        if visual_objects:
+            existing_objects = [
+                item for item in (merged.get("visual_risk_objects") or [])
+                if isinstance(item, dict)
+            ]
+            merged["visual_risk_objects"] = visual_objects + existing_objects
+            deduped = []
+            seen = set()
+            for item in merged["visual_risk_objects"]:
+                key = (
+                    str(item.get("type") or ""),
+                    str(item.get("label") or ""),
+                    str(item.get("severity") or ""),
+                )
+                if key in seen:
+                    continue
+                seen.add(key)
+                deduped.append(item)
+            merged["visual_risk_objects"] = deduped[:12]
+            visual_level = str(screen.get("visual_risk_level") or "").strip().lower()
+            if visual_level not in {"high", "watch", "none"}:
+                visual_level = "watch" if any(
+                    str(item.get("severity") or "").lower() == "watch" for item in visual_objects
+                ) else "none"
+            merged["visual_risk_level"] = visual_level
+            if not str(merged.get("visual_risk_summary") or "").strip():
+                merged["visual_risk_summary"] = str(screen.get("visual_risk_summary") or "").strip()
         if not str(merged.get("confidence") or "").strip():
             merged["confidence"] = str(screen.get("confidence") or "unknown")
     if isinstance(screen, dict):
@@ -1148,58 +1182,118 @@ def _holistic_priority(report: dict[str, Any], payload: dict[str, Any]) -> dict[
     return None
 
 
+def _visual_priority(
+    report: dict[str, Any],
+    payload: dict[str, Any],
+) -> dict[str, Any] | None:
+    """视觉高危物体的分级：单件非死亡物 L3；尸体/悬吊/多件 high L4。"""
+    screen = payload.get("_holistic_screen") if isinstance(payload.get("_holistic_screen"), dict) else {}
+    chapter_1 = report.get("chapter_1_overview") if isinstance(report.get("chapter_1_overview"), dict) else {}
+    check = chapter_1.get("holistic_visual_check") if isinstance(chapter_1.get("holistic_visual_check"), dict) else {}
+    objects: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str]] = set()
+    for source in (screen, check):
+        for item in (source.get("visual_risk_objects") or []):
+            if not isinstance(item, dict):
+                continue
+            key = (
+                str(item.get("type") or ""),
+                str(item.get("label") or ""),
+                str(item.get("severity") or ""),
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            objects.append(item)
+
+    high = [item for item in objects if str(item.get("severity") or "").lower() == "high"]
+    death = [
+        item for item in high
+        if str(item.get("type") or "") in {"corpse", "hanging"}
+        or any(word in str(item.get("label") or "") for word in ("尸体", "遗体", "上吊", "悬吊"))
+    ]
+    l4_triggers: list[str] = []
+    l3_triggers: list[str] = []
+    if death:
+        l4_triggers.extend(visual_risk_triggers({"visual_risk_objects": death}))
+        l4_triggers.append("视觉死亡符号：需立即进行安全核查")
+    if len(high) >= 2:
+        l4_triggers.append(f"视觉高危物体 {len(high)} 件：需按重大风险人工复核")
+    elif high and not death:
+        l3_triggers.extend(visual_risk_triggers({"visual_risk_objects": high}))
+        l3_triggers.append("单件视觉高危物体：降为 L3 人工复核，需核实朝向、人物关系与场景语境")
+    if not high and str(screen.get("visual_risk_level") or "").lower() == "high":
+        l3_triggers.append("视觉筛查提示高危但未返回结构化物体：需人工复核原图")
+    if l4_triggers:
+        return {"level": "L4_RED", "triggers": list(dict.fromkeys(l4_triggers))}
+    if l3_triggers:
+        return {"level": "L3_ORANGE", "triggers": list(dict.fromkeys(l3_triggers))}
+    return None
+
+
 def _detect_priority(
     report: dict[str, Any],
     payload: dict[str, Any],
     transcript_url: str | None,
 ) -> dict[str, Any] | None:
-    triggers: list[str] = []
+    l4_triggers: list[str] = []
+    l3_triggers: list[str] = []
     text_blob = _priority_text_blob(payload)
+
     holistic = _holistic_priority(report, payload)
-    if holistic and holistic["level"] == "L4_RED":
-        return holistic
+    if holistic:
+        target = l4_triggers if holistic["level"] == "L4_RED" else l3_triggers
+        target.extend(holistic.get("triggers") or [])
+
+    visual = _visual_priority(report, payload)
+    if visual:
+        target = l4_triggers if visual["level"] == "L4_RED" else l3_triggers
+        target.extend(visual.get("triggers") or [])
 
     high_risk_items = [
         item for item in (payload.get("items") or [])
         if isinstance(item, dict) and str(item.get("risk_tier") or "").lower() == "high_risk"
     ]
-    severe_names = [
-        str(item.get("label") or item.get("name") or "").strip()
+    high_risk_labels = [
+        str(item.get("label") or item.get("name") or "高危沙具").strip()
         for item in high_risk_items
-        if any(word in str(item.get("label") or item.get("name") or "") for word in _DEATH_ITEM_WORDS)
+    ]
+    severe_names = [
+        label for label in high_risk_labels
+        if any(word in label for word in _DEATH_ITEM_WORDS)
     ]
     if severe_names:
-        triggers.extend(f"高危画面：{name}" for name in severe_names[:4])
-    elif len(high_risk_items) >= 1:
-        labels = [
-            str(item.get("label") or item.get("name") or "高危沙具").strip()
-            for item in high_risk_items[:4]
-        ]
-        triggers.extend(f"高危画面：{label}" for label in labels)
+        l4_triggers.extend(f"高危画面：{name}" for name in severe_names[:4])
+    if len(high_risk_items) >= 2:
+        l4_triggers.append(f"多件高危沙具：{len(high_risk_items)} 件，需按重大风险人工复核")
+    elif high_risk_items and not severe_names:
+        l3_triggers.append(
+            f"单件高危沙具：{high_risk_labels[0]}；降为 L3 人工复核，需结合场景语境、位置与过程证据"
+        )
 
     for match in _L4_TEXT_RE.finditer(text_blob):
-        triggers.append(f"自伤/绝望文本：{match.group(1)}")
-
-    if not triggers:
-        for word in _HIGH_RISK_ITEM_WORDS:
-            if word in text_blob:
-                triggers.append(f"高危画面关键词：{word}")
-                break
+        l4_triggers.append(f"自伤/绝望文本：{match.group(1)}")
+    for word in _DEATH_ITEM_WORDS:
+        if word in text_blob:
+            l4_triggers.append(f"死亡/高危关键词：{word}")
+    for word in _HIGH_RISK_ITEM_WORDS:
+        if word in text_blob and word not in _DEATH_ITEM_WORDS:
+            l3_triggers.append(f"高危沙具关键词：{word}")
 
     for match in _DESTRUCTION_TEXT_RE.finditer(text_blob):
-        triggers.append(f"掩埋/破坏操作描述：{match.group(1)}")
+        l4_triggers.append(f"掩埋/破坏操作描述：{match.group(1)}")
 
     telemetry = _process_telemetry(payload)
     if telemetry["bury_actions"]:
-        triggers.append(f"制作过程：掩埋人物 {len(telemetry['bury_actions'])} 次")
+        l4_triggers.append(f"制作过程：掩埋人物 {len(telemetry['bury_actions'])} 次")
     if telemetry["destructive_loops"]:
-        triggers.append(f"制作过程：短时反复放删 {telemetry['destructive_loops']} 次")
+        l4_triggers.append(f"制作过程：短时反复放删 {telemetry['destructive_loops']} 次")
 
     interaction = payload.get("interaction_summary") or {}
     for key in ("buried_count", "destroyed_count", "delete_count", "removed_count"):
         value = interaction.get(key)
         if isinstance(value, (int, float)) and value >= 1:
-            triggers.append(f"操作记录：{key}={int(value)}")
+            l4_triggers.append(f"操作记录：{key}={int(value)}")
 
     levels = _risk_dimension_levels(report)
     expected = dict(RISK_DIMENSIONS)
@@ -1208,24 +1302,23 @@ def _detect_priority(
         if level == "L4"
     ]
     if l4_dimensions:
-        triggers.extend(f"九维风险达 L4：{name}" for name in l4_dimensions)
-
-    if triggers:
-        return {"level": "L4_RED", "triggers": list(dict.fromkeys(triggers))}
+        l4_triggers.extend(f"九维风险达 L4：{name}" for name in l4_dimensions)
 
     l3_dimensions = [
         expected.get(key, key) for key, level in levels.items()
-        if level in ("L3", "L4")
+        if level == "L3"
     ]
     if l3_dimensions:
-        triggers.extend(f"九维风险达 L3：{name}" for name in l3_dimensions)
+        l3_triggers.extend(f"九维风险达 L3：{name}" for name in l3_dimensions)
     for match in _L3_TEXT_RE.finditer(text_blob):
-        triggers.append(f"自述/教师观察关键词：{match.group(1)}")
-    if holistic and holistic["level"] == "L3_ORANGE":
-        triggers.extend(holistic.get("triggers") or [])
+        l3_triggers.append(f"自述/教师观察关键词：{match.group(1)}")
 
-    if triggers:
-        return {"level": "L3_ORANGE", "triggers": list(dict.fromkeys(triggers))}
+    l4_triggers = list(dict.fromkeys(item for item in l4_triggers if item))
+    l3_triggers = list(dict.fromkeys(item for item in l3_triggers if item))
+    if l4_triggers:
+        return {"level": "L4_RED", "triggers": l4_triggers}
+    if l3_triggers:
+        return {"level": "L3_ORANGE", "triggers": l3_triggers}
     return None
 
 
@@ -1375,7 +1468,7 @@ def _apply_priority_routing(
             "severity": 3,
             "visibility": "counselor_only",
             "title": "L3 橙色优先提示：先做校园安全与情绪稳定访谈",
-            "message": "检测到 L3 风险维度或霸凌/重大变故/拒绝交流等线索，优先确认校园安全与情绪稳定，再展开常规发展性建议。",
+            "message": "检测到 L3 风险维度、单件高危沙具/视觉高危物体，或霸凌/重大变故/拒绝交流等线索；先确认校园安全与情绪稳定，再展开常规发展性建议。",
             "triggers": triggers[:8],
             "recommended_actions": [
                 "优先开展校园安全与情绪稳定访谈，确认霸凌、欺凌、威胁、勒索或重大变故。",
@@ -1647,6 +1740,306 @@ def _guard_process_integration(report: dict[str, Any], payload: dict[str, Any]) 
     chapter_3["process_integration"] = current
 
 
+def _clip_text(value: Any, limit: int) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    if len(text) <= limit:
+        return text
+    return text[: max(1, limit - 1)].rstrip("，。；; ") + "…"
+
+
+def _ensure_self_image_section(report: dict[str, Any], payload: dict[str, Any]) -> None:
+    chapter_2 = report.get("chapter_2_imagery")
+    if not isinstance(chapter_2, dict):
+        return
+    name = _clip_text(payload.get("self_image"), 80)
+    note = _clip_text(payload.get("self_image_note"), 300)
+    if not name:
+        chapter_2["self_image"] = {
+            "name": "",
+            "note": note,
+            "hypothesis": "",
+            "alternative_hypothesis": "",
+            "verification_question": "",
+            "risk_boundary": "自我像仅用于访谈假设，不直接决定风险等级。",
+        }
+        return
+    current = chapter_2.get("self_image") if isinstance(chapter_2.get("self_image"), dict) else {}
+    hypothesis = _clip_text(current.get("hypothesis"), 260)
+    alternative = _clip_text(current.get("alternative_hypothesis"), 260)
+    question = _clip_text(current.get("verification_question"), 180)
+    if not hypothesis:
+        hypothesis = (
+            f"受测者选择「{name}」作为自我像，可能提示其此刻以某种姿态或状态表征自己；"
+            "这既可能是当下体验，也可能是愿望、保护性象征或对重要他人的认同，不能单凭该符号定性。"
+        )
+    if not alternative:
+        alternative = (
+            f"「{name}」也可能承担保护、理想化或防御功能，需结合沙盘位置、代表沙具、"
+            "自述与访谈区分“真实状态”与“愿望/认同”。"
+        )
+    if not question:
+        question = f"你选择「{name}」作为此刻的自己，它最像你现在的哪一部分？"
+    chapter_2["self_image"] = {
+        "name": name,
+        "note": note,
+        "hypothesis": hypothesis,
+        "alternative_hypothesis": alternative,
+        "verification_question": _student_question_text(question),
+        "risk_boundary": "自我像仅用于访谈假设，不直接决定风险等级；风险仍需沙盘结构、文本、过程与量表证据。",
+    }
+
+
+def _parse_iso_datetime(value: Any) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _ensure_longitudinal_comparison(report: dict[str, Any], payload: dict[str, Any]) -> None:
+    previous = payload.get("_previous_assessment")
+    if not isinstance(previous, dict) or not previous:
+        report["longitudinal_comparison"] = {
+            "available": False,
+            "comparability": "unavailable",
+            "note": "本次没有可用的同一学生历史报告；未做跨报告比较。",
+            "risk_changes": [],
+            "previous_date": "",
+            "days_between": None,
+        }
+        return
+
+    current_levels = _risk_dimension_levels(report)
+    previous_levels = {
+        str(item.get("key") or ""): str(item.get("level") or "").upper()
+        for item in (previous.get("risk_dimensions") or [])
+        if isinstance(item, dict) and str(item.get("key") or "")
+    }
+    changes: list[dict[str, str]] = []
+    improved = 0
+    worsened = 0
+    stable = 0
+    for key, name in RISK_DIMENSIONS:
+        before = previous_levels.get(key, "")
+        after = current_levels.get(key, "")
+        if before not in _RISK_LABELS or after not in _RISK_LABELS:
+            changes.append({
+                "key": key,
+                "name": name,
+                "previous_level": before,
+                "current_level": after,
+                "direction": "unknown",
+                "text": "上次或本次缺少该项分级，无法比较",
+            })
+            continue
+        before_rank = int(before[1])
+        after_rank = int(after[1])
+        if after_rank < before_rank:
+            direction = "improved"
+            improved += 1
+            text = f"较上次下降（{_risk_label(before)} → {_risk_label(after)}）"
+        elif after_rank > before_rank:
+            direction = "worsened"
+            worsened += 1
+            text = f"较上次上升（{_risk_label(before)} → {_risk_label(after)}）"
+        else:
+            direction = "stable"
+            stable += 1
+            text = f"与上次持平（{_risk_label(after)}）"
+        changes.append({
+            "key": key,
+            "name": name,
+            "previous_level": before,
+            "current_level": after,
+            "direction": direction,
+            "text": text,
+        })
+
+    current_at = _parse_iso_datetime((report.get("meta") or {}).get("generated_at"))
+    previous_at = _parse_iso_datetime(previous.get("created_at") or previous.get("generated_at"))
+    days_between = None
+    if current_at and previous_at:
+        days_between = max(0, (current_at - previous_at).days)
+
+    limitations: list[str] = []
+    missing_previous_keys = [name for key, name in RISK_DIMENSIONS if key not in previous_levels]
+    if previous.get("lean_only"):
+        limitations.append("上次为低投射量样本，风险分级可比性有限")
+    if days_between is not None and days_between > 180:
+        limitations.append("两次间隔超过 180 天，趋势需结合期间事件")
+    if not previous_levels:
+        limitations.append("上次报告缺少九维风险数据")
+    elif missing_previous_keys:
+        limitations.append(f"上次报告缺少{len(missing_previous_keys)}个维度（{'、'.join(missing_previous_keys)}），仅按可对齐维度比较")
+    if str(previous.get("engine") or "").lower() == "demo":
+        limitations.append("上次为本地演示报告")
+    comparability = "limited" if limitations else "comparable"
+    previous_count = sum(
+        1 for level in previous_levels.values()
+        if level in {"L2", "L3", "L4"}
+    )
+    current_count = sum(
+        1 for level in current_levels.values()
+        if level in {"L2", "L3", "L4"}
+    )
+    report["longitudinal_comparison"] = {
+        "available": True,
+        "comparability": comparability,
+        "note": "；".join(limitations) if limitations else "同一学生、同一九维口径，可用于趋势参考。",
+        "previous_report_no": str(previous.get("report_no") or ""),
+        "previous_date": str(previous.get("created_at") or previous.get("generated_at") or ""),
+        "days_between": days_between,
+        "previous_self_image": str(previous.get("self_image") or ""),
+        "previous_representative_item_name": str(previous.get("representative_item_name") or ""),
+        "previous_risk_count": previous_count,
+        "current_risk_count": current_count,
+        "improved": improved,
+        "worsened": worsened,
+        "stable": stable,
+        "risk_changes": changes,
+    }
+
+
+def _first_interview_question(report: dict[str, Any]) -> str:
+    chapter_6 = report.get("chapter_6_interview")
+    if isinstance(chapter_6, dict):
+        for item in (chapter_6.get("items") or []):
+            if not isinstance(item, dict):
+                continue
+            for question in (item.get("questions") or []):
+                text = _clip_text(question, 180)
+                if text:
+                    return text
+    chapter_2 = report.get("chapter_2_imagery")
+    if isinstance(chapter_2, dict):
+        for theme in (chapter_2.get("themes") or []):
+            if isinstance(theme, dict) and theme.get("verification_question"):
+                return _clip_text(theme["verification_question"], 180)
+    chapter_9 = report.get("chapter_9_general_advice")
+    if isinstance(chapter_9, dict):
+        for item in (chapter_9.get("growth_mindset") or []):
+            if str(item or "").strip():
+                return _clip_text(item, 180)
+    return "先由心理老师结合访谈核实本次沙盘线索，再决定下一步支持方式。"
+
+
+def _ensure_summary_card(report: dict[str, Any], payload: dict[str, Any]) -> None:
+    chapter_1 = report.get("chapter_1_overview") if isinstance(report.get("chapter_1_overview"), dict) else {}
+    chapter_2 = report.get("chapter_2_imagery") if isinstance(report.get("chapter_2_imagery"), dict) else {}
+    chapter_5 = report.get("chapter_5_risk") if isinstance(report.get("chapter_5_risk"), dict) else {}
+    chapter_6 = report.get("chapter_6_interview") if isinstance(report.get("chapter_6_interview"), dict) else {}
+    chapter_7 = report.get("chapter_7_career") if isinstance(report.get("chapter_7_career"), dict) else {}
+
+    self_image = chapter_2.get("self_image") if isinstance(chapter_2.get("self_image"), dict) else {}
+    self_image_name = _clip_text(self_image.get("name") or payload.get("self_image"), 80)
+    representative = _clip_text(
+        payload.get("representative_item_name") or chapter_1.get("representative_item_name"),
+        80,
+    )
+    theme_names: list[str] = []
+    for theme in (chapter_2.get("themes") or []):
+        if isinstance(theme, dict):
+            name = _clip_text(theme.get("theme"), 60)
+            if name and name not in theme_names:
+                theme_names.append(name)
+        if len(theme_names) >= 3:
+            break
+    themes_text = "、".join(theme_names[:2]) if theme_names else (representative or "当前沙盘的主要场景")
+
+    risk_levels = _risk_dimension_levels(report)
+    risk_count = sum(1 for level in risk_levels.values() if level in {"L2", "L3", "L4"})
+    highest_level = "L1"
+    for level in risk_levels.values():
+        if level in _RISK_LABELS and int(level[1]) > int(highest_level[1]):
+            highest_level = level
+    comparison = report.get("longitudinal_comparison") if isinstance(report.get("longitudinal_comparison"), dict) else {}
+    comparison_public = {
+        "available": bool(comparison.get("available")),
+        "previous_date": str(comparison.get("previous_date") or ""),
+        "days_between": comparison.get("days_between"),
+        "comparability": str(comparison.get("comparability") or "unavailable"),
+        "note": str(comparison.get("note") or ""),
+    }
+
+    strengths: list[str] = []
+    for item in (chapter_7.get("strengths") or []):
+        value = _clip_text(item, 70)
+        if value and value not in strengths:
+            strengths.append(value)
+        if len(strengths) >= 1:
+            break
+    resource_text = strengths[0] if strengths else "当前沙盘中可见的资源线索有限，需结合访谈补充"
+
+    signals: list[dict[str, str]] = []
+    if self_image_name:
+        signals.append({"label": "自我像", "value": self_image_name, "tone": "neutral"})
+    signals.append({"label": "核心意象", "value": representative or "未填写", "tone": "neutral"})
+    signals.append({"label": "主要主题", "value": themes_text, "tone": "neutral"})
+    signals.append({"label": "资源线索", "value": resource_text, "tone": "resource"})
+    if risk_count:
+        signals.append({
+            "label": "需关注",
+            "value": f"{risk_count} 项，最高 {_risk_label(highest_level)}",
+            "tone": "attention",
+        })
+    else:
+        signals.append({
+            "label": "需关注",
+            "value": f"当前未见 L2–L4 风险维度；仍需访谈核验",
+            "tone": "neutral",
+        })
+    signals = signals[:5]
+
+    next_step = _clip_text(
+        self_image.get("verification_question") or _first_interview_question(report),
+        180,
+    )
+    if self_image_name:
+        headline = f"本次以「{self_image_name}」作为自我像，沙盘整体围绕「{themes_text}」展开。"
+        public_headline = f"你选择了「{self_image_name}」作为此刻的自己，沙盘里还有「{themes_text}」这些线索。"
+    else:
+        headline = f"本次沙盘以「{representative or '当前场景'}」为核心意象，整体围绕「{themes_text}」展开。"
+        public_headline = f"你的沙盘里出现了「{representative or '当前场景'}」和「{themes_text}」这些线索。"
+
+    public_signals: list[dict[str, str]] = []
+    if self_image_name:
+        public_signals.append({"label": "你选择的自我像", "value": self_image_name, "tone": "neutral"})
+    public_signals.append({"label": "沙盘里的核心意象", "value": representative or "未填写", "tone": "neutral"})
+    public_signals.append({"label": "主要线索", "value": themes_text, "tone": "neutral"})
+    public_signals.append({"label": "你已经有的资源", "value": resource_text, "tone": "resource"})
+    public_signals = public_signals[:5]
+
+    report["summary_card"] = {
+        "headline": headline,
+        "signals": signals,
+        "next_step": next_step,
+        "risk_overview": {
+            "count": risk_count,
+            "highest_level": highest_level,
+            "highest_label": _risk_label(highest_level),
+            "total_dimensions": len(RISK_DIMENSIONS),
+            "previous_count": comparison.get("previous_risk_count", 0) if comparison.get("available") else 0,
+            "previous": comparison_public,
+            "improved": comparison.get("improved", 0),
+            "worsened": comparison.get("worsened", 0),
+            "stable": comparison.get("stable", 0),
+        },
+        "public": {
+            "headline": public_headline,
+            "signals": public_signals,
+            "next_step": next_step,
+            "previous": comparison_public,
+            "note": "本页为发展性评估摘要，不含风险分级；具体支持方式以心理老师沟通为准。",
+        },
+    }
+
+
 def _collect_quality_report(
     report: dict[str, Any],
     sample_quality: dict[str, Any],
@@ -1698,6 +2091,16 @@ def _collect_quality_report(
             "HOLISTIC_SCREEN_UNAVAILABLE",
             "整体构图安全筛查未完成，当前报告不能据此排除整体画面高危语义；需由咨询师直接查看原图并人工复核。",
         )
+    visual_high = visual_high_objects(screen)
+    if visual_high:
+        labels = "、".join(
+            str(item.get("label") or item.get("type_label") or "高危物体")
+            for item in visual_high[:4]
+        )
+        add(
+            "VISUAL_RISK_OBJECT",
+            f"画面发现视觉高危物体：{labels}；已结合位置、朝向、人物关系和场景语境分级，需咨询师核对原图。",
+        )
     if str(meta.get("engine") or "").strip().lower() == "demo":
         add("DEMO_ENGINE", "当前为本地示例报告，未接入多模态模型；内容用于流程演示，不能直接作为真实评估结论交付。")
 
@@ -1729,6 +2132,8 @@ def apply_report_quality_gates(
         "self_narrative": raw_record["self_narrative"],
         "teacher_observation": raw_record["teacher_observation"],
         "representative_item_name": str(payload.get("representative_item_name") or "").strip(),
+        "self_image": str(payload.get("self_image") or "").strip(),
+        "self_image_note": str(payload.get("self_image_note") or "").strip(),
         "terrain_metrics": payload.get("terrain_metrics") or {},
         "terrain_observation": terrain_text,
         "process_telemetry": _process_telemetry(payload),
@@ -1751,6 +2156,7 @@ def apply_report_quality_gates(
         chapter_1["process_observation"] = process_note
         _merge_holistic_screen(report, holistic_screen)
         _ensure_process_analysis(report, payload)
+    _ensure_self_image_section(report, payload)
     _ensure_process_integration(report, payload)
     _guard_process_integration(report, payload)
     priority_level = _apply_priority_routing(report, payload, transcript_url)
@@ -1768,11 +2174,13 @@ def apply_report_quality_gates(
         _backfill_dimension_training(report)
     _rewrite_career_for_evidence(report, sample_quality, priority_level)
     _ensure_chapter9(report)
+    _ensure_longitudinal_comparison(report, payload)
     report["chapter_5_risk"]["visibility"] = "counselor_only"
     for chapter_key, chapter_value in report.items():
         if re.fullmatch(r"chapter_[1-9]_[a-z_]+", str(chapter_key)) and chapter_key != "chapter_6_interview":
             report[chapter_key] = _enforce_third_person(chapter_value)
     _ensure_dialogue_second_person(report)
+    _ensure_summary_card(report, payload)
     flags, warnings, quality_level = _collect_quality_report(report, sample_quality, priority_level)
     meta["quality_flags"] = flags
     meta["quality_warnings"] = warnings
@@ -1800,6 +2208,8 @@ def normalize_meta(
         "gender": student.get("gender") or meta.get("gender") or "未填写",
         "student_name": student.get("name") or "匿名受测者",
         "student_no": student.get("student_no") or "",
+        "self_image": str(payload.get("self_image") or "").strip(),
+        "self_image_note": str(payload.get("self_image_note") or "").strip(),
         "disclaimer": "发展性心理评估参考·非临床诊断",
         "engine": engine,
         "engine_note": engine_note,
@@ -1852,7 +2262,7 @@ async def screen_holistic_image(sandplay_image: bytes) -> dict[str, Any]:
             ],
         }],
         "temperature": 0,
-        "max_tokens": 1200,
+        "max_tokens": 1800,
     }
     if "volces.com" in MULTIMODAL_BASE_URL:
         body["thinking"] = {"type": "disabled"}
@@ -1873,7 +2283,7 @@ async def screen_holistic_image(sandplay_image: bytes) -> dict[str, Any]:
                 content = "\n".join(part.get("text", "") for part in content if isinstance(part, dict))
             if not isinstance(content, str) or not content.strip():
                 raise ValueError("整体构图筛查返回为空")
-            parsed = json.loads(clean_json_text(content))
+            parsed = parse_json_object(content)
             if not isinstance(parsed, dict):
                 raise ValueError("整体构图筛查不是 JSON 对象")
             result = normalize_screen(parsed, status="ok")
@@ -1928,7 +2338,7 @@ async def call_multimodal(
         content = "\n".join(part.get("text", "") for part in content if isinstance(part, dict))
     if not isinstance(content, str) or not content.strip():
         raise ValueError("多模态模型返回为空")
-    parsed = json.loads(clean_json_text(content))
+    parsed = parse_json_object(content)
     usage = data.get("usage") if isinstance(data.get("usage"), dict) else {}
     if isinstance(parsed, dict):
         meta = parsed.setdefault("meta", {})

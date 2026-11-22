@@ -442,6 +442,8 @@
   .review-summary-kicker { color: #9a7a54; font-size: 8px; letter-spacing: .18em; }
   .review-summary h3 { display: flex; align-items: center; gap: 8px; margin: 5px 0 0; font-family: var(--serif); font-size: 15px; font-weight: 600; color: #22352b; }
   .review-summary p { margin: 5px 0 0; color: #6d7a71; font-size: 9px; line-height: 1.6; }
+  .review-summary .summary-headline { margin-top: 7px; color: #22352b; font-family: var(--serif); font-size: 11px; line-height: 1.55; }
+  .review-hint { color: #8a7a68; font-size: 8px; font-weight: 400; }
   .engine-pill { padding: 2px 7px; border-radius: 99px; font-family: var(--sans); font-size: 7.5px; font-weight: 500; letter-spacing: .03em; }
   .engine-pill.demo { color: #8a5a27; background: #f7e8d0; border: 1px solid #e6cba4; }
   .engine-pill.model { color: #1f5d45; background: #e4f1e9; border: 1px solid #bfdccb; }
@@ -1451,6 +1453,13 @@
     const flags = warnings.length ? warnings : list(meta.quality_flags)
       .filter((code) => code && code !== "DEMO_ENGINE")
       .map((code) => ({ code, severity: "info", message: code }));
+    const summary = report.summary_card || {};
+    const summaryRisk = summary.risk_overview || {};
+    const previous = summaryRisk.previous || {};
+    const summaryLine = summary.headline ? `<p class="summary-headline">${esc(summary.headline)}</p>` : "";
+    const previousLine = previous.available
+      ? `上次 ${fmtDate(previous.previous_date)}${previous.days_between != null ? ` · 间隔 ${previous.days_between} 天` : ""}${previous.comparability === "limited" ? " · 可比性有限" : ""}`
+      : "无同学生历史报告";
     const evidenceText = { adequate: "较充分", limited: "有限", minimal: "偏少" }[sample.evidence_level] || "未评估";
     const qualityText = { critical: "需重点核对", warning: "需复核", info: "正常" }[meta.quality_level] || "未标注";
     const flagHtml = flags.length
@@ -1468,12 +1477,13 @@
           <p>${isDemo
             ? "本报告由本地演示模板与固定规则算法生成，未调用多模态大模型，不能直接作为真实评估结论；审核时请重点核对风险分级、证据链与职业/训练建议。"
             : "本报告由多模态模型生成，固定规则负责风险分级、证据校验与质量门控；审核时请核对模型叙述与原始记录是否一致。"}</p>
+          ${summaryLine}
         </div>
         <div class="summary-metrics">
           <div class="summary-metric"><span>沙具样本</span><b>${esc(sample.item_count || "—")}<small>件</small></b></div>
           <div class="summary-metric"><span>证据水平</span><b>${esc(evidenceText)}</b></div>
           <div class="summary-metric"><span>风险等级</span><b class="${levelClass}">${esc(level)}</b></div>
-          <div class="summary-metric"><span>报告质量</span><b>${esc(qualityText)}</b></div>
+          <div class="summary-metric"><span>上次对比</span><b>${esc(previousLine)}</b></div>
         </div>
         <div class="summary-quality">
           <span>质量提示 · ${esc(statusText(status))}</span>
@@ -1533,15 +1543,25 @@
   }
 
   function renderChapter2Editor(draft) {
-    const themes = list((draft.chapter_2_imagery || {}).themes);
-    if (!themes.length) return '<div class="empty-table">AI 原稿没有第二章主题条目</div>';
-    return themes.map((theme, index) => `
+    const chapter = draft.chapter_2_imagery || {};
+    const themes = list(chapter.themes);
+    const selfImage = chapter.self_image || {};
+    const selfImageCard = selfImage.name ? `
+      <div class="review-card">
+        <div class="review-card-head"><b>自我像 · ${esc(selfImage.name)}</b><span class="review-hint">独立字段 · 不参与风险分级</span></div>
+        <label class="review-label">支持性假设${reviewTextarea("self_image.hypothesis", selfImage.hypothesis, 3)}</label>
+        <label class="review-label">竞争性解释${reviewTextarea("self_image.alternative_hypothesis", selfImage.alternative_hypothesis, 3)}</label>
+        <label class="review-label">核验问题${reviewTextarea("self_image.verification_question", selfImage.verification_question, 2)}</label>
+      </div>` : "";
+    const themeCards = themes.map((theme, index) => `
       <div class="review-card">
         <div class="review-card-head"><b>假设 ${index + 1}</b><input class="review-input" data-review-path="themes.${index}.theme" value="${esc(theme.theme || "")}" placeholder="主题名称"></div>
         <label class="review-label">探索性假设${reviewTextarea(`themes.${index}.hypothesis`, theme.hypothesis, 3)}</label>
         <label class="review-label">替代解释${reviewTextarea(`themes.${index}.alternative_hypothesis`, theme.alternative_hypothesis, 3)}</label>
         <label class="review-label">核验问题${reviewTextarea(`themes.${index}.verification_question`, theme.verification_question, 2)}</label>
       </div>`).join("");
+    if (!selfImageCard && !themeCards) return '<div class="empty-table">AI 原稿没有第二章内容</div>';
+    return selfImageCard + themeCards;
   }
 
   function renderChapter6Editor(draft) {
@@ -1757,6 +1777,7 @@
     const chapter2 = `
       <section class="chapter"><div class="chapter-head"><span class="chapter-num">二</span><h3>沙盘作品意象分析</h3><span class="chapter-aside">探索性假设</span></div>
       <div class="chapter-body">
+        ${c2.self_image && c2.self_image.name ? `<div class="mini-card" style="margin-bottom:10px"><label>自我像 · ${esc(c2.self_image.name)}</label><p>${esc(text(c2.self_image.hypothesis, "—"))}</p><small>边界：${esc(text(c2.self_image.risk_boundary, "仅用于访谈假设，不直接决定风险等级。"))}</small></div>` : ""}
         <table class="paper-table"><thead><tr><th>主题</th><th>象征物</th><th>探索性理解</th><th>置信度</th></tr></thead><tbody>
           ${themes.length ? themes.map((theme) => `<tr><td>${esc(text(theme.theme, "未命名主题"))}</td><td>${esc(list(theme.symbols).join("、") || "—")}</td><td>${esc(text(theme.hypothesis, "—"))}</td><td class="highlight-cell">${esc(text(theme.confidence, "待确认"))}</td></tr>`).join("") : '<tr><td colspan="4">暂无意象分析</td></tr>'}
         </tbody></table>

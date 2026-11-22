@@ -35,6 +35,7 @@ QUALITY_FLAG_META = {
     "EVIDENCE_LIMITED": ("info", "证据有限"),
     "RISK_LEVEL_CONFLICT": ("critical", "顶部预警与风险表不一致"),
     "HOLISTIC_RISK_SYMBOL": ("critical", "整体构图高危文字/符号"),
+    "VISUAL_RISK_OBJECT": ("critical", "视觉高危物体"),
     "HOLISTIC_SCREEN_UNAVAILABLE": ("critical", "整体构图安全筛查未完成"),
     "TRAINING_INTENSITY_CONFLICT": ("warning", "优先期训练强度不一致"),
     "SCORE_BASIS_MISMATCH": ("warning", "报告引用了不存在的成绩依据"),
@@ -495,6 +496,8 @@ def build_assessment_basis(payload: dict[str, Any], transcript_url: str | None =
         basis.append("沙盘地形记录（仅客户端声明，未采用）")
     if payload.get("representative_item_id") or payload.get("representative_item_name"):
         basis.append("代表沙具1件")
+    if str(payload.get("self_image") or "").strip():
+        basis.append("自我像1项（访谈假设，不参与风险分级）")
     if quality["has_description"]:
         basis.append("受测者沙盘描述1段")
     if quality["has_narrative"]:

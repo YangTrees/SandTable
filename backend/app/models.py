@@ -25,6 +25,8 @@ class Assessment(Base):
 
     representative_item_id: Mapped[str] = mapped_column(String(120), default="")
     representative_item_name: Mapped[str] = mapped_column(String(120), default="")
+    self_image: Mapped[str] = mapped_column(String(120), default="")
+    self_image_note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     sandplay_description: Mapped[str] = mapped_column(Text, default="")
     self_narrative: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     consent: Mapped[bool] = mapped_column(Boolean, default=True)

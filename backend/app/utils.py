@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import secrets
 from datetime import datetime, timezone
@@ -34,6 +35,19 @@ def clean_json_text(text: str) -> str:
     return text
 
 
+def parse_json_object(text: str) -> Any:
+    """解析模型返回的 JSON 对象，忽略对象结束后的附加说明或第二段内容。"""
+    cleaned = clean_json_text(text)
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        start = cleaned.find("{")
+        if start < 0:
+            raise
+        value, _ = json.JSONDecoder().raw_decode(cleaned, start)
+        return value
+
+
 def report_chapter_count(report: dict[str, Any]) -> int:
     return sum(1 for key in report if re.fullmatch(r"chapter_[1-9]_[a-z_]+", key))
 
@@ -46,7 +60,7 @@ def _public_scrub(value: Any) -> Any:
             lowered = str(key).lower()
             if lowered in {"nine_grid_distribution", "grid_distribution", "heightmap"}:
                 continue
-            if lowered.startswith("counselor") or lowered in {"risk_level", "risk_summary"}:
+            if lowered.startswith("counselor") or lowered in {"risk_level", "risk_summary", "risk_overview"}:
                 continue
             out[key] = _public_scrub(item)
         return out
@@ -74,21 +88,32 @@ def public_copy(report: dict[str, Any]) -> dict[str, Any]:
     data.pop("priority_banner", None)
     data.pop("risk_banner", None)
     data.pop("raw_record_echo", None)
+    data.pop("longitudinal_comparison", None)
+    summary_card = data.get("summary_card")
+    if isinstance(summary_card, dict):
+        public_summary = summary_card.get("public")
+        if isinstance(public_summary, dict):
+            data["summary_card"] = _public_scrub(public_summary)
+        else:
+            data.pop("summary_card", None)
+    else:
+        data.pop("summary_card", None)
     if isinstance(meta, dict):
         meta.pop("counselor_note", None)
         meta.pop("review_note", None)
         meta.pop("client_inputs", None)
         meta.pop("holistic_screen", None)
         meta.pop("holistic_screen_risk", None)
+        meta.pop("previous_assessment", None)
         if isinstance(meta.get("quality_flags"), list):
             meta["quality_flags"] = [
                 item for item in meta["quality_flags"]
-                if not str(item).startswith("HOLISTIC_")
+                if not str(item).startswith(("HOLISTIC_", "VISUAL_"))
             ]
         if isinstance(meta.get("quality_warnings"), list):
             meta["quality_warnings"] = [
                 item for item in meta["quality_warnings"]
-                if not str((item or {}).get("code") or "").startswith("HOLISTIC_")
+                if not str((item or {}).get("code") or "").startswith(("HOLISTIC_", "VISUAL_"))
             ]
     chapter1 = data.get("chapter_1_overview")
     if isinstance(chapter1, dict):

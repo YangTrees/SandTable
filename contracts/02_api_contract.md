@@ -106,6 +106,8 @@
   "representative_item_id": "item-001",
   "representative_item_name": "灯塔",
   "representative_category": "建筑与庇护",
+  "self_image": "一盏灯",
+  "self_image_note": "希望自己也能照亮别人",
   "items": [
     {
       "id": "item-001",
@@ -150,6 +152,8 @@
 
 - `payload` 必须是合法 JSON，且符合 `AssessmentPayload`。
 - `representative_item_id` 必须存在于 `items[].id`，否则 422 `VALIDATION_REPRESENTATIVE_NOT_FOUND`。
+- `self_image` 为可选独立字段（最长 120 字），不要求存在于 `items[].id`；只进入第二章自我意象假设与第六章访谈，不直接参与风险分级。
+- `self_image_note` 为可选补充说明（最长 800 字）。
 - `heightmap.depth` 默认 `900`（4:3 沙箱）。
 - `student.academic_scores.subjects` 非空时，服务端把它作为成绩依据传入报告提示词；报告第四章写入 `structured_scores`、`score_source="structured_entry"`，并注明“待与成绩单核对”。提供成绩单图片时 `score_source` 为 `mixed`。
 - 成功返回 `assessment summary + report + sandplay_image_url + transcript_image_url`。
@@ -168,6 +172,8 @@
   "class_name": "初一 1 班",
   "representative_item_id": "item-001",
   "representative_item_name": "灯塔",
+  "self_image": "一盏灯",
+  "self_image_note": "希望自己也能照亮别人",
   "report_engine": "multimodal",
   "created_at": "2026-11-22T03:00:00Z",
   "counselor_report_url": "/api/v1/reports/{id}",
@@ -182,6 +188,21 @@
 报告固定九章，章节不可缺失：
 
 `chapter_1_overview`、`chapter_2_imagery`、`chapter_3_six_dimensions`、`chapter_4_academic`、`chapter_5_risk`、`chapter_6_interview`、`chapter_7_career`、`chapter_8_training_modules`、`chapter_9_general_advice`。
+
+服务端派生展示字段（不由模型直接生成）：
+
+| 字段 | 说明 |
+| --- | --- |
+| `summary_card` | 顶部摘要卡：3–5 个核心信号、一句话、下一步；`summary_card.public` 为家长/学生脱敏版，不含风险分级 |
+| `longitudinal_comparison` | 同一 `student_no` 上一份已完成报告的九维变化；`availability/comparability/risk_changes` 由服务端计算 |
+| `chapter_2_imagery.self_image` | 自我像独立对象：假设 A/B、核验问题与“仅用于访谈、不参与风险分级”边界 |
+| `chapter_1_overview.holistic_visual_check.visual_risk_objects` | 视觉高危物体：类型、位置、朝向、人物关系、场景语境、severity |
+
+风险优先规则（服务端硬门控）：
+
+- 单件非死亡类 `high_risk` 沙具 → `L3_ORANGE`，需人工复核场景语境。
+- 死亡类符号（骷髅/墓碑/棺材/尸体/遗照/坟墓）、两件及以上 `high_risk`、明确的负向文本、掩埋/破坏过程 → `L4_RED`。
+- 视觉高危物体单独筛查：单件枪械/刀具/血/伤/排泄物等 `high` 物体 → L3；尸体/悬吊/两件及以上 `high` 物体 → L4；军事/警察/博物馆/玩具陈列或厕所/医疗语境 → 最多 `watch`，不自动升级。
 
 报告 `meta` 关键字段：
 

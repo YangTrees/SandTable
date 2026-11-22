@@ -343,6 +343,8 @@ def _report_brief(row: Assessment, review: ReportReview | None, active_shares: i
         "contact_phone": getattr(row, "contact_phone", "") or "",
         "academic_scores": _parse_json_object(getattr(row, "academic_scores_json", "{}")),
         "representative_item_name": row.representative_item_name,
+        "self_image": getattr(row, "self_image", "") or "",
+        "self_image_note": getattr(row, "self_image_note", "") or "",
         "created_at": iso_utc(row.created_at),
         "updated_at": iso_utc(row.updated_at),
         "report_revision": int(getattr(row, "report_revision", 0) or 0),

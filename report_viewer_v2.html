@@ -339,6 +339,82 @@
     .holistic-card-head span { color: #a8554e; font-size: 7.6pt; font-weight: 600; }
     .holistic-card p { margin: 1mm 0 0; }
     .holistic-card p b { color: var(--muted); font-weight: 600; margin-right: 1.5mm; }
+    .summary-card {
+      margin: 0 0 5mm;
+      padding: 4.2mm 4.8mm;
+      border: 1px solid var(--line);
+      border-radius: 3.2mm;
+      background: linear-gradient(135deg, #fbfaf6 0%, #f4f7f4 100%);
+      display: grid;
+      grid-template-columns: 30mm minmax(0, 1fr);
+      gap: 4.5mm;
+      align-items: center;
+      break-inside: avoid;
+    }
+    .summary-card.public { grid-template-columns: 1fr; }
+    .summary-ring {
+      width: 28mm;
+      height: 28mm;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(#8a6554 var(--risk-fill, 0%), #e5e1d7 0);
+      position: relative;
+    }
+    .summary-ring::after {
+      content: "";
+      position: absolute;
+      inset: 3.2mm;
+      border-radius: 50%;
+      background: #fffdf8;
+      box-shadow: inset 0 0 0 1px #ece7dc;
+    }
+    .summary-ring-inner { position: relative; z-index: 1; text-align: center; line-height: 1.1; }
+    .summary-ring-inner strong { display: block; font-family: var(--serif); font-size: 15pt; color: var(--accent-deep); }
+    .summary-ring-inner span { display: block; margin-top: 1mm; font-size: 6.8pt; color: var(--muted); }
+    .summary-main { min-width: 0; }
+    .summary-kicker { margin: 0 0 1.4mm; color: var(--accent-deep); font-size: 7.2pt; letter-spacing: .12em; font-weight: 700; }
+    .summary-headline { margin: 0 0 2.6mm; font-family: var(--serif); font-size: 11.5pt; line-height: 1.55; color: var(--ink); }
+    .summary-signals { display: flex; flex-wrap: wrap; gap: 1.6mm 2mm; margin-bottom: 2.4mm; }
+    .summary-signal { padding: 1.4mm 2.4mm; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.72); font-size: 7.8pt; color: var(--ink-2); }
+    .summary-signal b { color: var(--muted); font-weight: 600; margin-right: 1.2mm; }
+    .summary-signal.attention { border-color: #d6b48a; background: #fbf0df; color: #7a4a12; }
+    .summary-signal.resource { border-color: #bfd2c4; background: #eef6f0; color: #315b45; }
+    .summary-next { margin: 0; padding-top: 2.2mm; border-top: 1px dashed var(--line); color: var(--ink-2); font-size: 8pt; line-height: 1.65; }
+    .summary-next b { color: var(--accent-deep); margin-right: 1.5mm; }
+    .summary-prev { margin-top: 1.6mm; color: var(--muted); font-size: 7.4pt; }
+    .self-image-card {
+      margin: 0 0 3.5mm;
+      padding: 3.4mm 4mm;
+      border: 1px solid #d9c9b8;
+      border-left: 3px solid #a87955;
+      border-radius: 0 2.5mm 2.5mm 0;
+      background: #fcf8f1;
+      break-inside: avoid;
+    }
+    .self-image-head { display: flex; justify-content: space-between; gap: 3mm; margin-bottom: 1.4mm; }
+    .self-image-head b { font-family: var(--serif); color: var(--ink); font-size: 9.6pt; }
+    .self-image-head span { color: var(--muted); font-size: 7.2pt; }
+    .self-image-card p { margin: 1.2mm 0 0; color: var(--ink-2); font-size: 8.2pt; line-height: 1.65; }
+    .self-image-card p b { color: var(--muted); margin-right: 1.4mm; }
+    .visual-risk-card {
+      margin-top: 3mm;
+      padding: 3mm 4mm;
+      border: 1px solid #e0c7a1;
+      border-left: 3px solid #a87020;
+      border-radius: 0 2.5mm 2.5mm 0;
+      background: #fdf8ee;
+      font-size: 8pt;
+      line-height: 1.6;
+      break-inside: avoid;
+    }
+    .visual-risk-card.high { border-color: #d9a49c; border-left-color: #a8554e; background: #fdf2f0; }
+    .visual-risk-card-head { display: flex; justify-content: space-between; gap: 3mm; margin-bottom: 1mm; }
+    .visual-risk-card-head b { color: var(--ink); font-family: var(--serif); font-size: 9pt; }
+    .visual-risk-card-head span { color: #a8554e; font-size: 7.4pt; font-weight: 600; }
+    .visual-risk-object { margin-top: 1.2mm; padding-top: 1.2mm; border-top: 1px dashed #ead8bd; }
+    .visual-risk-object b { display: block; color: var(--ink); margin-bottom: .6mm; }
+    .visual-risk-object span { display: inline-block; margin: 0 3mm .4mm 0; color: var(--ink-2); }
     .process-analysis { margin-top: 3mm; padding: 3mm 4.5mm; border-left: 1.2mm solid #8a6a3d; border-radius: 2.5mm; background: linear-gradient(135deg, #fbf7ef, #f6f0e4); color: var(--ink-2); font-size: 7.9pt; line-height: 1.56; break-inside: avoid; page-break-inside: avoid; }
     .process-analysis-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4mm; margin-bottom: 1.4mm; padding-bottom: 1.2mm; border-bottom: 1px solid #e4d8c5; }
     .process-analysis-head b { color: #624a2b; font-family: var(--serif); font-size: 9.2pt; font-weight: 600; }
@@ -489,7 +565,18 @@
       border-left: 4px solid var(--accent); border-radius: 0 2.5mm 2.5mm 0;
       background: #fff8f5; color: #6f4640; font-size: 8pt; line-height: 1.65;
     }
-    .risk-overall-note b { color: var(--accent-deep); }
+    .risk-overall-head { display: flex; align-items: center; gap: 3mm; margin-bottom: 1.3mm; }
+    .risk-overall-head > span { color: var(--ink); font-size: 8.4pt; font-weight: 600; letter-spacing: .04em; }
+    .risk-overall-head .risk-status { min-width: 20mm; padding: 1.1mm 3mm; font-size: 8pt; }
+    .risk-overall-copy { color: inherit; line-height: 1.65; }
+    .risk-overall-note.l1 { border-color: #c8dbd1; border-left-color: #4f8a70; background: #f4faf6; color: #4b6b5b; }
+    .risk-overall-note.l2 { border-color: #e4c9ab; border-left-color: #c69856; background: #fdf8ef; color: #75562c; }
+    .risk-overall-note.l3 { border-color: #e2bda3; border-left-color: #c07a56; background: #fdf3ec; color: #7d462f; }
+    .risk-overall-note.l4 { border-color: #dcb1a9; border-left-color: #a8554e; background: #fdf0ef; color: #74332e; }
+    .risk-overall-note.l1 .risk-overall-head > span { color: #356b53; }
+    .risk-overall-note.l2 .risk-overall-head > span { color: #8a612f; }
+    .risk-overall-note.l3 .risk-overall-head > span { color: #9c5233; }
+    .risk-overall-note.l4 .risk-overall-head > span { color: #8f3c36; }
     .risk-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3mm; margin-bottom: 4mm; }
     .risk-card {
       min-height: 19mm; padding: 3.2mm 4mm; border: 1px solid var(--line);
@@ -709,6 +796,8 @@
       .report-sheet::before, .report-sheet::after { display: none; }
       .report-hero { border-radius: 0; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .priority-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid; page-break-inside: avoid; }
+      .risk-overall-note, .risk-card, .risk-status { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .summary-card, .self-image-card, .visual-risk-card { break-inside: avoid; page-break-inside: avoid; }
       .risk-card, .risk-detail { break-inside: avoid; page-break-inside: avoid; }
       .section-head, .advice-card h3 { break-after: avoid; page-break-after: avoid; }
       .chapter9-lead { break-inside: avoid; page-break-inside: avoid; }
@@ -750,8 +839,7 @@
   <div id="toast"></div>
 
   <script>
-    const SAME_ORIGIN_API = ["8000", "80", "443", ""].includes(location.port);
-    const API_BASE = (window.localStorage.getItem("sandplay_report_api") || (location.protocol.indexOf("http") === 0 && SAME_ORIGIN_API ? `${location.origin}/api/v1` : "http://127.0.0.1:8000/api/v1")).replace(/\/$/, "");
+    const API_BASE = (window.localStorage.getItem("sandplay_report_api") || (location.protocol.indexOf("http") === 0 ? `${location.origin}/api/v1` : "http://127.0.0.1:8000/api/v1")).replace(/\/$/, "");
     const params = new URLSearchParams(window.location.search);
     const numerals = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
     const state = {
@@ -812,6 +900,9 @@
       if (Number.isNaN(date.getTime())) return String(value);
       const pad = (n) => String(n).padStart(2, "0");
       return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+    function metaItem(label, value) {
+      return `<div class="meta-item"><span>${esc(label)}</span><strong>${esc(value || "—")}</strong></div>`;
     }
     function percent(value) {
       if (value == null || value === "") return "—";
@@ -889,7 +980,7 @@
         delete data.meta.generation_usage;
         delete data.meta.holistic_screen;
         delete data.meta.holistic_screen_risk;
-        const riskCodes = ["RISK_LEVEL_CONFLICT", "TRAINING_INTENSITY_CONFLICT", "HOLISTIC_RISK_SYMBOL", "HOLISTIC_SCREEN_UNAVAILABLE"];
+        const riskCodes = ["RISK_LEVEL_CONFLICT", "TRAINING_INTENSITY_CONFLICT", "HOLISTIC_RISK_SYMBOL", "HOLISTIC_SCREEN_UNAVAILABLE", "VISUAL_RISK_OBJECT"];
         data.meta.quality_warnings = list(data.meta.quality_warnings).filter((item) => item && !riskCodes.includes(String(item.code || "")));
         data.meta.quality_flags = list(data.meta.quality_flags).filter((code) => !riskCodes.includes(String(code || "")));
         if (data.meta.sample_quality && typeof data.meta.sample_quality === "object") {
@@ -917,6 +1008,14 @@
         data.chapter_8_training_modules.intro = "本阶段训练模块暂缓，具体安排以心理老师的沟通为准。";
       }
       if (data.chapter_3_six_dimensions) delete data.chapter_3_six_dimensions.process_integration;
+      delete data.longitudinal_comparison;
+      if (data.summary_card && typeof data.summary_card === "object") {
+        if (data.summary_card.public && typeof data.summary_card.public === "object") {
+          data.summary_card = data.summary_card.public;
+        } else if (data.summary_card.risk_overview || !data.summary_card.headline) {
+          data.summary_card = null;
+        }
+      }
       function scrub(value) {
         if (Array.isArray(value)) return value.map(scrub);
         if (value && typeof value === "object") {
@@ -924,7 +1023,7 @@
           Object.keys(value).forEach((key) => {
             const lower = key.toLowerCase();
             if (["nine_grid_distribution", "grid_distribution", "heightmap"].indexOf(lower) >= 0) return;
-            if (lower.indexOf("counselor") === 0 || lower === "risk_level" || lower === "risk_summary") return;
+            if (lower.indexOf("counselor") === 0 || lower === "risk_level" || lower === "risk_summary" || lower === "risk_overview") return;
             out[key] = scrub(value[key]);
           });
           return out;
@@ -1024,8 +1123,42 @@
         ${qualityAlert}
       </header>`;
     }
-    function metaItem(label, value) {
-      return `<div class="meta-item"><span class="meta-label">${esc(label)}</span><span class="meta-value">${esc(value)}</span></div>`;
+    function renderSummaryCard(card) {
+      if (!card || typeof card !== "object") return "";
+      const counselor = state.mode === "counselor";
+      const view = counselor ? card : (card.public && typeof card.public === "object" ? card.public : card);
+      if (!view || !view.headline) return "";
+      const signals = list(view.signals).filter(Boolean);
+      const risk = card.risk_overview || {};
+      const previous = view.previous || risk.previous || {};
+      const count = Number(risk.count) || 0;
+      const total = Number(risk.total_dimensions) || 9;
+      const highest = String(risk.highest_level || "L1").toUpperCase();
+      const fill = Math.max(0, Math.min(100, Math.round((count / total) * 100)));
+      const toneClass = highest === "L4" ? "attention" : (highest === "L3" ? "attention" : "");
+      const ring = counselor ? `<div class="summary-ring" style="--risk-fill:${fill}%">
+        <div class="summary-ring-inner"><strong>${esc(count)}</strong><span>项需关注</span></div>
+      </div>` : "";
+      const previousText = previous.available
+        ? `上次评估 ${esc(formatDateTime(previous.previous_date).slice(0, 10))}${previous.days_between != null ? ` · 间隔 ${esc(previous.days_between)} 天` : ""}${previous.comparability === "limited" ? " · 可比性有限" : ""}`
+        : "暂无同学生历史报告";
+      let previousCompare = "";
+      if (counselor && previous.available) {
+        previousCompare = `上次 ${esc(risk.previous_count ?? "—")} 项需关注；本次较上次：下降 ${esc(risk.improved ?? 0)} 项、上升 ${esc(risk.worsened ?? 0)} 项、持平 ${esc(risk.stable ?? 0)} 项`;
+      }
+      return `<section class="summary-card ${counselor ? "" : "public"}" data-summary="1">
+        ${ring}
+        <div class="summary-main">
+          <p class="summary-kicker">${counselor ? "COUNSELOR SUMMARY · 咨询师摘要" : "PLAIN SUMMARY · 家长 / 学生摘要"}</p>
+          <h2 class="summary-headline">${esc(view.headline)}</h2>
+          <div class="summary-signals">
+            ${signals.map((item) => `<span class="summary-signal ${esc(item.tone || "")}"><b>${esc(item.label || "")}</b>${esc(item.value || "")}</span>`).join("")}
+            ${counselor ? `<span class="summary-signal ${toneClass}"><b>最高等级</b>${esc(risk.highest_label || highest)}</span>` : ""}
+          </div>
+          <p class="summary-next"><b>下一步</b>${esc(view.next_step || "先由心理老师结合访谈核实本次沙盘线索。")}</p>
+          <div class="summary-prev">${esc(previousText)}${previousCompare ? ` · ${esc(previousCompare)}` : ""}${previous.note ? ` · ${esc(previous.note)}` : ""}</div>
+        </div>
+      </section>`;
     }
     function sectionHead(index, title, aside) {
       return `<div class="section-head"><span class="section-numeral">${numerals[index]}</span><h2>${esc(title)}</h2>${aside ? `<span class="section-aside">${esc(aside)}</span>` : ""}</div>`;
@@ -1062,6 +1195,14 @@
       const holisticText = list(holistic.readable_text).filter(Boolean);
       const holisticForms = list(holistic.overall_forms).filter(Boolean);
       const holisticHigh = String(holistic.risk_level || "").toLowerCase() === "high";
+      const visualObjects = list(holistic.visual_risk_objects).filter(Boolean);
+      const visualHigh = String(holistic.visual_risk_level || "").toLowerCase() === "high" || visualObjects.some((item) => String(item.severity || "").toLowerCase() === "high");
+      const visualHtml = (visualObjects.length || holistic.visual_risk_summary) ? `
+        <div class="visual-risk-card ${visualHigh ? "high" : ""}">
+          <div class="visual-risk-card-head"><b>视觉高危物体 · 语境化筛查</b><span>${visualHigh ? "存在 high 物体 · 已结合朝向/人物关系" : "未见 high 物体"}</span></div>
+          ${holistic.visual_risk_summary ? `<p>${esc(text(holistic.visual_risk_summary, ""))}</p>` : ""}
+          ${visualObjects.map((item) => `<div class="visual-risk-object"><b>${esc(item.label || item.type_label || "物体")} · ${esc(String(item.severity || "").toUpperCase())}</b>${item.location ? `<span>位置：${esc(item.location)}</span>` : ""}${item.orientation ? `<span>朝向：${esc(item.orientation)}</span>` : ""}${item.person_relation ? `<span>与人物关系：${esc(item.person_relation)}</span>` : ""}${item.scene_context ? `<span>场景：${esc(item.scene_context)}</span>` : ""}</div>`).join("")}
+        </div>` : "";
       const holisticHtml = (holisticText.length || holisticForms.length || holistic.risk_level) ? `
         <div class="holistic-card ${holisticHigh ? "high" : ""}">
           <div class="holistic-card-head"><b>整体构图判读</b><span>${holisticHigh ? "高危文字/符号 · 已触发预警" : "整体筛查"}</span></div>
@@ -1089,6 +1230,7 @@
         </div>
         <div class="scene-quote"><div class="soft-label">场景意象</div>${listMarkup(c1.scene_imagery, "plain-list")}</div>
         ${state.mode === "counselor" ? holisticHtml : ""}
+        ${state.mode === "counselor" ? visualHtml : ""}
         ${clientInputBlock()}
         ${state.mode !== "counselor" && representativeName
           ? `<div class="representative-line"><b>代表沙具</b>${esc(representativeName)}</div>` : ""}
@@ -1107,9 +1249,19 @@
     }
     function renderChapter2(c2, index) {
       const themes = list(c2.themes).filter(Boolean);
+      const selfImage = c2.self_image && typeof c2.self_image === "object" ? c2.self_image : {};
+      const selfImageHtml = selfImage.name ? `<div class="self-image-card">
+        <div class="self-image-head"><b>自我像 · ${esc(selfImage.name)}</b><span>独立于代表沙具 · 仅作访谈假设</span></div>
+        ${selfImage.note ? `<p><b>受测者补充</b>${esc(selfImage.note)}</p>` : ""}
+        ${selfImage.hypothesis ? `<p><b>假设 A</b>${esc(selfImage.hypothesis)}</p>` : ""}
+        ${selfImage.alternative_hypothesis ? `<p><b>假设 B</b>${esc(selfImage.alternative_hypothesis)}</p>` : ""}
+        ${selfImage.verification_question ? `<p><b>核验提问</b>${esc(selfImage.verification_question)}</p>` : ""}
+        <p><b>边界</b>${esc(selfImage.risk_boundary || "自我像仅用于访谈假设，不直接决定风险等级。")}</p>
+      </div>` : "";
       return `<section class="section avoid-break" data-chapter="2">
         ${sectionHead(index, c2.title || "沙盘作品意象分析", "")}
         <div class="warn-strip"><b>需访谈确认：</b><span>${esc(c2.disclaimer || "以下为探索性假设，需访谈确认，非临床诊断")}</span></div>
+        ${selfImageHtml}
         ${themes.length ? `<div class="table-wrap"><table>
           <thead><tr><th style="width:22%">意象主题</th><th style="width:19%">象征沙具</th><th>分析假设</th></tr></thead>
           <tbody>${themes.map((theme) => `<tr>
@@ -1203,11 +1355,15 @@
       if (state.mode !== "counselor") return "";
       const dimensions = list(c5.dimensions).filter(Boolean);
       const overall = c5.overall_label || c5.overall_level || "";
+      const overallTone = levelClass(overall);
       const override = c5.priority_override && (c5.priority_override.level || c5.priority_override.message)
         ? `<div>优先级覆盖：${esc(c5.priority_override.level || "")}${c5.priority_override.message ? " · " + esc(c5.priority_override.message) : ""}</div>`
         : "";
       const overallNote = overall
-        ? `<div class="risk-overall-note"><b>总体风险等级：${esc(overall)}。</b>${esc(c5.consistency_warning || "九维分级用于形成访谈假设，不等同于临床诊断；总体等级已综合顶部触发线索。")}${override}</div>`
+        ? `<div class="risk-overall-note ${overallTone}">
+            <div class="risk-overall-head"><span>总体风险等级</span><b class="risk-status ${overallTone}">${esc(overall)}</b></div>
+            <div class="risk-overall-copy">${esc(c5.consistency_warning || "九维分级用于形成访谈假设，不等同于临床诊断；总体等级已综合顶部触发线索。")}${override}</div>
+          </div>`
         : "";
       return `<section class="section" data-chapter="5">
         ${sectionHead(index, c5.title || "风险研判（九维度分级预警·仅咨询师可见）", "仅咨询师可见")}
@@ -1391,6 +1547,8 @@
         return;
       }
       const sections = [renderHeader(report)];
+      const summaryCard = renderSummaryCard(report.summary_card);
+      if (summaryCard) sections.push(summaryCard);
       if (state.mode === "public" && report.share_guard && !report.share_guard.blocked) {
         sections.push(renderShareNotice(report.share_guard));
       }

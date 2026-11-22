@@ -162,9 +162,59 @@ def _assessment_summary(row: Assessment) -> dict[str, Any]:
         "class_name": getattr(row, "class_name", ""),
         "representative_item_id": row.representative_item_id,
         "representative_item_name": row.representative_item_name,
+        "self_image": getattr(row, "self_image", "") or "",
+        "self_image_note": getattr(row, "self_image_note", "") or "",
         "report_engine": row.report_engine,
         "created_at": iso_utc(row.created_at),
         "counselor_report_url": f"/api/v1/reports/{row.id}",
+    }
+
+
+def _previous_assessment_context(db: Session, row: Assessment) -> dict[str, Any]:
+    """同一学生上一份已完成报告的轻量摘要，不复制整份历史报告。"""
+    student_no = str(row.student_no or "").strip()
+    if not student_no:
+        return {}
+    previous = (
+        db.query(Assessment)
+        .filter(
+            Assessment.student_no == student_no,
+            Assessment.id != row.id,
+            Assessment.report_json.isnot(None),
+            Assessment.status == "completed",
+            Assessment.created_at <= row.created_at,
+        )
+        .order_by(Assessment.created_at.desc())
+        .first()
+    )
+    if not previous:
+        return {}
+    try:
+        report = json.loads(previous.report_json or "{}")
+    except json.JSONDecodeError:
+        return {}
+    chapter5 = report.get("chapter_5_risk") if isinstance(report.get("chapter_5_risk"), dict) else {}
+    risk_dimensions = [
+        {
+            "key": str(item.get("key") or ""),
+            "name": str(item.get("name") or ""),
+            "level": str(item.get("level") or "L1").upper(),
+            "label": str(item.get("label") or ""),
+        }
+        for item in (chapter5.get("dimensions") or [])
+        if isinstance(item, dict)
+    ]
+    sample = ((report.get("meta") or {}).get("sample_quality") or {}) if isinstance(report.get("meta"), dict) else {}
+    return {
+        "assessment_id": previous.id,
+        "report_no": str((report.get("meta") or {}).get("report_no") or f"PS-{previous.id[:8].upper()}"),
+        "created_at": iso_utc(previous.created_at),
+        "generated_at": str((report.get("meta") or {}).get("generated_at") or ""),
+        "engine": str(previous.report_engine or ""),
+        "lean_only": bool(sample.get("low_projection")),
+        "representative_item_name": str(previous.representative_item_name or ""),
+        "self_image": str(getattr(previous, "self_image", "") or ""),
+        "risk_dimensions": risk_dimensions,
     }
 
 
@@ -216,6 +266,8 @@ async def create_assessment(
         academic_scores_json=json.dumps(payload_obj.student.academic_scores or {}, ensure_ascii=False),
         representative_item_id=payload_obj.representative_item_id,
         representative_item_name=payload_obj.representative_item_name,
+        self_image=str(payload_obj.self_image or "").strip(),
+        self_image_note=str(payload_obj.self_image_note or "").strip() or None,
         sandplay_description=payload_obj.sandplay_description,
         self_narrative=payload_obj.self_narrative,
         consent=payload_obj.consent,
@@ -232,9 +284,13 @@ async def create_assessment(
 
     image_url = f"{PUBLIC_BASE_URL}/media/{sandplay_rel}"
     transcript_url = f"{PUBLIC_BASE_URL}/media/{transcript_rel}" if transcript_rel else None
+    report_payload = dict(raw_payload)
+    previous = _previous_assessment_context(db, row)
+    if previous:
+        report_payload["_previous_assessment"] = previous
     try:
         report, engine = await generate_report(
-            raw_payload,
+            report_payload,
             sandplay_image=sandplay_bytes,
             transcript_image=transcript_bytes,
             image_url=image_url,
@@ -309,6 +365,9 @@ async def reanalyze_report(
     except json.JSONDecodeError:
         return fail(request, "PAYLOAD_INVALID", "原始测评数据损坏，无法重新分析", 422)
 
+    previous = _previous_assessment_context(db, row)
+    if previous:
+        payload["_previous_assessment"] = previous
     try:
         report, engine = await generate_report(
             payload,

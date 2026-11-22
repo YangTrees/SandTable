@@ -49,6 +49,8 @@ def _migrate_legacy_schema() -> None:
             ("seat_no", "VARCHAR(40) DEFAULT ''"),
             ("contact_phone", "VARCHAR(80) DEFAULT ''"),
             ("academic_scores_json", "TEXT DEFAULT '{}'"),
+            ("self_image", "VARCHAR(120) DEFAULT ''"),
+            ("self_image_note", "TEXT"),
             ("report_revision", "INTEGER DEFAULT 0"),
         ],
         "report_reviews": [
