@@ -20,22 +20,18 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 ## 前端接入
 
-前端文件为 `D:\AI\AI_SandBox\sandplay_workbench_react.html`。默认请求：
+前端文件为 `D:\AI\AI_SandBox\sandplay_workbench_react.html`。前端必须与后端同源部署，默认请求：
 
 ```
 http://127.0.0.1:8000/api/v1
 ```
 
-如后端换了地址，在浏览器控制台执行后刷新：
-
-```js
-localStorage.setItem("sandplay_report_api", "http://192.168.1.10:8000/api/v1")
-```
+前端不再读取 `localStorage.sandplay_report_api` 覆盖 API 地址，避免会话令牌被带到非预期域名。若后端换地址，请直接修改同源反向代理。
 
 “结束制作”后的流程：
 
 1. 选择一件最能代表自己的沙具；
-2. 写一段不少于 10 字的沙盘描述，可选填自述、教师观察、学生信息和成绩单图片；
+2. 写一段不少于 10 字的沙盘描述，可给沙盘起名并可选填自述与学生信息；
 3. 提交沙盘图、沙具、九宫格 JSON、地形高度图、代表沙具与文字；
 4. 报告生成后自动打开导出弹窗，可复制/下载九章 JSON、下载高清 PNG、打开“精排报告”、生成分享二维码；精排页支持咨询师完整版 / 家长学生脱敏版切换与 html2pdf A4 导出。
 
@@ -45,21 +41,23 @@ localStorage.setItem("sandplay_report_api", "http://192.168.1.10:8000/api/v1")
 |---|---|---|
 | GET | `/api/v1/health` | 健康检查 |
 | POST | `/api/v1/assessments` | 创建评估，`multipart/form-data` |
-| GET | `/api/v1/assessments/{id}` | 咨询师查看评估元信息 |
-| GET | `/api/v1/reports/{id}` | 咨询师完整九章报告，需 `X-Counselor-Token` |
-| POST | `/api/v1/reports/{id}/share` | 生成分享 token、分享 URL、二维码 data URI |
-| GET | `/api/v1/share/{token}` | 家长/学生端 JSON，已脱敏 |
-| GET | `/share/{token}` | 303 跳转到家长/学生端精排 HTML 页 |
-| GET | `/report-viewer` | 报告精排 H5 / A4 打印页，支持 `report_id`、`share_token`、`mode` |
-| DELETE | `/api/v1/shares/{token}` | 撤回分享链接，需咨询师令牌 |
+| GET | `/api/v1/assessments/{id}` | 学生查看本人提交状态 |
+| GET | `/api/v1/reports/{id}` | 咨询师完整九章报告，需 `Authorization: Bearer <session-token>` |
+| POST | `/api/v1/reports/{id}/share` | 生成 30 天有效的分享 token、分享 URL、二维码 data URI |
+| GET | `/api/v1/share/access` | 家长/学生端 JSON，需请求头 `X-Share-Token` |
+| GET | `/share/{token}` | 旧二维码兼容入口，303 跳转到 fragment 形式 |
+| GET | `/report-viewer` | 报告精排 H5 / A4 打印页，支持 `report_id`、`mode` 或 `#share_token` |
+| DELETE | `/api/v1/shares/{token}` | 撤回分享链接，需咨询师 / 超级管理员会话 |
 
 创建评估的 multipart 字段：
 
-- `payload`：JSON 字符串，核心字段 `student`、`items`、`grid_distribution`、`heightmap`、`representative_item_id`、`representative_item_name`、`self_image`、`self_image_note`、`sandplay_description`、`self_narrative`、`teacher_observation`、`consent`；
-- `sandplay_image`：必传，前端导出的沙盘 PNG；
+- `payload`：JSON 字符串，核心字段 `student`、`items`、`grid_distribution`、`heightmap`、`representative_item_id`、`representative_item_name`、`sand_name`、`sandplay_description`、`self_narrative`、`consent`；
+- `sandplay_image`：必传，前端导出的 PNG；
 - `transcript_image`：可选，成绩单图片。
+- 服务端会忽略学生伪造的 `teacher_observation` 与 `_` 开头的内部字段。
 
 也兼容 `sandplay_image_base64` / `transcript_image_base64` 表单字段。
+
 
 ## 九章结构
 

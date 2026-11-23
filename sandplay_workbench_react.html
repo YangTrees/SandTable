@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>学生心理沙盘测评</title>
   <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap">
-  <script src="https://fastly.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <script src="https://fastly.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
-  <script src="https://fastly.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://fastly.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="assets/vendor/tailwindcss-browser.js"></script>
+  <script src="assets/vendor/react.production.min.js"></script>
+  <script src="assets/vendor/react-dom.production.min.js"></script>
+  <script src="assets/vendor/three.min.js"></script>
   <script src="assets/generated/sandplay_library.js"></script>
   <style>
     :root {
@@ -765,7 +765,7 @@
       inset: -3%;
       z-index: 0;
       pointer-events: none;
-      background: url("https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261104_080623_c94c85a3-23d5-4a0c-afff-41be1b5b8191.png&w=2400&q=85") center / cover no-repeat;
+      background: url("assets/vendor/workbench-hero.webp") center / cover no-repeat;
       filter: blur(2.5px) saturate(1.05);
       transform: scale(1.08);
     }
@@ -2341,10 +2341,9 @@
       const LEGACY_TOKEN_KEY = "sandplay_counselor_token";
       const ADMIN_TOKEN_KEY = "sandplay_admin_token";
       const API_BASE = (
-        window.localStorage.getItem("sandplay_report_api") ||
-        (location.protocol.indexOf("http") === 0
+        location.protocol.indexOf("http") === 0
           ? `${location.origin}/api/v1`
-          : "http://127.0.0.1:8011/api/v1")
+          : "http://127.0.0.1:8000/api/v1"
       ).replace(/\/$/, "");
 
       let token = "";
@@ -2563,7 +2562,7 @@
     const h = React.createElement;
 
     const WORLD = { width: 1200, depth: 900, segX: 160, segZ: 100 };
-    const REPORT_API_BASE = (window.localStorage.getItem("sandplay_report_api") || (location.protocol.indexOf("http") === 0 ? `${location.origin}/api/v1` : "http://127.0.0.1:8000/api/v1")).replace(/\/$/, "");
+    const REPORT_API_BASE = (location.protocol.indexOf("http") === 0 ? `${location.origin}/api/v1` : "http://127.0.0.1:8000/api/v1").replace(/\/$/, "");
     const REPORT_VIEWER_PAGE = location.protocol.indexOf("http") === 0
       ? `${location.origin}/report-viewer`
       : "report_viewer_v2.html";

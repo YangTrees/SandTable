@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>心理沙盘发展性评估报告</title>
-  <script src="https://fastly.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
-  <script src="https://fastly.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="assets/vendor/html2pdf.bundle.min.js"></script>
   <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
   <style>
     :root {
@@ -839,17 +838,30 @@
   <div id="toast"></div>
 
   <script>
-    const API_BASE = (window.localStorage.getItem("sandplay_report_api") || (location.protocol.indexOf("http") === 0 ? `${location.origin}/api/v1` : "http://127.0.0.1:8000/api/v1")).replace(/\/$/, "");
+    const API_BASE = (location.protocol.indexOf("http") === 0 ? `${location.origin}/api/v1` : "http://127.0.0.1:8000/api/v1").replace(/\/$/, "");
     const params = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams((window.location.hash || "").replace(/^#/, ""));
+    function readAdminSessionToken() {
+      try {
+        const direct = sessionStorage.getItem("sandplay_admin_token") || "";
+        if (direct) return direct;
+        if (window.opener && !window.opener.closed) {
+          return window.opener.sessionStorage.getItem("sandplay_admin_token") || "";
+        }
+      } catch (error) {
+        return "";
+      }
+      return "";
+    }
     const numerals = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
     const state = {
       full: null,
       publicReport: null,
       reportId: params.get("report_id") || null,
-      shareToken: params.get("share_token") || null,
-      counselorToken: params.get("counselor_token") || window.localStorage.getItem("sandplay_counselor_token") || "dev-counselor-token",
-      mode: params.get("share_token") ? "public" : (params.get("mode") === "public" ? "public" : "counselor"),
-      lockedPublic: Boolean(params.get("share_token")),
+      shareToken: hashParams.get("share_token") || params.get("share_token") || null,
+      adminToken: readAdminSessionToken(),
+      mode: (hashParams.get("share_token") || params.get("share_token")) ? "public" : (params.get("mode") === "public" ? "public" : "counselor"),
+      lockedPublic: Boolean(hashParams.get("share_token") || params.get("share_token")),
       share: null,
       sourceLabel: ""
     };
@@ -1513,7 +1525,7 @@
         <div class="qr-box">${qr}</div>
         <div class="qr-copy">
           <strong>报告扫码查看</strong>
-          <small>${publicMode ? "当前为家长 / 学生脱敏版 · 内部研判内容已隐藏" : "手机扫码查看 · 长期有效"}</small>
+          <small>${publicMode ? "当前为家长 / 学生脱敏版 · 内部研判内容已隐藏" : "手机扫码查看 · 有效期以二维码说明为准"}</small>
           ${share && share.share_url ? `<small>分享二维码已生成，可直接让家长 / 学生扫码查看。</small>` : (state.full ? `<small>该报告尚未生成分享二维码，可在顶部点击“生成分享二维码”。</small>` : "")}
         </div>
       </div>`;
@@ -1590,7 +1602,9 @@
     async function loadReportFromApi() {
       try {
         if (state.shareToken) {
-          const response = await fetch(`${API_BASE}/share/${encodeURIComponent(state.shareToken)}`);
+          const response = await fetch(`${API_BASE}/share/access`, {
+            headers: { "X-Share-Token": state.shareToken }
+          });
           const body = await response.json();
           if (!response.ok || body.code !== "OK") throw new Error(body.message || "分享报告加载失败");
           const report = body.data && body.data.report;
@@ -1603,8 +1617,9 @@
           return;
         }
         if (state.reportId) {
+          if (!state.adminToken) throw new Error("登录状态已失效，请从管理后台重新打开报告");
           const response = await fetch(`${API_BASE}/reports/${encodeURIComponent(state.reportId)}`, {
-            headers: { "X-Counselor-Token": state.counselorToken }
+            headers: { "Authorization": `Bearer ${state.adminToken}` }
           });
           const body = await response.json();
           if (!response.ok || body.code !== "OK") throw new Error(body.message || "完整报告加载失败");
@@ -1615,18 +1630,6 @@
           if (params.get("mode") === "public") state.mode = "public";
           render();
           return;
-        }
-        const cached = window.localStorage.getItem("sandplay_last_report");
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          const report = extractReport(parsed);
-          if (report) {
-            state.full = report;
-            state.reportId = parsed.report_id || parsed.assessment_id || null;
-            state.sourceLabel = "本地最近报告";
-            render();
-            return;
-          }
         }
         render();
       } catch (error) {
@@ -1642,7 +1645,7 @@
       try {
         const response = await fetch(`${API_BASE}/reports/${encodeURIComponent(state.reportId)}/share`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "X-Counselor-Token": state.counselorToken },
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${state.adminToken}` },
           body: JSON.stringify({})
         });
         const body = await response.json();

@@ -185,12 +185,20 @@ class SummaryAndComparisonTests(unittest.TestCase):
             {"code": "VISUAL_RISK_OBJECT", "message": "视觉高危物体"},
             {"code": "KEEP_WARNING", "message": "保留"},
         ]
+        report["meta"]["student_name"] = "李瑶"
+        report["meta"]["student_no"] = "PS-QUICK"
+        report["meta"]["process_metrics"] = {"long_pause_count": 1}
+        report["meta"]["generation_usage"] = {"total_tokens": 100}
         public = public_copy(report)
         self.assertNotIn("chapter_5_risk", public)
         self.assertNotIn("risk_overview", public.get("summary_card", {}))
         self.assertEqual(public["summary_card"]["headline"], "家长标题")
-        self.assertEqual(public["meta"]["quality_flags"], ["KEEP_FLAG"])
-        self.assertEqual([item["code"] for item in public["meta"]["quality_warnings"]], ["KEEP_WARNING"])
+        self.assertNotIn("quality_flags", public["meta"])
+        self.assertNotIn("quality_warnings", public["meta"])
+        self.assertNotIn("student_name", public["meta"])
+        self.assertNotIn("student_no", public["meta"])
+        self.assertNotIn("process_metrics", public["meta"])
+        self.assertNotIn("generation_usage", public["meta"])
 
 
 if __name__ == "__main__":

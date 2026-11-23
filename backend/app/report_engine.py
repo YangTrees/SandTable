@@ -2367,10 +2367,10 @@ async def generate_report(
                 engine="multimodal", engine_note="多模态模型生成，经九章节结构校验",
             )
             return report, "multimodal"
-        except Exception as exc:  # 生产可改为记录并返回 502；默认允许降级演示报告
+        except Exception:  # 生产默认不降级，演示模式只保留通用说明
             if not allow_demo:
                 raise
-            note = f"多模态调用失败，已降级为本地演示报告：{type(exc).__name__}: {exc}"
+            note = "多模态调用失败，已降级为本地演示报告；请查看服务端日志定位原因"
     else:
         note = "未配置 MULTIMODAL_API_KEY，使用本地演示报告；配置密钥后自动切换多模态生成"
 

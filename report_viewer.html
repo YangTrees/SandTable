@@ -347,15 +347,28 @@
 
   <script>
     const SAME_ORIGIN_API = ["8000", "80", "443", ""].includes(location.port);
-    const API_BASE = (window.localStorage.getItem("sandplay_report_api") || (location.protocol.indexOf("http") === 0 && SAME_ORIGIN_API ? `${location.origin}/api/v1` : "http://127.0.0.1:8000/api/v1")).replace(/\/$/, "");
+    const API_BASE = (location.protocol.indexOf("http") === 0 && SAME_ORIGIN_API ? `${location.origin}/api/v1` : "http://127.0.0.1:8000/api/v1").replace(/\/$/, "");
     const params = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams((window.location.hash || "").replace(/^#/, ""));
+    function readAdminSessionToken() {
+      try {
+        const direct = sessionStorage.getItem("sandplay_admin_token") || "";
+        if (direct) return direct;
+        if (window.opener && !window.opener.closed) {
+          return window.opener.sessionStorage.getItem("sandplay_admin_token") || "";
+        }
+      } catch (error) {
+        return "";
+      }
+      return "";
+    }
     const numerals = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
     const state = {
       full: null,
       publicReport: null,
       reportId: params.get("report_id") || null,
-      shareToken: params.get("share_token") || null,
-      counselorToken: params.get("counselor_token") || window.localStorage.getItem("sandplay_counselor_token") || "dev-counselor-token",
+      shareToken: hashParams.get("share_token") || params.get("share_token") || null,
+      adminToken: readAdminSessionToken(),
       mode: params.get("mode") === "public" ? "public" : "counselor",
       lockedPublic: Boolean(params.get("share_token")),
       share: null,
@@ -790,7 +803,9 @@
     async function loadReportFromApi() {
       try {
         if (state.shareToken) {
-          const response = await fetch(`${API_BASE}/share/${encodeURIComponent(state.shareToken)}`);
+          const response = await fetch(`${API_BASE}/share/access`, {
+            headers: { "X-Share-Token": state.shareToken }
+          });
           const body = await response.json();
           if (!response.ok || body.code !== "OK") throw new Error(body.message || "分享报告加载失败");
           const report = body.data && body.data.report;
@@ -803,8 +818,9 @@
           return;
         }
         if (state.reportId) {
+          if (!state.adminToken) throw new Error("登录状态已失效，请从管理后台重新打开报告");
           const response = await fetch(`${API_BASE}/reports/${encodeURIComponent(state.reportId)}`, {
-            headers: { "X-Counselor-Token": state.counselorToken }
+            headers: { "Authorization": `Bearer ${state.adminToken}` }
           });
           const body = await response.json();
           if (!response.ok || body.code !== "OK") throw new Error(body.message || "完整报告加载失败");
@@ -842,7 +858,7 @@
       try {
         const response = await fetch(`${API_BASE}/reports/${encodeURIComponent(state.reportId)}/share`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "X-Counselor-Token": state.counselorToken },
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${state.adminToken}` },
           body: JSON.stringify({})
         });
         const body = await response.json();

@@ -27,12 +27,15 @@
 
 ### 1.2 鉴权
 
-当前为**单令牌、四角色视图**模型，没有登录、会话或 JWT：
+当前为**账号会话 + 角色分权**模型：
 
-- 除 `/api/v1/health`、公开分享页与静态页面外，接口都需要请求头 `X-Counselor-Token: <COUNSELOR_TOKEN>`。
-- 兼容 `Authorization: Bearer <token>`。
-- 开发默认令牌 `dev-counselor-token`，由后端 `.env` 的 `COUNSELOR_TOKEN` 配置。
-- `admin_users.role_key`（counselor / teacher / student / parent）仅用于后台展示与前端视图切换，**服务端不做按角色分权**。
+- 教职员工通过 `POST /api/v1/admin/login` 登录，学生通过 `POST /api/v1/workbench/login` 登录；成功后返回会话 token。
+- 后续请求使用 `Authorization: Bearer <token>`；会话默认 12 小时，可在 `.env` 配置。
+- `/api/v1/admin/*` 拒绝学生账号；`/api/v1/workbench/*` 只接受学生账号。
+- 个体报告、审核、修订、分享、撤回接口只允许 `counselor` 与 `super_admin`；`teacher` 只能访问班级汇总，服务端会移除个体风险字段。
+- `X-Counselor-Token` 仅作为受控运维脚本的兼容入口，必须同时设置 `ENABLE_SERVICE_TOKEN=true` 和强随机 `COUNSELOR_TOKEN` 才生效；默认关闭且没有内置默认值。
+- 公开分享报告使用 `GET /api/v1/share/access`，在请求头 `X-Share-Token` 中携带分享令牌，不把令牌放进 JSON 接口路径。
+
 
 ### 1.3 通用错误码
 
@@ -52,8 +55,9 @@
 | GET | `/workbench` | 沙盘工作台（`sandplay_workbench_react.html`） |
 | GET | `/report-viewer` | 报告查看页（`report_viewer_v2.html`） |
 | GET | `/admin` | 管理后台（`admin_dashboard.html`） |
-| GET | `/share/{token}` | 家长/学生分享页 |
-| GET | `/media/{assessment_id}/{filename}` | 沙盘图与转录图静态资源 |
+| GET | `/share/{token}` | 兼容旧分享链接，303 跳转到 fragment 形式 |
+| GET | `/media/{assessment_id}/{filename}` | 沙盘图 / 成绩单，必须带短期签名 `?exp=&sig=` |
+| GET | `/docs` | 仅 `ENABLE_API_DOCS=true` 时开放 |
 
 ---
 
@@ -142,7 +146,7 @@
   ],
   "sandplay_description": "我把灯塔放在中间……",
   "self_narrative": "最近总觉得……",
-  "teacher_observation": "摆放时犹豫较久……",
+  "sand_name": "海边的灯塔",
   "interaction_summary": {},
   "consent": true
 }
@@ -151,6 +155,11 @@
 校验规则：
 
 - `payload` 必须是合法 JSON，且符合 `AssessmentPayload`。
+- `sandplay_description` 至少 10 个字符，最多 4000 字。
+- `consent` 必须为 `true`，否则返回 422 `CONSENT_REQUIRED`。
+- 学生提交中的 `teacher_observation` 与 `_` 开头的内部字段会被服务端丢弃，避免伪造教师观察或污染报告。
+- `sand_name` 为可选字段（给沙盘起名），随 `input_payload` 保存，不写入 `self_image`。
+- `sandplay_image` / `transcript_image` 只接受可解码的 PNG / JPEG / WebP，单张不超过 24MB；服务端会重编码为 PNG 后再保存，拒绝伪造扩展名或超大像素图。
 - `representative_item_id` 必须存在于 `items[].id`，否则 422 `VALIDATION_REPRESENTATIVE_NOT_FOUND`。
 - `self_image` 为可选独立字段（最长 120 字），不要求存在于 `items[].id`；只进入第二章自我意象假设与第六章访谈，不直接参与风险分级。
 - `self_image_note` 为可选补充说明（最长 800 字）。
@@ -180,7 +189,7 @@
   "report": { "meta": {}, "chapter_1_overview": {}, "...": "..." },
   "sandplay_image_url": "http://127.0.0.1:8000/media/{id}/sandplay.png",
   "transcript_image_url": null,
-  "counselor_access": { "header": "X-Counselor-Token" },
+  "counselor_access": { "header": "Authorization: Bearer <session-token>" },
   "share_hint": "POST /api/v1/reports/{id}/share"
 }
 ```
@@ -243,22 +252,27 @@ Demo 回退默认关闭（`ALLOW_DEMO_REPORT=false`）。模型失败时返回 5
 ```
 
 - 复用未过期、未撤销的分享链接；`regenerate=true` 强制换新 token。
-- `expires_days` 范围 1–3650，省略则长期有效。
-- 返回分享 URL、API URL、二维码 base64、token 与过期时间。
+- `expires_days` 范围 1–3650；省略时使用 `SHARE_DEFAULT_EXPIRES_DAYS`，默认 30 天。
+- 返回 `share_token`、`share_url`（令牌位于 fragment）、`api_url`、二维码 base64 与过期时间。
+- `share_url` 形如 `https://<域名>/report-viewer#share_token=<token>`，页面加载时不会把令牌发送给服务端。
+- 分享报告的沙盘图 / 成绩单地址在序列化时重新签名为短期 URL，不能直接枚举 `/media`。
 
-`GET /api/v1/share/{token}`
 
-- 无需咨询师令牌。
-- 返回脱敏后的报告；联系方式、学号、座位等敏感字段在分享视图隐藏。
+`GET /api/v1/share/access`
+
+- 无需登录会话，但必须携带 `X-Share-Token: <token>`。
+- 返回脱敏后的报告；风险章节、风险等级、咨询师字段和原始记录不回传。
 - 链接过期或撤销返回 410/404。
 
-`DELETE /api/v1/shares/{token}`：撤销分享，需咨询师令牌。
+`GET /share/{token}`：兼容旧二维码的跳转入口，会 303 跳到 fragment 形式；新分享链接不再使用该路径。
+
+`DELETE /api/v1/shares/{token}`：撤销分享，需咨询师 / 超级管理员会话。
 
 ---
 
 ## 3. 管理后台
 
-前缀 `/api/v1/admin`，全部需要 `X-Counselor-Token`。
+前缀 `/api/v1/admin`，除登录外均需 `Authorization: Bearer <session-token>`；个体报告相关接口仅 `counselor / super_admin` 可用。
 
 ### 3.1 初始化数据
 
@@ -450,7 +464,7 @@ Demo 回退默认关闭（`ALLOW_DEMO_REPORT=false`）。模型失败时返回 5
 
 ## 4. 报告阅读页约定
 
-`report_viewer_v2.html` 通过 `GET /api/v1/reports/{id}` 拉取报告，并通过 `GET /api/v1/share/{token}` 支持公开只读视图。
+`report_viewer_v2.html` 通过 `GET /api/v1/reports/{id}` 拉取咨询师报告，并通过 `GET /api/v1/share/access` + `X-Share-Token` 支持公开只读视图。咨询师报告页从管理后台打开，复用后台 `sessionStorage` 会话；不再支持 URL 查询参数或 `localStorage` 中的服务令牌。
 
 - 当 `report.meta.demo_report === true` 或 `engine === "demo"` 时，页面顶部展示 Demo 标识，提示“演示报告，非真实评估结论”。
 - Demo 标识在报告页、管理后台列表、后台详情三处一致。

@@ -22,15 +22,19 @@ from .auth import (
     verify_password,
 )
 from .config import (
+    ADMIN_INITIAL_ACCOUNT,
+    ADMIN_INITIAL_NAME,
     ADMIN_INITIAL_PASSWORD,
     ADMIN_LOCK_MINUTES,
     ADMIN_MAX_LOGIN_FAILURES,
     ADMIN_SESSION_HOURS,
     COUNSELOR_TOKEN,
+    ENABLE_SERVICE_TOKEN,
+    SEED_DEMO_USERS,
 )
 from .db import get_db
 from .models import AdminSession, AdminUser, Assessment, ReportReview, ShareLink
-from .utils import iso_utc, new_id
+from .utils import iso_utc, new_id, sign_report_media
 
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 workbench_router = APIRouter(prefix="/api/v1/workbench", tags=["workbench"])
@@ -180,8 +184,8 @@ def require_admin(
     if not token:
         raise HTTPException(status_code=401, detail="请先登录咨询师控制台")
 
-    # 兼容既有服务令牌（报告查看器、运维脚本），但它不携带账号会话。
-    if hmac.compare_digest(token, COUNSELOR_TOKEN):
+    # 兼容受控运维脚本的服务令牌：必须同时在配置中显式开启，且不再有内置默认值。
+    if ENABLE_SERVICE_TOKEN and COUNSELOR_TOKEN and hmac.compare_digest(token, COUNSELOR_TOKEN):
         return AdminPrincipal(
             user=None,
             role_key="super_admin",
@@ -263,23 +267,51 @@ def require_super_admin(principal: AdminPrincipal = Depends(require_admin)) -> A
     return principal
 
 
+def require_counselor(principal: AdminPrincipal = Depends(require_admin)) -> AdminPrincipal:
+    """个体报告只对咨询师与超级管理员开放，班主任只能查看班级汇总。"""
+    if principal.role_key not in {"counselor", "super_admin"}:
+        raise HTTPException(status_code=403, detail="班主任账号不可查看个体心理报告")
+    return principal
+
+
+def _create_seed_user(item: dict[str, Any]) -> AdminUser:
+    return AdminUser(
+        id=new_id(),
+        name=item["name"],
+        account=normalise_account(item["account"]),
+        role_key=item["role_key"],
+        department=item.get("department", ""),
+        grade_level=item.get("grade_level", ""),
+        class_name=item.get("class_name", ""),
+        student_no=item.get("student_no", ""),
+        status=item.get("status", "active"),
+    )
+
+
 def ensure_admin_seed(db: Session) -> None:
+    """只在空库时创建首个管理员；演示账号必须显式开启，避免进入生产库。"""
     users = db.query(AdminUser).order_by(AdminUser.created_at.asc()).all()
     if not users:
-        for item in SEED_USERS:
-            db.add(
-                AdminUser(
-                    id=new_id(),
-                    name=item["name"],
-                    account=item["account"],
-                    role_key=item["role_key"],
-                    department=item.get("department", ""),
-                    grade_level=item.get("grade_level", ""),
-                    class_name=item.get("class_name", ""),
-                    student_no=item.get("student_no", ""),
-                    status=item.get("status", "active"),
-                )
+        if not ADMIN_INITIAL_PASSWORD:
+            raise RuntimeError(
+                "首次部署必须配置 ADMIN_INITIAL_PASSWORD，系统不会创建无密码管理员，"
+                "也不会自动写入演示账号。"
             )
+        db.add(
+            _create_seed_user(
+                {
+                    "name": ADMIN_INITIAL_NAME,
+                    "account": ADMIN_INITIAL_ACCOUNT,
+                    "role_key": "super_admin",
+                    "department": "平台管理中心",
+                }
+            )
+        )
+        if SEED_DEMO_USERS:
+            for item in SEED_USERS:
+                if normalise_account(item["account"]) == normalise_account(ADMIN_INITIAL_ACCOUNT):
+                    continue
+                db.add(_create_seed_user(item))
         db.commit()
         users = db.query(AdminUser).order_by(AdminUser.created_at.asc()).all()
 
@@ -553,7 +585,7 @@ def _load_report(row: Assessment) -> dict[str, Any]:
         return {}
     try:
         value = json.loads(row.report_json)
-        return value if isinstance(value, dict) else {}
+        return sign_report_media(value, row.id) if isinstance(value, dict) else {}
     except Exception:
         return {}
 
@@ -911,7 +943,7 @@ async def list_reports(
     date_to: str = "",
     limit: int = 100,
     db: Session = Depends(get_db),
-    _: None = Depends(require_admin),
+    principal: AdminPrincipal = Depends(require_admin),
 ):
     query = _filtered_assessments(
         db,
@@ -933,6 +965,12 @@ async def list_reports(
         review = db.get(ReportReview, row.id)
         shares = db.query(ShareLink).filter(ShareLink.assessment_id == row.id, ShareLink.revoked.is_(False)).count()
         brief = _report_brief(row, review, shares)
+        if principal.role_key == "teacher":
+            # 班主任只保留班级管理所需字段，不返回任何个体风险信号。
+            brief.pop("risk_level", None)
+            brief.pop("review_note", None)
+            brief["review_status"] = "restricted"
+            brief["risk_visibility"] = "restricted"
         if status and status != "all" and brief["review_status"] != status:
             continue
         if q.strip():
@@ -978,7 +1016,7 @@ async def report_review_context(
     request: Request,
     assessment_id: str,
     db: Session = Depends(get_db),
-    _: None = Depends(require_admin),
+    _: None = Depends(require_counselor),
 ):
     row = db.get(Assessment, assessment_id)
     if not row or not row.report_json:
@@ -988,7 +1026,7 @@ async def report_review_context(
     ai_report = effective
     if review and review.ai_report_json:
         try:
-            ai_report = json.loads(review.ai_report_json)
+            ai_report = sign_report_media(json.loads(review.ai_report_json), row.id)
         except Exception:
             ai_report = effective
     draft_sections: dict[str, Any] = {}
@@ -1026,7 +1064,7 @@ async def save_review_draft(
     request: Request,
     assessment_id: str,
     db: Session = Depends(get_db),
-    _: None = Depends(require_admin),
+    principal: AdminPrincipal = Depends(require_counselor),
 ):
     row = db.get(Assessment, assessment_id)
     if not row or not row.report_json:
@@ -1042,7 +1080,7 @@ async def save_review_draft(
     review.draft_report_json = json.dumps(draft, ensure_ascii=False)
     review.draft_note = str(body.get("note") or "").strip()
     review.draft_updated_at = datetime.utcnow()
-    review.reviewer_id = str(body.get("reviewer_id") or review.reviewer_id or "").strip() or None
+    review.reviewer_id = (principal.user.account if principal.user else "service")
     if review.status in {"pending", "approved"}:
         review.status = "changes"
     db.commit()
@@ -1063,7 +1101,7 @@ async def review_report(
     request: Request,
     assessment_id: str,
     db: Session = Depends(get_db),
-    _: None = Depends(require_admin),
+    principal: AdminPrincipal = Depends(require_counselor),
 ):
     row = db.get(Assessment, assessment_id)
     if not row or not row.report_json:
@@ -1093,7 +1131,7 @@ async def review_report(
 
     review.status = status
     review.note = str(body.get("note") or "").strip()
-    review.reviewer_id = str(body.get("reviewer_id") or "").strip() or None
+    review.reviewer_id = (principal.user.account if principal.user else "service")
 
     if status == "approved" and draft_sections:
         original = _load_report(row)
@@ -1178,7 +1216,7 @@ async def admin_stats(
     date_from: str = "",
     date_to: str = "",
     db: Session = Depends(get_db),
-    _: None = Depends(require_admin),
+    principal: AdminPrincipal = Depends(require_admin),
 ):
     rows = _filtered_assessments(
         db,
@@ -1269,6 +1307,14 @@ async def admin_stats(
             .count()
         )
     high_risk.sort(key=lambda item: (_risk_rank(item["risk_level"]), item["created_at"]), reverse=True)
+    risk_visible = principal.role_key != "teacher"
+    risk_distribution = [
+        {"level": "L1", "label": "L1 平稳", "value": risk_counts["L1"]},
+        {"level": "L2", "label": "L2 轻度关注", "value": risk_counts["L2"]},
+        {"level": "L3", "label": "L3 中度关注", "value": risk_counts["L3"]},
+        {"level": "L4", "label": "L4 重点关注", "value": risk_counts["L4"]},
+    ] if risk_visible else []
+    visible_high_risk = high_risk[:8] if risk_visible else []
 
     return _ok(
         request,
@@ -1277,18 +1323,14 @@ async def admin_stats(
                 "total_reports": len(rows),
                 "pending_reviews": pending,
                 "approved_reports": approved,
-                "high_risk_reports": len(high_risk),
+                "high_risk_reports": len(high_risk) if risk_visible else 0,
                 "share_links": share_count,
                 "total_items": total_items,
                 "sample_sufficient": len(rows) >= 5,
+                "risk_visibility": "full" if risk_visible else "restricted",
             },
-            "risk_distribution": [
-                {"level": "L1", "label": "L1 平稳", "value": risk_counts["L1"]},
-                {"level": "L2", "label": "L2 轻度关注", "value": risk_counts["L2"]},
-                {"level": "L3", "label": "L3 中度关注", "value": risk_counts["L3"]},
-                {"level": "L4", "label": "L4 重点关注", "value": risk_counts["L4"]},
-            ],
-            "high_risk_students": high_risk[:8],
+            "risk_distribution": risk_distribution,
+            "high_risk_students": visible_high_risk,
             "top_items": [
                 {"name": name, "value": count}
                 for name, count in item_counts.most_common(20)

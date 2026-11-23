@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import base64
+import hmac
 import io
 import json
 import logging
 import re
+import time
 import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
@@ -12,11 +14,12 @@ from pathlib import Path
 from typing import Any
 
 import qrcode
-from fastapi import BackgroundTasks, Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import BackgroundTasks, Depends, FastAPI, File, Form, Header, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from PIL import Image, UnidentifiedImageError
 from sqlalchemy.orm import Session
 
 from .admin_api import (
@@ -28,19 +31,37 @@ from .admin_api import (
     workbench_router,
 )
 from .config import (
+    APP_ENV,
     CORS_ORIGINS,
+    ENABLE_API_DOCS,
+    ENABLE_MANUAL,
+    ENABLE_SERVICE_TOKEN,
+    MEDIA_SIGNED_URL_TTL_SECONDS,
+    MEDIA_SIGNING_SECRET,
+    MEDIA_SIGNING_SECRET_CONFIGURED,
     MULTIMODAL_API_KEY,
     MULTIMODAL_MODEL,
     PUBLIC_BASE_URL,
+    SEED_DEMO_USERS,
+    SHARE_DEFAULT_EXPIRES_DAYS,
     UPLOAD_DIR,
 )
 from .db import SessionLocal, get_db, init_db
 from .models import Assessment, ReportReview, ShareLink
 from .report_engine import generate_report
 from .schemas import AssessmentPayload, ShareRequest
-from .utils import iso_utc, new_id, new_share_token, public_copy
+from .utils import (
+    iso_utc,
+    media_signature,
+    new_id,
+    new_share_token,
+    public_copy,
+    sign_report_media,
+    signed_media_url,
+)
 
 MAX_IMAGE_BYTES = 24 * 1024 * 1024
+Image.MAX_IMAGE_PIXELS = 20_000_000
 REPORT_VIEWER_PATH = Path(__file__).resolve().parents[2] / "report_viewer_v2.html"
 ADMIN_DASHBOARD_PATH = Path(__file__).resolve().parents[2] / "admin_dashboard.html"
 WORKBENCH_PATH = Path(__file__).resolve().parents[2] / "sandplay_workbench_react.html"
@@ -51,26 +72,104 @@ ASSETS_DIR = Path(__file__).resolve().parents[2] / "assets"
 logger = logging.getLogger(__name__)
 
 
+def _validate_release_config() -> None:
+    if APP_ENV != "production":
+        return
+    release_errors: list[str] = []
+    if not PUBLIC_BASE_URL.startswith("https://"):
+        release_errors.append("PUBLIC_BASE_URL 必须为 https:// 公网域名")
+    if "*" in CORS_ORIGINS:
+        release_errors.append("CORS_ORIGINS 不能包含通配符 *")
+    if not MEDIA_SIGNING_SECRET_CONFIGURED:
+        release_errors.append("必须设置 MEDIA_SIGNING_SECRET（或 COUNSELOR_TOKEN）")
+    if ENABLE_API_DOCS:
+        release_errors.append("生产环境必须设置 ENABLE_API_DOCS=false")
+    if ENABLE_MANUAL:
+        release_errors.append("生产环境必须设置 ENABLE_MANUAL=false，避免内部手册和截图公网暴露")
+    if SEED_DEMO_USERS:
+        release_errors.append("生产环境必须设置 SEED_DEMO_USERS=false")
+    if release_errors:
+        raise RuntimeError("生产发布配置未通过：" + "；".join(release_errors))
+    if ENABLE_SERVICE_TOKEN:
+        logger.warning("生产环境已开启 ENABLE_SERVICE_TOKEN，请确认令牌仅用于受控运维")
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    _validate_release_config()
     init_db()
     with SessionLocal() as db:
         ensure_admin_seed(db)
     yield
 
 
-app = FastAPI(title="心理沙盘发展性评估 API", version="1.0", lifespan=lifespan)
+app = FastAPI(
+    title="心理沙盘发展性评估 API",
+    version="1.0",
+    lifespan=lifespan,
+    docs_url="/docs" if ENABLE_API_DOCS else None,
+    redoc_url="/redoc" if ENABLE_API_DOCS else None,
+    openapi_url="/openapi.json" if ENABLE_API_DOCS else None,
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
     allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Counselor-Token", "X-Request-Id", "X-Share-Token"],
 )
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    response.headers.setdefault(
+        "Content-Security-Policy",
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline' https://miaoda.feishu.cn; "
+        "font-src 'self' https://miaoda.feishu.cn https://sf3-scmcdn-cn.feishucdn.com; "
+        "img-src 'self' data: blob:; "
+        "connect-src 'self'; object-src 'none'; base-uri 'self'; "
+        "frame-ancestors 'none'; form-action 'self'",
+    )
+    if request.url.scheme == "https":
+        response.headers.setdefault(
+            "Strict-Transport-Security", "max-age=31536000; includeSubDomains"
+        )
+    return response
+
+
 app.include_router(admin_router)
 app.include_router(workbench_router)
-app.mount("/media", StaticFiles(directory=UPLOAD_DIR), name="media")
-if MANUAL_ASSETS_DIR.is_dir():
+
+
+@app.get("/media/{assessment_id}/{filename}")
+async def protected_media(assessment_id: str, filename: str, exp: int = 0, sig: str = ""):
+    """只提供短期签名 URL，避免公开静态目录被枚举或热链接。"""
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", assessment_id or ""):
+        raise HTTPException(status_code=404, detail="资源不存在")
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+\.png", filename or ""):
+        raise HTTPException(status_code=404, detail="资源不存在")
+    if exp < int(time.time()):
+        raise HTTPException(status_code=403, detail="图片链接已过期，请重新打开报告")
+    if not hmac.compare_digest(sig, media_signature(assessment_id, filename, exp)):
+        raise HTTPException(status_code=403, detail="图片链接签名无效")
+    path = UPLOAD_DIR / assessment_id / filename
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="资源不存在")
+    return FileResponse(
+        path,
+        media_type="image/png",
+        headers={"Cache-Control": "private, max-age=300", "X-Content-Type-Options": "nosniff"},
+    )
+
+
+if ENABLE_MANUAL and MANUAL_ASSETS_DIR.is_dir():
     app.mount("/manual/assets", StaticFiles(directory=MANUAL_ASSETS_DIR), name="manual-assets")
 if ASSETS_DIR.is_dir():
     app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
@@ -105,6 +204,8 @@ async def http_handler(request: Request, exc: HTTPException):
 def require_counselor(
     principal: AdminPrincipal = Depends(require_admin),
 ) -> AdminPrincipal:
+    if principal.role_key not in {"counselor", "super_admin"}:
+        raise HTTPException(status_code=403, detail="班主任账号不可查看个体心理报告")
     return principal
 
 
@@ -114,9 +215,32 @@ def _decode_base64(value: str | None) -> bytes | None:
     if value.startswith("data:"):
         value = value.split(",", 1)[-1]
     try:
-        return base64.b64decode(value)
+        return base64.b64decode(value, validate=True)
     except Exception as exc:
-        raise HTTPException(status_code=422, detail=f"base64 图片解码失败: {exc}") from exc
+        raise HTTPException(status_code=422, detail="图片数据格式不正确") from exc
+
+
+def _normalise_uploaded_image(content: bytes, label: str = "图片") -> bytes:
+    """只接受可正常解码的常见位图，并统一重编码为 PNG，避免伪造扩展名。"""
+    if not content:
+        raise HTTPException(status_code=422, detail=f"缺少{label}")
+    try:
+        with Image.open(io.BytesIO(content)) as image:
+            if image.format not in {"PNG", "JPEG", "WEBP"}:
+                raise HTTPException(status_code=422, detail=f"{label}仅支持 PNG、JPEG 或 WebP")
+            image.load()
+            if image.width * image.height > 20_000_000:
+                raise HTTPException(status_code=413, detail=f"{label}像素尺寸过大")
+            buffer = io.BytesIO()
+            image.convert("RGB").save(buffer, format="PNG", optimize=True)
+            normalised = buffer.getvalue()
+    except HTTPException:
+        raise
+    except (UnidentifiedImageError, Image.DecompressionBombError, OSError, ValueError) as exc:
+        raise HTTPException(status_code=422, detail=f"{label}无法识别或已损坏") from exc
+    if len(normalised) > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413, detail=f"{label}重编码后超过 24MB")
+    return normalised
 
 
 async def _read_upload(upload: UploadFile | None, base64_value: str | None) -> bytes:
@@ -128,7 +252,7 @@ async def _read_upload(upload: UploadFile | None, base64_value: str | None) -> b
         raise HTTPException(status_code=422, detail="缺少沙盘图片")
     if len(content) > MAX_IMAGE_BYTES:
         raise HTTPException(status_code=413, detail="单张图片不得超过 24MB")
-    return content
+    return _normalise_uploaded_image(content, "沙盘图片")
 
 
 async def _read_optional_upload(upload: UploadFile | None, base64_value: str | None) -> bytes | None:
@@ -136,9 +260,11 @@ async def _read_optional_upload(upload: UploadFile | None, base64_value: str | N
         content = await upload.read()
     else:
         content = _decode_base64(base64_value)
-    if content and len(content) > MAX_IMAGE_BYTES:
+    if not content:
+        return None
+    if len(content) > MAX_IMAGE_BYTES:
         raise HTTPException(status_code=413, detail="单张图片不得超过 24MB")
-    return content or None
+    return _normalise_uploaded_image(content, "成绩单图片")
 
 
 def _store_bytes(assessment_id: str, name: str, content: bytes) -> tuple[str, str]:
@@ -151,8 +277,12 @@ def _store_bytes(assessment_id: str, name: str, content: bytes) -> tuple[str, st
 
 
 def _clean_payload(payload: dict[str, Any]) -> dict[str, Any]:
-    """移除前端 data URI，避免数据库重复存储大字段。"""
+    """移除前端 data URI，并拒绝学生伪造教师观察或服务端内部字段。"""
     payload.pop("canvas_image_base64", None)
+    payload["teacher_observation"] = ""
+    for key in list(payload.keys()):
+        if str(key).startswith("_"):
+            payload.pop(key, None)
     for item in payload.get("items") or []:
         if isinstance(item, dict):
             item.pop("image", None)
@@ -411,8 +541,13 @@ async def create_assessment(
 ):
     try:
         payload_obj = AssessmentPayload.model_validate(json.loads(payload))
-    except (json.JSONDecodeError, ValueError) as exc:
-        return fail(request, "VALIDATION_INVALID_PAYLOAD", f"payload JSON 解析或校验失败: {exc}", 422)
+    except json.JSONDecodeError:
+        return fail(request, "VALIDATION_INVALID_PAYLOAD", "payload 不是合法 JSON", 422)
+    except ValueError:
+        return fail(request, "VALIDATION_INVALID_PAYLOAD", "payload 字段校验未通过", 422)
+
+    if not payload_obj.consent:
+        return fail(request, "CONSENT_REQUIRED", "请先确认知情同意，再提交沙盘作品", 422)
 
     raw_payload = _clean_payload(payload_obj.model_dump(mode="json"))
     item_ids = {str(item.get("id")) for item in raw_payload.get("items") or [] if isinstance(item, dict)}
@@ -477,8 +612,9 @@ async def create_assessment(
     db.add(row)
     db.commit()
 
-    image_url = f"{PUBLIC_BASE_URL}/media/{sandplay_rel}"
-    transcript_url = f"{PUBLIC_BASE_URL}/media/{transcript_rel}" if transcript_rel else None
+    image_url = signed_media_url(PUBLIC_BASE_URL, assessment_id, "sandplay.png")
+    transcript_url = signed_media_url(PUBLIC_BASE_URL, assessment_id, "transcript.png") if transcript_rel else None
+
     report_payload = dict(raw_payload)
     previous = _previous_assessment_context(db, row)
     if previous:
@@ -533,7 +669,7 @@ async def get_student_assessment_status(
         "status": row.status,
         "report_ready": report_ready,
         "created_at": iso_utc(row.created_at),
-        "sandplay_image_url": f"{PUBLIC_BASE_URL}/media/{row.id}/sandplay.png" if row.sandplay_image_path else "",
+        "sandplay_image_url": signed_media_url(PUBLIC_BASE_URL, row.id, "sandplay.png") if row.sandplay_image_path else "",
     }
     if report_ready:
         payload["brief"] = _student_report_brief(row)
@@ -551,7 +687,8 @@ async def get_assessment(
     if not row:
         return fail(request, "NOT_FOUND", "评估记录不存在", 404)
     report = json.loads(row.report_json) if row.report_json else None
-    return ok(request, {**_assessment_summary(row), "report": report})
+    return ok(request, {**_assessment_summary(row), "report": sign_report_media(report, row.id) if report else report})
+
 
 
 @app.post("/api/v1/reports/{assessment_id}/reanalyze")
@@ -581,7 +718,8 @@ async def reanalyze_report(
     transcript_url = None
     if row.transcript_image_path and Path(row.transcript_image_path).is_file():
         transcript_bytes = Path(row.transcript_image_path).read_bytes()
-        transcript_url = f"{PUBLIC_BASE_URL}/media/{row.id}/transcript.png"
+        transcript_url = signed_media_url(PUBLIC_BASE_URL, row.id, "transcript.png")
+
 
     try:
         payload = json.loads(row.input_payload or "{}")
@@ -596,12 +734,13 @@ async def reanalyze_report(
             payload,
             sandplay_image=sandplay_bytes,
             transcript_image=transcript_bytes,
-            image_url=f"{PUBLIC_BASE_URL}/media/{row.id}/sandplay.png",
+            image_url=signed_media_url(PUBLIC_BASE_URL, row.id, "sandplay.png"),
             transcript_url=transcript_url,
             allow_demo_fallback=False,
         )
-    except Exception as exc:
-        return fail(request, "MODEL_CALL_FAILED", f"多模态模型调用失败：{type(exc).__name__}: {exc}", 502)
+    except Exception:
+        logger.exception("重新生成报告失败 assessment_id=%s", assessment_id)
+        return fail(request, "MODEL_CALL_FAILED", "多模态模型调用失败，请稍后重试", 502)
 
     if engine != "multimodal":
         return fail(request, "MODEL_CALL_FAILED", "模型未返回有效报告，已保留原报告未覆盖", 502)
@@ -637,7 +776,7 @@ async def reanalyze_report(
         "engine": engine,
         "model": MULTIMODAL_MODEL,
         "generation_usage": meta.get("generation_usage"),
-        "report": report,
+        "report": sign_report_media(report, row.id),
     }, message="report reanalyzed by multimodal model")
 
 
@@ -653,7 +792,7 @@ async def get_full_report(
         return fail(request, "NOT_FOUND", "报告不存在或尚未生成", 404)
     return ok(request, {
         **_assessment_summary(row),
-        "report": json.loads(row.report_json),
+        "report": sign_report_media(json.loads(row.report_json), row.id),
     })
 
 
@@ -680,17 +819,19 @@ async def create_share(
         active = None
     if body.regenerate or not active:
         token = new_share_token()
+        days = body.expires_days if body.expires_days is not None else SHARE_DEFAULT_EXPIRES_DAYS
         active = ShareLink(
             token=token,
             assessment_id=assessment_id,
-            expires_at=datetime.utcnow() + timedelta(days=body.expires_days) if body.expires_days else None,
+            expires_at=datetime.utcnow() + timedelta(days=days) if days else None,
         )
         db.add(active)
         db.commit()
         db.refresh(active)
 
-    share_url = f"{PUBLIC_BASE_URL}/share/{active.token}"
-    api_url = f"{PUBLIC_BASE_URL}/api/v1/share/{active.token}"
+    # 把分享令牌放在 fragment 中，避免进入反向代理访问日志、Referer 和浏览器历史。
+    share_url = f"{PUBLIC_BASE_URL}/report-viewer#share_token={active.token}"
+    api_url = f"{PUBLIC_BASE_URL}/api/v1/share/access"
     qr = qrcode.QRCode(version=None, error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=8, border=2)
     qr.add_data(share_url)
     qr.make(fit=True)
@@ -730,8 +871,15 @@ def _get_share_or_error(request: Request, token: str, db: Session) -> tuple[Shar
     return link, row
 
 
-@app.get("/api/v1/share/{token}")
-async def get_shared_report(request: Request, token: str, db: Session = Depends(get_db)):
+@app.get("/api/v1/share/access")
+async def get_shared_report(
+    request: Request,
+    x_share_token: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+):
+    token = str(x_share_token or "").strip()
+    if not token:
+        return fail(request, "MISSING_SHARE_TOKEN", "缺少分享令牌", 401)
     link, row = _get_share_or_error(request, token, db)
     full = json.loads(row.report_json)
     return ok(request, {
@@ -743,7 +891,7 @@ async def get_shared_report(request: Request, token: str, db: Session = Depends(
             "visibility": "student_guardian",
             "redacted_chapters": ["chapter_5_risk"],
         },
-        "report": public_copy(full),
+        "report": sign_report_media(public_copy(full), row.id),
     })
 
 
@@ -774,11 +922,15 @@ async def admin_page():
 
 @app.get("/manual")
 async def manual_page_redirect():
+    if not ENABLE_MANUAL:
+        raise HTTPException(status_code=404, detail="页面不存在")
     return RedirectResponse(url="/manual/", status_code=307)
 
 
 @app.get("/manual/")
 async def manual_page():
+    if not ENABLE_MANUAL:
+        raise HTTPException(status_code=404, detail="页面不存在")
     if not MANUAL_PATH.exists():
         raise HTTPException(status_code=404, detail="操作手册页面尚未部署")
     return FileResponse(
@@ -802,7 +954,7 @@ async def workbench_page():
 @app.get("/share/{token}")
 async def share_page(request: Request, token: str, db: Session = Depends(get_db)):
     link, _ = _get_share_or_error(request, token, db)
-    return RedirectResponse(url=f"/report-viewer?share_token={link.token}", status_code=303)
+    return RedirectResponse(url=f"/report-viewer#share_token={link.token}", status_code=303)
 
 
 @app.delete("/api/v1/shares/{token}")
@@ -822,4 +974,7 @@ async def revoke_share(
 
 @app.get("/")
 async def root():
-    return {"service": "sandplay-assessment-api", "docs": "/docs", "health": "/api/v1/health"}
+    payload = {"service": "sandplay-assessment-api", "health": "/api/v1/health"}
+    if ENABLE_API_DOCS:
+        payload["docs"] = "/docs"
+    return payload

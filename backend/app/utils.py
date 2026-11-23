@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import base64
+import hashlib
+import hmac
 import json
 import re
 import secrets
+import time
 from datetime import datetime, timezone
 from typing import Any
+
+from .config import MEDIA_SIGNED_URL_TTL_SECONDS, MEDIA_SIGNING_SECRET
 
 
 def new_id(prefix: str = "") -> str:
@@ -21,6 +27,44 @@ def iso_utc(value: datetime | None) -> str | None:
     if value.tzinfo is None:
         value = value.replace(tzinfo=timezone.utc)
     return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+_MEDIA_URL_RE = re.compile(r"(/media/([A-Za-z0-9_-]+)/([A-Za-z0-9_.-]+))(?:\?[^\s\"'<>]*)?")
+_MEDIA_ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+_MEDIA_NAME_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
+
+
+def media_signature(assessment_id: str, filename: str, expires: int) -> str:
+    message = f"{assessment_id}/{filename}:{expires}".encode("utf-8")
+    digest = hmac.new(MEDIA_SIGNING_SECRET.encode("utf-8"), message, hashlib.sha256).digest()
+    return base64.urlsafe_b64encode(digest).decode("ascii").rstrip("=")
+
+
+def signed_media_url(base_url: str, assessment_id: str, filename: str) -> str:
+    if not _MEDIA_ID_RE.fullmatch(str(assessment_id)) or not _MEDIA_NAME_RE.fullmatch(str(filename)):
+        return ""
+    expires = int(time.time()) + max(60, MEDIA_SIGNED_URL_TTL_SECONDS)
+    signature = media_signature(assessment_id, filename, expires)
+    return f"{base_url.rstrip('/')}/media/{assessment_id}/{filename}?exp={expires}&sig={signature}"
+
+
+def sign_report_media(value: Any, assessment_id: str) -> Any:
+    """给报告中的沙盘图 / 成绩单地址追加短期签名，避免公开静态目录被枚举。"""
+    if isinstance(value, dict):
+        return {key: sign_report_media(item, assessment_id) for key, item in value.items()}
+    if isinstance(value, list):
+        return [sign_report_media(item, assessment_id) for item in value]
+    if isinstance(value, str):
+        def replace(match: re.Match[str]) -> str:
+            path, owner, filename = match.group(1), match.group(2), match.group(3)
+            if owner != assessment_id:
+                return match.group(0)
+            expires = int(time.time()) + max(60, MEDIA_SIGNED_URL_TTL_SECONDS)
+            signature = media_signature(owner, filename, expires)
+            return f"{path}?exp={expires}&sig={signature}"
+
+        return _MEDIA_URL_RE.sub(replace, value)
+    return value
 
 
 def clean_json_text(text: str) -> str:
@@ -67,7 +111,12 @@ def _public_scrub(value: Any) -> Any:
     if isinstance(value, list):
         return [_public_scrub(item) for item in value]
     if isinstance(value, str):
-        return value.replace("九宫格", "画面分区").replace("宫格", "区域")
+        return (
+            value.replace("九宫格", "画面分区")
+            .replace("宫格", "区域")
+            .replace("风险分级", "评估结果")
+            .replace("风险等级", "评估结果")
+        )
     return value
 
 
@@ -105,16 +154,20 @@ def public_copy(report: dict[str, Any]) -> dict[str, Any]:
         meta.pop("holistic_screen", None)
         meta.pop("holistic_screen_risk", None)
         meta.pop("previous_assessment", None)
-        if isinstance(meta.get("quality_flags"), list):
-            meta["quality_flags"] = [
-                item for item in meta["quality_flags"]
-                if not str(item).startswith(("HOLISTIC_", "VISUAL_"))
-            ]
-        if isinstance(meta.get("quality_warnings"), list):
-            meta["quality_warnings"] = [
-                item for item in meta["quality_warnings"]
-                if not str((item or {}).get("code") or "").startswith(("HOLISTIC_", "VISUAL_"))
-            ]
+        public_meta_blocked_prefixes = (
+            "student_", "school_", "class_", "teacher_", "guardian_",
+            "heightmap_", "terrain_", "sample_", "client_", "generation_",
+            "counselor_", "risk_",
+        )
+        public_meta_blocked_keys = {
+            "self_image", "self_image_note", "engine", "engine_note",
+            "quality_flags", "quality_warnings", "quality_level", "process_metrics",
+            "school", "class_name", "phone", "email", "account", "user_id",
+        }
+        for key in list(meta.keys()):
+            lowered = str(key).lower()
+            if lowered in public_meta_blocked_keys or lowered.startswith(public_meta_blocked_prefixes):
+                meta.pop(key, None)
     chapter1 = data.get("chapter_1_overview")
     if isinstance(chapter1, dict):
         chapter1.pop("process_observation", None)

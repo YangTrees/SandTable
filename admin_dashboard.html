@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>心理沙盘 · 管理后台</title>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap">
-<script src="https://fastly.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.1/echarts.min.js'"></script>
+<script src="assets/vendor/echarts.min.js"></script>
 <style>
   :root {
     --paper: #efe9dd;
@@ -1179,7 +1179,7 @@
   <h3>报告分享二维码</h3>
   <p id="qrSub">家长 / 学生扫码查看脱敏版报告，风险研判章节自动隐藏。</p>
   <div class="qr-frame"><img id="qrImage" alt="报告分享二维码"></div>
-  <div class="qr-meta"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3.8 19 7v5.2c0 4.3-2.8 7.1-7 8-4.2-.9-7-3.7-7-8V7z"/><path d="M9 12.3l2 2 4-4.2"/></svg><span>长期有效 · 仅展示发展性内容</span></div>
+  <div class="qr-meta"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3.8 19 7v5.2c0 4.3-2.8 7.1-7 8-4.2-.9-7-3.7-7-8V7z"/><path d="M9 12.3l2 2 4-4.2"/></svg><span id="qrExpiry">默认 30 天有效 · 仅展示发展性内容</span></div>
   <div class="qr-modal-actions">
     <button class="btn" id="closeQrBtn">关闭</button>
     <button class="btn primary" id="copyShareBtn">复制分享链接</button>
@@ -1709,8 +1709,11 @@
 
   function renderNav() {
     const isSuperAdmin = Boolean(state.currentUser && state.currentUser.role_key === "super_admin");
+    const isTeacher = Boolean(state.currentUser && state.currentUser.role_key === "teacher");
     const userNav = document.querySelector('.nav-item[data-view="users"]');
     if (userNav) userNav.style.display = isSuperAdmin ? "" : "none";
+    const reviewNav = document.querySelector('.nav-item[data-view="review"]');
+    if (reviewNav) reviewNav.style.display = isTeacher ? "none" : "";
     document.querySelectorAll(".nav-item[data-view]").forEach((button) => {
       button.classList.toggle("active", button.dataset.view === state.view);
     });
@@ -1724,8 +1727,13 @@
   }
 
   function setView(view) {
-    if (view === "users" && !(state.currentUser && state.currentUser.role_key === "super_admin")) {
+    const role = state.currentUser && state.currentUser.role_key;
+    if (view === "users" && role !== "super_admin") {
       view = "overview";
+    }
+    if (view === "review" && role === "teacher") {
+      view = "overview";
+      toast("班主任账号仅可查看班级汇总，不可进入个体报告审核", true);
     }
     state.view = view;
     renderNav();
@@ -2110,7 +2118,7 @@
     try {
       const result = await api(`/admin/reports/${encodeURIComponent(brief.assessment_id)}/review-draft`, {
         method: "PUT",
-        body: JSON.stringify({ draft: state.reviewDraft, note: state.reviewNote || "", reviewer_id: "shen.lan" }),
+        body: JSON.stringify({ draft: state.reviewDraft, note: state.reviewNote || "" }),
       });
       state.reviewContext = { ...(state.reviewContext || {}), review: result.review, draft_sections: result.draft_sections };
       state.reviewDraftDirty = false;
@@ -2390,7 +2398,7 @@
       return;
     }
     try {
-      const payload = { status, note, reviewer_id: "shen.lan" };
+      const payload = { status, note };
       const hasDraft = Boolean(state.reviewContext && state.reviewContext.review && state.reviewContext.review.has_draft);
       if (status === "approved" && state.reviewDraft && (state.reviewDraftDirty || hasDraft)) {
         payload.draft = state.reviewDraft;
@@ -2443,6 +2451,12 @@
       brief.share_count = Math.max(1, brief.share_count || 0);
       el("qrImage").src = share.qr_png_base64;
       el("qrSub").textContent = `${brief.student_name} · ${brief.report_no}　扫码查看脱敏版报告，风险研判章节自动隐藏。`;
+      if (share.expires_at) {
+        const expireDate = new Date(share.expires_at).toLocaleDateString("zh-CN");
+        el("qrExpiry").textContent = `${expireDate} 到期 · 仅展示发展性内容`;
+      } else {
+        el("qrExpiry").textContent = "长期有效 · 仅展示发展性内容";
+      }
       el("qrOverlay").classList.add("show");
       el("qrModal").classList.add("show");
       el("qrModal").setAttribute("aria-hidden", "false");
@@ -2473,7 +2487,8 @@
   function openReport(mode) {
     if (!state.selectedId) return;
     const target = `${VIEWER_URL}?report_id=${encodeURIComponent(state.selectedId)}&mode=${mode === "public" ? "public" : "counselor"}`;
-    window.open(target, "_blank", "noopener");
+    // 同源新标签需要读取 opener 的后台会话；请勿添加 noopener，否则报告将无法鉴权加载。
+    window.open(target, "_blank");
   }
 
   function renderRoleCards() {

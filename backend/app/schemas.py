@@ -51,13 +51,13 @@ class AssessmentPayload(BaseModel):
     interaction_summary: dict[str, Any] = Field(default_factory=dict)
     representative_item_id: str = Field(min_length=1)
     representative_item_name: str = ""
-    sandplay_description: str = Field(min_length=1, max_length=4000)
+    sandplay_description: str = Field(min_length=10, max_length=4000)
     # 自我像独立于代表沙具：只进入意象假设与访谈，不直接参与风险分级。
     self_image: str | None = Field(default=None, max_length=120)
     self_image_note: str | None = Field(default=None, max_length=800)
     self_narrative: str | None = Field(default=None, max_length=6000)
     teacher_observation: str | None = Field(default=None, max_length=4000)
-    consent: bool = True
+    consent: bool = False
 
     @field_validator("representative_item_id")
     @classmethod
