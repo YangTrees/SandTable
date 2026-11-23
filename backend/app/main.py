@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import logging
 import re
 import uuid
 from contextlib import asynccontextmanager
@@ -11,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 import qrcode
-from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import BackgroundTasks, Depends, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
@@ -46,6 +47,8 @@ WORKBENCH_PATH = Path(__file__).resolve().parents[2] / "sandplay_workbench_react
 MANUAL_PATH = Path(__file__).resolve().parents[2] / "manual_web" / "心理沙盘系统_账户与全系统操作手册.html"
 MANUAL_ASSETS_DIR = Path(__file__).resolve().parents[2] / "manual_web" / "assets"
 ASSETS_DIR = Path(__file__).resolve().parents[2] / "assets"
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -176,6 +179,132 @@ def _assessment_summary(row: Assessment) -> dict[str, Any]:
     }
 
 
+def _clip_text(value: Any, limit: int = 260) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    return text if len(text) <= limit else text[:limit].rstrip() + "…"
+
+
+def _normalise_academic_scores(value: Any) -> dict[str, Any]:
+    """保留学生提交的结构化成绩；身份字段仍以学校账号为准。"""
+    if not isinstance(value, dict):
+        return {}
+    scores: dict[str, Any] = {}
+    for key in ("exam_name", "exam_date", "total_score", "class_rank"):
+        text = _clip_text(value.get(key), 80)
+        if text:
+            scores[key] = text
+    subjects = value.get("subjects")
+    if isinstance(subjects, dict):
+        cleaned_subjects: dict[str, str] = {}
+        for subject, score in list(subjects.items())[:12]:
+            name = _clip_text(subject, 24)
+            text = _clip_text(score, 40)
+            if name and text:
+                cleaned_subjects[name] = text
+        if cleaned_subjects:
+            scores["subjects"] = cleaned_subjects
+    return scores
+
+
+def _student_report_brief(row: Assessment) -> dict[str, Any] | None:
+    """学生端简略报告：只保留摘要、整体印象、六维方向、学业与建议。"""
+    if not row.report_json:
+        return None
+    try:
+        report = json.loads(row.report_json)
+    except (json.JSONDecodeError, TypeError):
+        return None
+    if not isinstance(report, dict):
+        return None
+
+    meta = report.get("meta") if isinstance(report.get("meta"), dict) else {}
+    summary = report.get("summary_card") if isinstance(report.get("summary_card"), dict) else {}
+    public = summary.get("public") if isinstance(summary.get("public"), dict) else {}
+    if not public:
+        public = summary
+    chapter1 = report.get("chapter_1_overview") if isinstance(report.get("chapter_1_overview"), dict) else {}
+    chapter3 = report.get("chapter_3_six_dimensions") if isinstance(report.get("chapter_3_six_dimensions"), dict) else {}
+    chapter4 = report.get("chapter_4_academic") if isinstance(report.get("chapter_4_academic"), dict) else {}
+    chapter9 = report.get("chapter_9_general_advice") if isinstance(report.get("chapter_9_general_advice"), dict) else {}
+
+    signals = []
+    for item in (public.get("signals") or [])[:4]:
+        if isinstance(item, dict) and item.get("label"):
+            signals.append({
+                "label": _clip_text(item.get("label"), 40),
+                "value": _clip_text(item.get("value"), 180),
+                "tone": str(item.get("tone") or "neutral"),
+            })
+
+    scene_imagery = [
+        _clip_text(item, 140)
+        for item in (chapter1.get("scene_imagery") or [])[:4]
+        if _clip_text(item, 140)
+    ]
+    scene_points = [
+        _clip_text(chapter1.get(key), 160)
+        for key in ("clusters", "blank_areas", "terrain_observation")
+        if _clip_text(chapter1.get(key), 160)
+    ]
+
+    dimensions = []
+    for item in (chapter3.get("dimensions") or [])[:6]:
+        if isinstance(item, dict):
+            dimensions.append({
+                "name": _clip_text(item.get("name"), 40),
+                "judgement": _clip_text(item.get("judgement"), 200),
+                "confidence": _clip_text(item.get("confidence") or "中", 12),
+            })
+
+    subjects = []
+    for item in (chapter4.get("subjects") or [])[:8]:
+        if isinstance(item, dict):
+            subjects.append({
+                "subject": _clip_text(item.get("subject"), 20),
+                "score": item.get("score"),
+                "full_score": item.get("full_score"),
+                "rate": item.get("rate"),
+                "grade": _clip_text(item.get("grade"), 20),
+            })
+    total = chapter4.get("total") if isinstance(chapter4.get("total"), dict) else {}
+    advice_items = [
+        _clip_text(item, 160)
+        for item in (chapter9.get("growth_mindset") or [])[:3]
+        if _clip_text(item, 160)
+    ]
+
+    return {
+        "report_no": _clip_text(meta.get("report_no"), 40),
+        "generated_at": _clip_text(meta.get("generated_at"), 40),
+        "headline": _clip_text(public.get("headline") or summary.get("headline"), 260),
+        "signals": signals,
+        "next_step": _clip_text(public.get("next_step") or summary.get("next_step"), 200),
+        "note": _clip_text(public.get("note") or "本摘要为发展性评估参考，不含风险分级。", 200),
+        "overall": {
+            "title": _clip_text(chapter1.get("title"), 60),
+            "scene_imagery": scene_imagery,
+            "scene_points": scene_points,
+        },
+        "dimensions": dimensions,
+        "academic": {
+            "transcript_provided": bool(chapter4.get("transcript_provided")),
+            "transcript_image_provided": bool(chapter4.get("transcript_image_url")),
+            "overall_interpretation": _clip_text(chapter4.get("overall_interpretation"), 280),
+            "subjects": subjects,
+            "total": {
+                "score": total.get("score"),
+                "full_score": total.get("full_score"),
+                "rate": total.get("rate"),
+            },
+            "strengths": _clip_text(chapter4.get("strengths"), 200),
+            "weaknesses": _clip_text(chapter4.get("weaknesses"), 200),
+            "trend": _clip_text(chapter4.get("trend"), 200),
+        },
+        "advice": advice_items,
+        "disclaimer": _clip_text(chapter9.get("disclaimer") or meta.get("disclaimer"), 200),
+    }
+
+
 def _previous_assessment_context(db: Session, row: Assessment) -> dict[str, Any]:
     """同一学生上一份已完成报告的轻量摘要，不复制整份历史报告。"""
     student_no = str(row.student_no or "").strip()
@@ -229,9 +358,49 @@ async def health(request: Request):
     return ok(request, {"status": "ok", "time": iso_utc(datetime.utcnow())})
 
 
+async def _generate_report_in_background(
+    assessment_id: str,
+    report_payload: dict[str, Any],
+    sandplay_image: bytes,
+    transcript_image: bytes | None,
+    image_url: str,
+    transcript_url: str | None,
+) -> None:
+    """学生提交后异步生成报告，避免提交请求阻塞在多模态模型上。"""
+    try:
+        report, engine = await generate_report(
+            report_payload,
+            sandplay_image=sandplay_image,
+            transcript_image=transcript_image,
+            image_url=image_url,
+            transcript_url=transcript_url,
+        )
+    except Exception:
+        logger.exception("后台生成测评报告失败 assessment_id=%s", assessment_id)
+        with SessionLocal() as db:
+            row = db.get(Assessment, assessment_id)
+            if row is not None and row.status != "completed":
+                row.status = "failed"
+                db.commit()
+        return
+
+    with SessionLocal() as db:
+        row = db.get(Assessment, assessment_id)
+        if row is None:
+            logger.warning("后台报告生成完成但测评记录不存在 assessment_id=%s", assessment_id)
+            return
+        if row.status == "completed":
+            return
+        row.report_json = json.dumps(report, ensure_ascii=False)
+        row.report_engine = engine
+        row.status = "completed"
+        db.commit()
+
+
 @app.post("/api/v1/assessments")
 async def create_assessment(
     request: Request,
+    background_tasks: BackgroundTasks,
     payload: str = Form(...),
     sandplay_image: UploadFile | None = File(default=None),
     sandplay_image_base64: str | None = Form(default=None),
@@ -254,16 +423,18 @@ async def create_assessment(
     student = principal.user
     if student is None:
         return fail(request, "FORBIDDEN", "学生账号信息缺失，请重新登录", 403)
+    submitted_student = raw_payload.get("student") if isinstance(raw_payload.get("student"), dict) else {}
+    academic_scores = _normalise_academic_scores(submitted_student.get("academic_scores"))
     bound_student = {
         "name": student.name or "学生",
         "student_no": student.student_no or student.account,
         "grade_level": student.grade_level or "未填写",
         "class_name": student.class_name or "",
         "school_name": student.department or "",
-        "gender": raw_payload.get("student", {}).get("gender") or "不透露",
+        "gender": submitted_student.get("gender") or "不透露",
         "seat_no": "",
         "contact_phone": "",
-        "academic_scores": {},
+        "academic_scores": academic_scores,
     }
     raw_payload["student"] = bound_student
 
@@ -287,7 +458,7 @@ async def create_assessment(
         class_name=bound_student["class_name"],
         seat_no="",
         contact_phone="",
-        academic_scores_json="{}",
+        academic_scores_json=json.dumps(academic_scores, ensure_ascii=False),
         representative_item_id=payload_obj.representative_item_id,
         representative_item_name=payload_obj.representative_item_name,
         self_image=str(payload_obj.self_image or "").strip(),
@@ -312,24 +483,17 @@ async def create_assessment(
     previous = _previous_assessment_context(db, row)
     if previous:
         report_payload["_previous_assessment"] = previous
-    try:
-        report, engine = await generate_report(
-            report_payload,
-            sandplay_image=sandplay_bytes,
-            transcript_image=transcript_bytes,
-            image_url=image_url,
-            transcript_url=transcript_url,
-        )
-    except Exception as exc:
-        row.status = "failed"
-        db.commit()
-        return fail(request, "REPORT_GENERATION_FAILED", f"报告生成失败: {type(exc).__name__}: {exc}", 502)
 
-    row.report_json = json.dumps(report, ensure_ascii=False)
-    row.report_engine = engine
-    row.status = "completed"
-    db.commit()
-    db.refresh(row)
+    # 提交请求立即返回，报告生成放到响应之后的后台任务，避免学生长时间等待。
+    background_tasks.add_task(
+        _generate_report_in_background,
+        assessment_id,
+        report_payload,
+        sandplay_bytes,
+        transcript_bytes,
+        image_url,
+        transcript_url,
+    )
 
     # 学生端只返回“已提交”回执，不返回临床报告正文。
     return ok(request, {
@@ -342,8 +506,38 @@ async def create_assessment(
         "representative_item_name": row.representative_item_name,
         "created_at": iso_utc(row.created_at),
         "sandplay_image_url": image_url,
-        "report_ready": True,
-    }, message="测评已提交")
+        "report_ready": False,
+    }, message="作品已提交，报告正在后台生成")
+
+
+@app.get("/api/v1/assessments/{assessment_id}/status")
+async def get_student_assessment_status(
+    request: Request,
+    assessment_id: str,
+    db: Session = Depends(get_db),
+    principal: AdminPrincipal = Depends(require_student),
+):
+    """学生查询本人提交的回执；报告完成后返回脱敏简略版。"""
+    row = db.get(Assessment, assessment_id)
+    if not row:
+        return fail(request, "NOT_FOUND", "评估记录不存在", 404)
+
+    student = principal.user
+    student_no = (student.student_no or student.account or "").strip() if student else ""
+    if not student or row.student_no != student_no or row.student_name != (student.name or "学生"):
+        return fail(request, "FORBIDDEN", "无权查看该测评记录", 403)
+
+    report_ready = row.status == "completed" and bool(row.report_json)
+    payload = {
+        "assessment_id": row.id,
+        "status": row.status,
+        "report_ready": report_ready,
+        "created_at": iso_utc(row.created_at),
+        "sandplay_image_url": f"{PUBLIC_BASE_URL}/media/{row.id}/sandplay.png" if row.sandplay_image_path else "",
+    }
+    if report_ready:
+        payload["brief"] = _student_report_brief(row)
+    return ok(request, payload)
 
 
 @app.get("/api/v1/assessments/{assessment_id}")

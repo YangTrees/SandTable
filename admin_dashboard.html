@@ -345,9 +345,9 @@
   .high-risk-row b { font-weight: 500; }
   .high-risk-row small { color: var(--muted); margin-left: 6px; }
 
-  .review-view { display: flex; flex-direction: column; overflow: hidden; padding-bottom: 0; }
+  .review-view { display: flex; flex-direction: column; overflow: auto; padding-bottom: 0; }
   .review-view .view-head { flex: none; }
-  .review-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: 286px minmax(0, 1fr); gap: 14px; padding-bottom: 2px; }
+  .review-layout { flex: none; height: calc(100vh - 96px); min-height: 680px; display: grid; grid-template-columns: 286px minmax(0, 1fr); gap: 14px; padding-bottom: 2px; }
   .review-side { min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
   .side-tools { padding: 16px 15px 12px; border-bottom: 1px solid var(--line); flex: none; }
   .search-field { position: relative; }
@@ -432,30 +432,30 @@
   .review-toolbar-right { display: flex; align-items: center; gap: 7px; flex: none; }
   .review-summary {
     flex: none; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-    gap: 10px 16px; margin: 12px 16px 0; padding: 13px 15px;
+    gap: 7px 14px; margin: 8px 14px 0; padding: 10px 13px;
     border: 1px solid rgba(161, 122, 78, .22); border-radius: 10px;
     background:
       radial-gradient(circle at 100% 0, rgba(161,122,78,.09), transparent 46%),
       linear-gradient(135deg, #fffdf8, #f7f1e5);
     box-shadow: 0 6px 18px rgba(45, 58, 48, .06);
   }
-  .review-summary > div:first-child { grid-row: 1 / span 2; }
-  .review-summary-kicker { color: #9a7a54; font-size: 8px; letter-spacing: .18em; }
-  .review-summary h3 { display: flex; align-items: center; gap: 8px; margin: 5px 0 0; font-family: var(--serif); font-size: 15px; font-weight: 600; color: #22352b; }
-  .review-summary p { margin: 5px 0 0; color: #6d7a71; font-size: 9px; line-height: 1.6; }
-  .review-summary .summary-headline { margin-top: 7px; color: #22352b; font-family: var(--serif); font-size: 11px; line-height: 1.55; }
+  .review-summary > div:first-child { grid-row: 1 / span 2; min-width: 0; }
+  .review-summary-kicker { color: #9a7a54; font-size: 7.5px; letter-spacing: .18em; }
+  .review-summary h3 { display: flex; align-items: center; gap: 8px; margin: 4px 0 0; font-family: var(--serif); font-size: 14px; font-weight: 600; color: #22352b; }
+  .review-summary p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 4px 0 0; color: #6d7a71; font-size: 8.5px; line-height: 1.45; }
+  .review-summary .summary-headline { margin-top: 5px; color: #22352b; font-family: var(--serif); font-size: 10.5px; line-height: 1.4; }
   .review-hint { color: #8a7a68; font-size: 8px; font-weight: 400; }
   .engine-pill { padding: 2px 7px; border-radius: 99px; font-family: var(--sans); font-size: 7.5px; font-weight: 500; letter-spacing: .03em; }
   .engine-pill.demo { color: #8a5a27; background: #f7e8d0; border: 1px solid #e6cba4; }
   .engine-pill.model { color: #1f5d45; background: #e4f1e9; border: 1px solid #bfdccb; }
-  .summary-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; align-content: start; }
-  .summary-metric { padding: 7px 9px; border: 1px solid rgba(42, 63, 49, .1); border-radius: 6px; background: rgba(255,255,255,.72); }
+  .summary-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; align-content: start; }
+  .summary-metric { padding: 5px 8px; border: 1px solid rgba(42, 63, 49, .1); border-radius: 6px; background: rgba(255,255,255,.72); }
   .summary-metric span { display: block; color: #8b978e; font-size: 7.5px; }
-  .summary-metric b { display: block; margin-top: 3px; color: #23362c; font-size: 13px; font-weight: 600; line-height: 1.15; }
+  .summary-metric b { display: block; margin-top: 2px; color: #23362c; font-size: 11px; font-weight: 600; line-height: 1.15; }
   .summary-metric b small { margin-left: 3px; color: #8b978e; font-size: 7.5px; font-weight: 400; }
   .summary-metric b.risk-l4 { color: #a12f2f; }
   .summary-metric b.risk-l3 { color: #996420; }
-  .summary-quality { display: flex; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 6px; padding-top: 7px; border-top: 1px dashed rgba(161,122,78,.25); }
+  .summary-quality { display: flex; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 5px; padding-top: 4px; border-top: 1px dashed rgba(161,122,78,.25); }
   .summary-quality > span { color: #8b978e; font-size: 7.5px; letter-spacing: .05em; white-space: nowrap; }
   .summary-flags { display: flex; flex-wrap: wrap; gap: 4px; }
   .summary-flag { padding: 2px 6px; border-radius: 4px; font-size: 7.5px; line-height: 1.5; }
@@ -539,6 +539,18 @@
     padding: 12px 15px 14px; border-top: 1px solid var(--line);
     background: linear-gradient(180deg, rgba(255, 253, 248, .72), rgba(251, 247, 239, .94));
   }
+  .review-view.reading { overflow: hidden; padding: 0; }
+  .review-view.reading .view-head,
+  .review-view.reading .filter-strip,
+  .review-view.reading .review-side,
+  .review-view.reading .review-summary,
+  .review-view.reading .review-editor-shell,
+  .review-view.reading .review-actions { display: none; }
+  .review-view.reading .review-layout { flex: 1; height: auto; min-height: 0; grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0; }
+  .review-view.reading .review-main { height: 100%; border-radius: var(--radius-lg); }
+  .review-view.reading .paper-scroll { padding: 22px 28px 46px; }
+  .review-view.reading .paper { max-width: 900px; }
+  .reading-toggle.on { border-color: var(--sage-dark); background: rgba(223, 232, 222, .8); color: var(--sage-deep); }
   .reviewer-line { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; color: var(--muted); font-size: 9px; }
   .reviewer-line .avatar { width: 22px; height: 22px; font-size: 9px; box-shadow: none; }
   .note-field {
@@ -745,6 +757,21 @@
     font-size: 12px; letter-spacing: .01em; transition: .16s ease;
   }
   .auth-form input:focus { border-color: rgba(64, 93, 76, .48); background: #fffdf8; box-shadow: 0 0 0 4px rgba(97, 125, 105, .10); }
+  .password-control { position: relative; display: block; }
+  .password-control input { padding-right: 60px; }
+  .password-toggle {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    display: grid; place-items: center; width: 40px; height: 36px; padding: 0;
+    border: 1px solid rgba(64, 93, 76, .28); border-radius: 8px;
+    background: rgba(255, 253, 248, .82); color: var(--forest);
+    cursor: pointer; transition: background .16s ease, border-color .16s ease, color .16s ease;
+  }
+  .password-toggle svg { width: 18px; height: 18px; display: block; }
+  .password-toggle .pw-eye-off { display: none; }
+  .password-toggle[aria-pressed="true"] .pw-eye { display: none; }
+  .password-toggle[aria-pressed="true"] .pw-eye-off { display: block; }
+  .password-toggle:hover { border-color: rgba(64, 93, 76, .5); background: rgba(238, 244, 238, .95); color: var(--forest); }
+  .password-toggle:focus-visible { outline: 2px solid rgba(64, 93, 76, .35); outline-offset: 1px; }
   .auth-error {
     display: none; padding: 9px 11px; border-radius: 10px;
     background: rgba(168, 88, 77, .10); border: 1px solid rgba(168, 88, 77, .2);
@@ -770,6 +797,9 @@
     background: rgba(255, 253, 248, .78); color: var(--ink); outline: none; font-size: 11px;
   }
   .password-form input:focus { border-color: rgba(64, 93, 76, .42); background: #fffdf8; }
+  .password-form .password-control input { padding-right: 48px; }
+  .password-toggle.compact { right: 4px; width: 34px; height: 32px; }
+  .password-toggle.compact svg { width: 16px; height: 16px; }
   .password-form .form-hint { margin-top: -2px; }
   .password-modal-actions { display: flex; gap: 7px; justify-content: flex-end; margin-top: 17px; }
 
@@ -835,7 +865,10 @@
         <input id="loginAccount" name="username" placeholder="如：lin.zhiyuan" autocomplete="username" required>
       </label>
       <label for="loginPassword">登录密码
-        <input id="loginPassword" name="password" type="password" placeholder="请输入密码" autocomplete="current-password" required>
+        <span class="password-control">
+          <input id="loginPassword" name="password" type="password" placeholder="请输入密码" autocomplete="current-password" required>
+          <button class="password-toggle" type="button" data-password-toggle="loginPassword" aria-label="显示密码" aria-pressed="false"><svg class="pw-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.2 12S5.8 5.8 12 5.8s9.8 6.2 9.8 6.2-3.6 6.2-9.8 6.2S2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="2.7"/></svg><svg class="pw-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1c.5-.1.9-.1 1.4-.1 6.2 0 9.8 6 9.8 6a14.4 14.4 0 0 1-3.1 3.3"/><path d="M6.7 7.3C4 9 2.2 12 2.2 12s3.6 6.2 9.8 6.2c1.3 0 2.5-.3 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button>
+        </span>
       </label>
       <div class="auth-error" id="loginError"></div>
       <button class="auth-submit" id="loginSubmit" type="submit">登录控制台</button>
@@ -1130,7 +1163,7 @@
       <div class="form-field"><label for="userGrade">年级</label><input id="userGrade" name="grade_level" placeholder="如：初二"></div>
       <div class="form-field"><label for="userClass">班级</label><input id="userClass" name="class_name" placeholder="如：3 班"></div>
       <div class="form-field full"><label for="userStudentNo">学生编号</label><input id="userStudentNo" name="student_no" placeholder="学生角色填写，如：PS-2026-018"><span class="form-hint">编号用于关联测评档案，可留空。</span></div>
-      <div class="form-field full"><label for="userPassword">登录密码</label><input id="userPassword" name="password" type="password" autocomplete="new-password" placeholder="留空则不修改或暂不设置"><span class="form-hint" id="userPasswordHint">新增用户可在此设置初始密码；编辑用户时填写新密码会立即重置并踢出该账号的其他登录。</span></div>
+      <div class="form-field full"><label for="userPassword">登录密码</label><div class="password-control"><input id="userPassword" name="password" type="password" autocomplete="new-password" placeholder="留空则不修改或暂不设置"><button class="password-toggle" type="button" data-password-toggle="userPassword" aria-label="显示密码" aria-pressed="false"><svg class="pw-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.2 12S5.8 5.8 12 5.8s9.8 6.2 9.8 6.2-3.6 6.2-9.8 6.2S2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="2.7"/></svg><svg class="pw-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1c.5-.1.9-.1 1.4-.1 6.2 0 9.8 6 9.8 6a14.4 14.4 0 0 1-3.1 3.3"/><path d="M6.7 7.3C4 9 2.2 12 2.2 12s3.6 6.2 9.8 6.2c1.3 0 2.5-.3 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></div><span class="form-hint" id="userPasswordHint">新增用户可在此设置初始密码；编辑用户时填写新密码会立即重置并踢出该账号的其他登录。</span></div>
       <div class="form-divider"></div>
       <div class="form-field full"><span class="form-hint">角色变更后，该账号下一次刷新页面时生效。学生账号只能进入学生心理沙盘测评入口；班主任可进入后台，但看不到风险研判章节。密码需至少 8 位并同时包含字母和数字。</span></div>
     </form>
@@ -1159,13 +1192,22 @@
   <p id="passwordDesc">修改后当前会话保持登录，其他设备会被退出。</p>
   <form class="password-form" id="passwordForm" autocomplete="off">
     <label id="currentPasswordField" for="currentPassword">当前密码
-      <input id="currentPassword" type="password" autocomplete="current-password" placeholder="请输入当前密码">
+      <span class="password-control">
+        <input id="currentPassword" type="password" autocomplete="current-password" placeholder="请输入当前密码">
+        <button class="password-toggle compact" type="button" data-password-toggle="currentPassword" aria-label="显示密码" aria-pressed="false"><svg class="pw-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.2 12S5.8 5.8 12 5.8s9.8 6.2 9.8 6.2-3.6 6.2-9.8 6.2S2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="2.7"/></svg><svg class="pw-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1c.5-.1.9-.1 1.4-.1 6.2 0 9.8 6 9.8 6a14.4 14.4 0 0 1-3.1 3.3"/><path d="M6.7 7.3C4 9 2.2 12 2.2 12s3.6 6.2 9.8 6.2c1.3 0 2.5-.3 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button>
+      </span>
     </label>
     <label for="newPassword">新密码
-      <input id="newPassword" type="password" autocomplete="new-password" placeholder="至少 8 位，包含字母和数字">
+      <span class="password-control">
+        <input id="newPassword" type="password" autocomplete="new-password" placeholder="至少 8 位，包含字母和数字">
+        <button class="password-toggle compact" type="button" data-password-toggle="newPassword" aria-label="显示密码" aria-pressed="false"><svg class="pw-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.2 12S5.8 5.8 12 5.8s9.8 6.2 9.8 6.2-3.6 6.2-9.8 6.2S2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="2.7"/></svg><svg class="pw-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1c.5-.1.9-.1 1.4-.1 6.2 0 9.8 6 9.8 6a14.4 14.4 0 0 1-3.1 3.3"/><path d="M6.7 7.3C4 9 2.2 12 2.2 12s3.6 6.2 9.8 6.2c1.3 0 2.5-.3 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button>
+      </span>
     </label>
     <label for="confirmPassword">确认新密码
-      <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="再次输入新密码">
+      <span class="password-control">
+        <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="再次输入新密码">
+        <button class="password-toggle compact" type="button" data-password-toggle="confirmPassword" aria-label="显示密码" aria-pressed="false"><svg class="pw-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.2 12S5.8 5.8 12 5.8s9.8 6.2 9.8 6.2-3.6 6.2-9.8 6.2S2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="2.7"/></svg><svg class="pw-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1c.5-.1.9-.1 1.4-.1 6.2 0 9.8 6 9.8 6a14.4 14.4 0 0 1-3.1 3.3"/><path d="M6.7 7.3C4 9 2.2 12 2.2 12s3.6 6.2 9.8 6.2c1.3 0 2.5-.3 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button>
+      </span>
     </label>
     <span class="form-hint" id="passwordHint">密码至少 8 位，需同时包含字母和数字。</span>
     <div class="auth-error" id="passwordError"></div>
@@ -1191,6 +1233,22 @@
     : "sandplay_workbench_react.html";
   const AUTH_TOKEN_KEY = "sandplay_admin_token";
 
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-password-toggle]");
+    if (!button) return;
+    const input = document.getElementById(button.dataset.passwordToggle);
+    if (!input) return;
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    button.setAttribute("aria-label", show ? "隐藏密码" : "显示密码");
+    button.setAttribute("aria-pressed", String(show));
+    input.focus();
+    if (show) {
+      const end = input.value.length;
+      input.setSelectionRange(end, end);
+    }
+  });
+
   const state = {
     view: "overview",
     bootstrap: null,
@@ -1208,6 +1266,7 @@
     detailError: "",
     reviewStatus: "pending",
     reviewNote: "",
+    readingMode: false,
     reviewContext: null,
     reviewDraft: null,
     reviewDraftDirty: false,
@@ -2073,6 +2132,8 @@
   function renderReviewDetail() {
     const main = el("reviewMain");
     const brief = state.reports.find((item) => item.assessment_id === state.selectedId) || null;
+    const reviewShell = el("view-review");
+    if (reviewShell) reviewShell.classList.toggle("reading", Boolean(state.readingMode && brief));
     if (!brief) {
       main.innerHTML = `<div class="review-toolbar"><div class="review-toolbar-left"><b>还没有可审核的报告</b><small>完成一次沙盘测评后，报告会自动进入队列</small></div></div><div class="paper-scroll"><div class="paper empty-paper">当前没有报告。<br>请学生从“学生心理沙盘测评”入口完成并提交一次测评。</div></div>`;
       return;
@@ -2101,6 +2162,7 @@
         <div class="review-toolbar-right">
           <span class="status-pill ${esc(status)}">${statusText(status)}</span>
           <button class="btn small soft" id="toggleEditorBtn">修订 AI 正文</button>
+          <button class="btn small reading-toggle${state.readingMode ? " on" : ""}" id="toggleReadingMode" title="${state.readingMode ? "退出放大阅读" : "放大阅读完整报告"}">${state.readingMode ? "⤡ 退出阅读" : "⤢ 放大阅读"}</button>
           <button class="btn small" id="openCounselorView">完整报告</button>
           <button class="btn small soft" id="openPublicView">家长版预览</button>
         </div>
@@ -2274,6 +2336,11 @@
     }
     const note = el("reviewNote");
     if (note) note.addEventListener("input", () => { state.reviewNote = note.value; });
+    const readingToggle = el("toggleReadingMode");
+    if (readingToggle) readingToggle.addEventListener("click", () => {
+      state.readingMode = !state.readingMode;
+      renderReviewDetail();
+    });
     const approve = el("approveBtn");
     if (approve) approve.addEventListener("click", () => saveReview("approved"));
     const changes = el("markChangesBtn");

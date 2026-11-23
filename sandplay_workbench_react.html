@@ -598,6 +598,117 @@
     .export-action:hover { background: rgba(255,255,255,.4); }
     .export-action.primary { border-color: #303630; background: #303630; color: #f7f0e3; }
     .export-action.primary:hover { background: #414a42; }
+    .export-action:disabled { opacity: .55; cursor: default; }
+    .submit-dialog { width: min(620px, 94vw); }
+    .submit-dialog .export-body {
+      display: block;
+      max-height: calc(92vh - 96px);
+      padding: 20px 24px 22px;
+      overflow: auto;
+    }
+    .submit-dialog .export-head { padding: 18px 24px 14px; }
+    .submit-receipt { display: grid; grid-template-columns: 136px minmax(0, 1fr); gap: 16px; align-items: start; }
+    @media (max-width: 560px) { .submit-receipt { grid-template-columns: 1fr; } }
+    .submit-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border: 1px solid var(--line); border-radius: 3px; background: #efe8dc; }
+    .submit-save {
+      width: 100%;
+      margin-top: 7px;
+      padding: 7px 8px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: transparent;
+      color: var(--ink-soft);
+      font-size: 9.5px;
+      letter-spacing: .06em;
+      cursor: pointer;
+    }
+    .submit-save:hover { background: rgba(255,255,255,.4); color: var(--ink); }
+    .submit-main { min-width: 0; }
+    .submit-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 10px;
+      border: 1px solid rgba(70,96,76,.26);
+      border-radius: 999px;
+      background: rgba(255,255,255,.42);
+      font-size: 9px;
+      letter-spacing: .1em;
+      color: #40614b;
+      white-space: nowrap;
+    }
+    .submit-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .submit-badge.waiting { color: #855f2d; border-color: rgba(133,95,45,.28); background: rgba(255,247,230,.62); }
+    .submit-badge.waiting .dot { animation: submit-pulse 1.2s ease-in-out infinite; }
+    .submit-badge.failed { color: #8a4331; border-color: rgba(138,67,49,.3); background: rgba(255,240,232,.7); }
+    .submit-message { margin: 11px 0 0; font-size: 11px; line-height: 1.75; color: var(--ink-soft); }
+    .submit-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px 14px; margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--line); }
+    .submit-meta-item { min-width: 0; }
+    .submit-meta-label { font-size: 8px; letter-spacing: .12em; color: var(--ink-soft); text-transform: uppercase; }
+    .submit-meta-value { margin-top: 3px; font-family: var(--serif); font-size: 12.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .submit-note { margin-top: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 3px; background: rgba(255,255,255,.3); font-size: 10px; line-height: 1.7; color: var(--ink-soft); }
+    .submit-note.warn { color: #7b5228; border-color: rgba(133,95,45,.28); background: rgba(255,247,230,.72); }
+    .submit-dialog-actions { display: grid; grid-template-columns: 1.35fr 1fr; gap: 8px; margin-top: 18px; }
+    .submit-dialog-actions.single { grid-template-columns: 1fr; }
+    .submit-dialog-actions.single .export-action { padding: 13px 12px; font-size: 12px; }
+    .submit-dialog-actions .export-action { justify-content: center; padding: 11px 12px; font-size: 11px; }
+    .submit-dialog.submit-report { width: min(900px, 96vw); }
+    .student-report-wrap { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .student-report { display: grid; gap: 14px; }
+    .student-report-hero {
+      padding: 16px 17px;
+      border: 1px solid rgba(30,30,32,.12);
+      border-radius: 4px;
+      background: linear-gradient(150deg, rgba(255,255,255,.62), rgba(246,242,233,.4));
+    }
+    .student-report-kicker { font-family: var(--mono); font-size: 8px; letter-spacing: .14em; color: var(--ink-soft); }
+    .student-report-hero h3 { margin: 7px 0 0; font-family: var(--serif); font-size: 21px; font-weight: 500; line-height: 1.5; color: var(--ink); }
+    .student-report-hero p { margin: 9px 0 0; font-size: 11px; line-height: 1.8; color: var(--ink-soft); }
+    .student-report-meta { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(30,30,32,.08); font-family: var(--mono); font-size: 8.5px; color: var(--ink-soft); }
+    .student-signal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .student-signal { padding: 12px 13px; border: 1px solid var(--line); border-radius: 4px; background: rgba(255,255,255,.4); }
+    .student-signal-tone { display: inline-block; padding: 2px 7px; border: 1px solid rgba(55,71,62,.16); border-radius: 999px; font-family: var(--mono); font-size: 8px; letter-spacing: .05em; color: #46604f; }
+    .student-signal-tone.tone-watch { color: #7b5228; border-color: rgba(133,95,45,.28); background: rgba(255,247,230,.6); }
+    .student-signal-tone.tone-growth { color: #405f6c; border-color: rgba(64,95,108,.26); background: rgba(240,248,250,.55); }
+    .student-signal p { margin: 8px 0 0; font-size: 10.5px; line-height: 1.7; color: var(--ink); }
+    .student-report-section { padding: 15px 16px; border: 1px solid var(--line); border-radius: 4px; background: rgba(255,255,255,.32); }
+    .student-report-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(30,30,32,.08); }
+    .student-report-section-head h4 { margin: 0; font-family: var(--serif); font-size: 14.5px; font-weight: 600; color: var(--ink); }
+    .student-report-section-head small { font-size: 8.5px; color: var(--ink-soft); text-align: right; }
+    .student-report-copy { margin: 0; font-size: 10.5px; line-height: 1.85; color: var(--ink-soft); }
+    .student-report-copy p { margin: 0 0 7px; }
+    .student-report-copy p:last-child { margin-bottom: 0; }
+    .student-report-list { margin: 8px 0 0; padding-left: 18px; font-size: 10px; line-height: 1.8; color: var(--ink-soft); }
+    .student-dimension-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .student-dimension { padding: 11px 12px; border: 1px solid rgba(30,30,32,.1); border-radius: 3px; background: rgba(255,255,255,.36); }
+    .student-dimension-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+    .student-dimension-head strong { font-size: 11px; color: var(--ink); }
+    .student-dimension-head span { font-family: var(--mono); font-size: 8px; color: var(--ink-soft); }
+    .student-dimension p { margin: 7px 0 0; font-size: 9.5px; line-height: 1.7; color: var(--ink-soft); }
+    .student-academic-total { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 13px; border: 1px solid rgba(55,71,62,.16); border-radius: 3px; background: rgba(246,242,233,.66); }
+    .student-academic-total small { display: block; font-size: 8px; color: var(--ink-soft); letter-spacing: .08em; }
+    .student-academic-total strong { display: block; margin-top: 3px; font-family: var(--serif); font-size: 18px; color: var(--ink); }
+    .student-academic-total span { font-family: var(--mono); font-size: 8.5px; color: #46604f; }
+    .student-subject-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; margin-top: 8px; }
+    .student-subject { padding: 9px 10px; border: 1px solid rgba(30,30,32,.1); border-radius: 3px; background: rgba(255,255,255,.45); }
+    .student-subject small { display: block; font-size: 8.5px; color: var(--ink-soft); }
+    .student-subject strong { display: block; margin-top: 5px; font-size: 13px; color: var(--ink); }
+    .student-subject span { display: block; margin-top: 3px; font-family: var(--mono); font-size: 8px; color: #46604f; }
+    .student-report-empty { margin: 8px 0 0; font-size: 10px; line-height: 1.7; color: var(--ink-soft); }
+    .student-report-gap { margin-top: 10px; }
+    .student-academic-notes { display: grid; gap: 5px; margin-top: 9px; padding-top: 9px; border-top: 1px solid rgba(30,30,32,.08); }
+    .student-academic-notes p { margin: 0; font-size: 9.5px; line-height: 1.7; color: var(--ink-soft); }
+    .student-advice-list { margin: 0; padding-left: 18px; display: grid; gap: 7px; font-size: 10.5px; line-height: 1.75; color: var(--ink-soft); }
+    .student-report-note { padding: 12px 14px; border: 1px solid rgba(30,30,32,.1); border-left: 2px solid rgba(55,71,62,.45); border-radius: 3px; background: rgba(246,242,233,.5); }
+    .student-report-note p { margin: 0 0 5px; font-size: 9px; line-height: 1.65; color: var(--ink-soft); }
+    .student-report-note p:last-child { margin-bottom: 0; }
+    @media (max-width: 640px) {
+      .student-signal-grid { grid-template-columns: 1fr; }
+      .student-dimension-grid { grid-template-columns: 1fr; }
+      .student-subject-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    .submit-footnote { margin-top: 9px; font-size: 9px; line-height: 1.6; color: var(--ink-soft); text-align: center; }
+    @keyframes submit-pulse { 0%, 100% { opacity: .28; transform: scale(.82); } 50% { opacity: 1; transform: scale(1); } }
     .scroll-soft::-webkit-scrollbar { width: 5px; height: 5px; }
     .scroll-soft::-webkit-scrollbar-thumb { border-radius: 0; background: rgba(46,52,47,.22); }
     .scroll-soft::-webkit-scrollbar-track { border-radius: 0; background: transparent; }
@@ -2050,6 +2161,31 @@
       background: #fffefb;
       box-shadow: 0 0 0 3px rgba(150, 98, 63, .13);
     }
+    .password-control { position: relative; display: block; }
+    .password-control input { padding-right: 68px; }
+    .password-toggle {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 42px;
+      padding: 0;
+      border: 1px solid rgba(150, 98, 63, .38);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .9);
+      color: #96623f;
+      cursor: pointer;
+      transition: background .16s ease, border-color .16s ease, color .16s ease;
+    }
+    .password-toggle svg { width: 20px; height: 20px; display: block; }
+    .password-toggle .pw-eye-off { display: none; }
+    .password-toggle[aria-pressed="true"] .pw-eye { display: none; }
+    .password-toggle[aria-pressed="true"] .pw-eye-off { display: block; }
+    .password-toggle:hover { border-color: rgba(150, 98, 63, .62); background: #fbf0e4; color: #6f4228; }
+    .password-toggle:focus-visible { outline: 2px solid rgba(150, 98, 63, .35); outline-offset: 1px; }
     .wb-auth-error {
       display: none;
       padding: 10px 12px;
@@ -2180,7 +2316,10 @@
           </label>
           <label class="wb-field">
             <span>密码</span>
-            <input id="wbAuthPassword" type="password" name="password" autocomplete="current-password" placeholder="请输入登录密码" maxlength="128" required>
+            <span class="password-control">
+              <input id="wbAuthPassword" type="password" name="password" autocomplete="current-password" placeholder="请输入登录密码" maxlength="128" required>
+              <button class="password-toggle" type="button" data-password-toggle="wbAuthPassword" aria-label="显示密码" aria-pressed="false"><svg class="pw-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.2 12S5.8 5.8 12 5.8s9.8 6.2 9.8 6.2-3.6 6.2-9.8 6.2S2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="2.7"/></svg><svg class="pw-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1c.5-.1.9-.1 1.4-.1 6.2 0 9.8 6 9.8 6a14.4 14.4 0 0 1-3.1 3.3"/><path d="M6.7 7.3C4 9 2.2 12 2.2 12s3.6 6.2 9.8 6.2c1.3 0 2.5-.3 3.6-.7"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button>
+            </span>
           </label>
           <div class="wb-auth-error" id="wbAuthError" role="alert"></div>
           <button type="submit" class="wb-auth-submit" id="wbAuthSubmit" data-busy="false">
@@ -2221,6 +2360,22 @@
       const submitLabel = document.getElementById("wbAuthSubmitLabel");
       const errorBox = document.getElementById("wbAuthError");
       const statusBox = document.getElementById("wbAuthStatus");
+
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-password-toggle]");
+        if (!button) return;
+        const input = document.getElementById(button.dataset.passwordToggle);
+        if (!input) return;
+        const show = input.type === "password";
+        input.type = show ? "text" : "password";
+        button.setAttribute("aria-label", show ? "隐藏密码" : "显示密码");
+        button.setAttribute("aria-pressed", String(show));
+        input.focus();
+        if (show) {
+          const end = input.value.length;
+          input.setSelectionRange(end, end);
+        }
+      });
 
       const readSession = () => {
         try { return window.sessionStorage.getItem(TOKEN_KEY) || ""; }
@@ -2496,6 +2651,7 @@
         grade_level: "初中",
         gender: "不透露",
         academic_scores: { exam_name: "", exam_date: "", total_score: "", class_rank: "", subjects: {} },
+        sand_name: "",
         self_image: "",
         self_narrative: "",
         teacher_observation: "",
@@ -3439,16 +3595,50 @@
     }
 
     const SCORE_SUBJECTS = ["语文", "数学", "英语", "科学", "综合"];
-    function StudentFields({ student }) {
+    function StudentFields({ student, onChange }) {
       const value = normaliseProfile(student);
+      const scores = value.academic_scores || {};
+      const subjects = scores.subjects || {};
       const classLine = [value.school_name, value.grade_level, value.class_name].filter(Boolean).join(" · ") || "未设置班级";
+      const setScore = (key, fieldValue) => {
+        if (!onChange) return;
+        onChange({
+          ...value,
+          academic_scores: { ...scores, [key]: fieldValue }
+        });
+      };
+      const setSubject = (subject, fieldValue) => {
+        if (!onChange) return;
+        onChange({
+          ...value,
+          academic_scores: { ...scores, subjects: { ...subjects, [subject]: fieldValue } }
+        });
+      };
       return h("div", { className: "student-fields" },
         h("div", { className: "identity-panel" },
           h("div", { className: "identity-item" }, h("small", null, "姓名"), h("strong", null, value.name || "学生")),
           h("div", { className: "identity-item" }, h("small", null, "学号"), h("strong", null, value.student_no || "未设置")),
           h("div", { className: "identity-item" }, h("small", null, "学部 / 年级 / 班级"), h("strong", null, classLine))
         ),
-        h("div", { className: "identity-note" }, "以上信息由学校账号统一维护。如果姓名、班级有误，请联系心理老师或管理员修改，不需要在测评里自行填写。")
+        h("div", { className: "identity-note" }, "身份信息由学校账号统一维护。下面的结构化成绩会直接进入报告的学习表现分析，请按这次考试实际情况填写；不确定的项可以留空。"),
+        h("div", { className: "score-panel" },
+          h("div", { className: "score-panel-head" },
+            h("span", null, "结构化成绩"),
+            h("small", null, "成绩会参与报告算法，缺项会在报告中标注待补充")
+          ),
+          h("div", { className: "score-meta-grid" },
+            h("div", { className: "finish-field" }, h("label", null, "考试名称"), h("input", { value: scores.exam_name || "", maxLength: 60, onChange: (event) => setScore("exam_name", event.target.value), placeholder: "如 期中考试" })),
+            h("div", { className: "finish-field" }, h("label", null, "考试日期"), h("input", { value: scores.exam_date || "", maxLength: 20, onChange: (event) => setScore("exam_date", event.target.value), placeholder: "YYYY-MM-DD" })),
+            h("div", { className: "finish-field" }, h("label", null, "总分"), h("input", { value: scores.total_score || "", maxLength: 20, onChange: (event) => setScore("total_score", event.target.value), placeholder: "如 286" })),
+            h("div", { className: "finish-field" }, h("label", null, "班级排名"), h("input", { value: scores.class_rank || "", maxLength: 24, onChange: (event) => setScore("class_rank", event.target.value), placeholder: "如 12/45" }))
+          ),
+          h("div", { className: "score-subject-grid" },
+            SCORE_SUBJECTS.map((subject) => h("div", { key: subject, className: "score-subject" },
+              h("label", null, subject),
+              h("input", { value: subjects[subject] || "", maxLength: 20, onChange: (event) => setSubject(subject, event.target.value), placeholder: "分数" })
+            ))
+          )
+        )
       );
     }
 
@@ -3465,7 +3655,7 @@
             h("button", { type: "button", className: "export-close", onClick: onClose }, "关闭")
           ),
           h("div", { className: "profile-body" },
-            h(StudentFields, { student: draft }),
+            h(StudentFields, { student: draft, onChange: setDraft }),
             h("div", { className: "finish-field" },
               h("label", null, "今天想说的话（可选）"),
               h("textarea", {
@@ -3547,9 +3737,10 @@
       const [stage, setStage] = React.useState("representative");
       const [representativeId, setRepresentativeId] = React.useState(items[0] ? items[0].id : "");
       const [description, setDescription] = React.useState("");
-      const [selfImage, setSelfImage] = React.useState(() => (profile && profile.self_image) || "");
+      const [sandName, setSandName] = React.useState(() => (profile && profile.sand_name) || "");
       const [selfNarrative, setSelfNarrative] = React.useState(() => (profile && profile.self_narrative) || "");
       const [student, setStudent] = React.useState(() => normaliseProfile(profile));
+      const [transcriptFile, setTranscriptFile] = React.useState(null);
       const [consent, setConsent] = React.useState(true);
       const [localError, setLocalError] = React.useState("");
 
@@ -3570,6 +3761,7 @@
       const submit = () => {
         if (!representative) { setLocalError("请先选择代表沙具。"); return; }
         if (description.trim().length < 10) { setLocalError("请至少写 10 个字，让老师理解你的沙盘。"); return; }
+        if (transcriptFile && transcriptFile.size > 24 * 1024 * 1024) { setLocalError("成绩单图片不能超过 24MB，请压缩后再上传。"); return; }
         if (!consent) { setLocalError("请确认知情同意后继续。"); return; }
         setLocalError("");
         onSubmit({
@@ -3577,9 +3769,10 @@
           representativeName: representative.label,
           representativeCategory: representative.category,
           description: description.trim(),
-          selfImage: selfImage.trim(),
+          sandName: sandName.trim(),
           selfNarrative: selfNarrative.trim(),
           student: normaliseProfile(student),
+          transcriptFile,
           consent
         });
       };
@@ -3589,15 +3782,15 @@
           h("div", { className: "finish-head" },
             h("div", null,
               h("div", { className: "finish-kicker" }, "SUBMIT WORK / 作品提交"),
-              h("h2", { className: "finish-title" }, stage === "representative" ? "哪一件沙具，最能代表此刻的你？" : "为你的沙盘，留下一段话"),
-              h("p", { className: "finish-sub" }, stage === "representative" ? "不是挑选最漂亮的一件，而是选择与你最有连接的一件。" : "这段描述会和沙盘图一起交给心理老师，帮助老师理解你的摆放。")
+              h("h2", { className: "finish-title" }, stage === "representative" ? "哪一件沙具，最能代表此刻的你？" : "为沙盘命名，并留下一段话"),
+              h("p", { className: "finish-sub" }, stage === "representative" ? "不是挑选最漂亮的一件，而是选择与你最有连接的一件。" : "给作品起个名字，再写下这段描述；它们会和沙盘图一起交给心理老师。")
             ),
             h("button", { type: "button", className: "export-close", onClick: busy ? null : onClose, disabled: busy }, "关闭")
           ),
           h("div", { className: "finish-steps" },
             h("div", { className: `finish-step${stage === "representative" ? " active" : " done"}` }, h("b", null, "01"), "选择代表沙具"),
             h("div", { className: "finish-step-line" }),
-            h("div", { className: `finish-step${stage === "description" ? " active" : ""}` }, h("b", null, "02"), "描述沙盘")
+            h("div", { className: `finish-step${stage === "description" ? " active" : ""}` }, h("b", null, "02"), "命名与描述")
           ),
           h("div", { className: "finish-body" },
             stage === "representative" ? h("div", null,
@@ -3632,13 +3825,13 @@
                 h("button", { type: "button", className: "mini-btn", onClick: () => setStage("representative") }, "重选")
               ) : null,
               h("div", { className: "finish-field" },
-                h("label", null, "哪一件沙具最像你（可选）"),
+                h("label", null, "给沙盘起个名字（可选）"),
                 h("input", {
-                  type: "text", value: selfImage, maxLength: 60,
-                  onChange: (event) => setSelfImage(event.target.value),
-                  placeholder: "例如：一棵树、一个蹲着的人、一盏灯……"
+                  type: "text", value: sandName, maxLength: 40,
+                  onChange: (event) => setSandName(event.target.value),
+                  placeholder: "例如：一个人的花园、雨后的操场、等风来……"
                 }),
-                h("span", { className: "counter" }, `${selfImage.length} / 60`)
+                h("span", { className: "counter" }, `${sandName.length} / 40`)
               ),
               h("div", { className: "finish-field" },
                 h("label", null, "沙盘描述（必填，不少于 10 字）"),
@@ -3665,8 +3858,18 @@
                 }),
                 h("span", { className: "counter" }, `${selfNarrative.length} / 800`)
               ),
-              h("div", { className: "profile-hint" },
-                `本次测评账号：${student.name || "学生"}${student.class_name ? " · " + student.class_name : ""}${student.student_no ? " · 学号 " + student.student_no : ""}`
+              h(StudentFields, { student, onChange: setStudent }),
+              h("label", { className: "file-drop" },
+                h("div", null,
+                  h("strong", null, transcriptFile ? `已选择：${transcriptFile.name}` : "上传成绩单图片（可选）"),
+                  h("small", null, "清晰的成绩单照片可以帮助老师核对各科成绩；不上传也可以只填结构化成绩。")
+                ),
+                h("span", { className: "mini-btn" }, transcriptFile ? "重新选择" : "选择图片"),
+                h("input", {
+                  type: "file",
+                  accept: "image/png,image/jpeg,image/webp",
+                  onChange: (event) => setTranscriptFile(event.target.files && event.target.files[0] ? event.target.files[0] : null)
+                })
               ),
               h("div", { className: "finish-consent" },
                 h("input", { type: "checkbox", checked: consent, onChange: (event) => setConsent(event.target.checked) }),
@@ -3676,7 +3879,7 @@
           ),
           h("div", { className: "finish-footer" },
             h("div", null,
-              (localError || error) ? h("div", { className: "finish-error" }, localError || error) : h("div", { className: "finish-footer-note" }, "提交后由心理老师在后台查看，你不需要在这里等待结果。")
+              (localError || error) ? h("div", { className: "finish-error" }, localError || error) : h("div", { className: "finish-footer-note" }, "提交后报告会在后台生成；完成后可在回执中查看你的简略版结果，完整报告由心理老师查看。")
             ),
             h("div", { className: "finish-actions" },
               h("button", { type: "button", className: "finish-btn", onClick: onClose, disabled: busy }, "返回沙盘"),
@@ -3691,75 +3894,340 @@
       );
     }
 
+    function StudentReportBrief({ brief }) {
+      if (!brief) return null;
+      const overall = brief.overall || {};
+      const academic = brief.academic || {};
+      const total = academic.total || {};
+      const signals = Array.isArray(brief.signals) ? brief.signals : [];
+      const dimensions = Array.isArray(brief.dimensions) ? brief.dimensions : [];
+      const subjects = Array.isArray(academic.subjects) ? academic.subjects : [];
+      const visibleSubjects = subjects.filter((row) => {
+        const hasScore = row && row.score !== null && row.score !== undefined && row.score !== "";
+        const grade = String((row && row.grade) || "").trim();
+        return hasScore || (grade && grade !== "待核对" && grade !== "待补充");
+      });
+      const advice = Array.isArray(brief.advice) ? brief.advice : [];
+      const sceneImagery = Array.isArray(overall.scene_imagery) ? overall.scene_imagery : [];
+      const scenePoints = Array.isArray(overall.scene_points) ? overall.scene_points : [];
+      const formatRate = (rate) => {
+        const number = Number(rate);
+        if (!Number.isFinite(number) || number <= 0) return "";
+        return number <= 1 ? `${Math.round(number * 100)}%` : `${Math.round(number)}%`;
+      };
+      const readableGrade = (grade) => {
+        const text = String(grade || "").trim();
+        return text && text !== "待核对" && text !== "待补充" ? text : "";
+      };
+      const scoreText = (row) => {
+        if (row.score === null || row.score === undefined || row.score === "") return row.grade || "待补充";
+        return row.full_score ? `${row.score} / ${row.full_score}` : String(row.score);
+      };
+      const totalText = (total.score === null || total.score === undefined || total.score === "")
+        ? "待补充"
+        : (total.full_score ? `${total.score} / ${total.full_score}` : String(total.score));
+      const section = (title, note, content) => h("section", { className: "student-report-section" },
+        h("div", { className: "student-report-section-head" },
+          h("h4", null, title),
+          note ? h("small", null, note) : null
+        ),
+        content
+      );
+      return h("div", { className: "student-report" },
+        h("div", { className: "student-report-hero" },
+          h("div", { className: "student-report-kicker" }, "YOUR SUMMARY / 你的简略版结果"),
+          h("h3", null, brief.headline || "本次沙盘已完成"),
+          brief.next_step ? h("p", null, brief.next_step) : null,
+          (brief.report_no || brief.generated_at) ? h("div", { className: "student-report-meta" },
+            brief.report_no ? h("span", null, `报告编号 ${brief.report_no}`) : null,
+            brief.generated_at ? h("span", null, brief.generated_at) : null
+          ) : null
+        ),
+        signals.length ? h("div", { className: "student-signal-grid" },
+          signals.map((signal, index) => h("div", { key: index, className: "student-signal" },
+            h("span", { className: `student-signal-tone tone-${signal.tone || "neutral"}` }, signal.label || "观察"),
+            h("p", null, signal.value || "—")
+          ))
+        ) : null,
+        (sceneImagery.length || scenePoints.length) ? section("整体印象", "沙盘画面的第一层印象", h("div", { className: "student-report-copy" },
+          sceneImagery.map((line, index) => h("p", { key: `imagery-${index}` }, line)),
+          scenePoints.length ? h("ul", { className: "student-report-list" },
+            scenePoints.map((line, index) => h("li", { key: `point-${index}` }, line))
+          ) : null
+        )) : null,
+        dimensions.length ? section("六维发展方向", "来自沙盘过程与作品的发展性观察", h("div", { className: "student-dimension-grid" },
+          dimensions.map((dimension, index) => h("div", { key: index, className: "student-dimension" },
+            h("div", { className: "student-dimension-head" },
+              h("strong", null, dimension.name || `方向 ${index + 1}`),
+              h("span", null, `把握度 ${dimension.confidence || "中"}`)
+            ),
+            h("p", null, dimension.judgement || "—")
+          ))
+        )) : null,
+        section("学业表现", academic.transcript_image_provided ? "已结合你上传的成绩单" : "来自你填写的结构化成绩", h("div", null,
+          h("div", { className: "student-academic-total" },
+            h("div", null, h("small", null, "总分"), h("strong", null, totalText)),
+            formatRate(total.rate) ? h("span", null, `得分率 ${formatRate(total.rate)}`) : null
+          ),
+          visibleSubjects.length ? h("div", { className: "student-subject-grid" },
+            visibleSubjects.map((subject, index) => h("div", { key: index, className: "student-subject" },
+              h("small", null, subject.subject || `科目 ${index + 1}`),
+              h("strong", null, scoreText(subject)),
+              (formatRate(subject.rate) || readableGrade(subject.grade)) ? h("span", null, [formatRate(subject.rate), readableGrade(subject.grade)].filter(Boolean).join(" · ")) : null
+            ))
+          ) : h("p", { className: "student-report-empty" }, academic.transcript_image_provided ? "已收到成绩单，老师会在完整报告中核对各科成绩。" : "本次没有填写各科成绩，学业分析会以老师掌握的信息为准。"),
+          academic.overall_interpretation ? h("p", { className: "student-report-copy student-report-gap" }, academic.overall_interpretation) : null,
+          (academic.strengths || academic.weaknesses || academic.trend) ? h("div", { className: "student-academic-notes" },
+            academic.strengths ? h("p", null, h("b", null, "优势："), academic.strengths) : null,
+            academic.weaknesses ? h("p", null, h("b", null, "待提升："), academic.weaknesses) : null,
+            academic.trend ? h("p", null, h("b", null, "变化："), academic.trend) : null
+          ) : null
+        )),
+        advice.length ? section("下一步建议", "可以先从一件小事开始", h("ul", { className: "student-advice-list" },
+          advice.map((item, index) => h("li", { key: index }, item))
+        )) : null,
+        h("div", { className: "student-report-note" },
+          h("p", null, brief.note || "本摘要为发展性评估参考。"),
+          h("p", null, "这是给你的简略版，不含风险分级与咨询师内部判断；完整报告由学校心理老师查看。"),
+          brief.disclaimer ? h("p", null, brief.disclaimer) : null
+        )
+      );
+    }
+
     function StudentSubmitModal({ payload, onClose, onToast }) {
-      if (!payload) return null;
+      const submitFailed = Boolean(payload.server_error);
+      const assessmentId = payload.report_id || "";
+      const initialPhase = submitFailed || payload.report_status === "failed"
+        ? "failed"
+        : (payload.report_status === "completed" ? "ready" : "offer");
+      const [phase, setPhase] = useState(initialPhase);
+      const [brief, setBrief] = useState(payload.report_brief || null);
+      const [pollError, setPollError] = useState("");
+      const [leaving, setLeaving] = useState(false);
+
+      useEffect(() => {
+        if (phase !== "waiting" || !assessmentId) return undefined;
+        let cancelled = false;
+        let timer = null;
+        const check = async () => {
+          try {
+            const authToken = window.SandplayAuth && window.SandplayAuth.getToken ? window.SandplayAuth.getToken() : "";
+            const response = await fetch(`${REPORT_API_BASE}/assessments/${encodeURIComponent(assessmentId)}/status`, {
+              method: "GET",
+              headers: authToken
+                ? { "Authorization": `Bearer ${authToken}`, "Accept": "application/json" }
+                : { "Accept": "application/json" },
+              cache: "no-store"
+            });
+            const body = await response.json().catch(() => ({}));
+            if (cancelled) return;
+            if (response.status === 401) {
+              setPhase("failed");
+              setPollError("登录状态已失效，请退出后重新登录查看。");
+              return;
+            }
+            if (response.status === 404 || response.status === 403) {
+              setPhase("failed");
+              setPollError("无法查询本次提交记录，请退出后联系心理老师。");
+              return;
+            }
+            if (!response.ok || body.code !== "OK") throw new Error(body.message || `状态查询返回 ${response.status}`);
+            const data = body.data || {};
+            const nextStatus = data.status || "analyzing";
+            if (data.report_ready || nextStatus === "completed") {
+              setBrief(data.brief || null);
+              setPhase("ready");
+              setPollError("");
+              if (onToast) onToast("沙盘结果已生成，心理老师可在后台查看");
+              return;
+            }
+            if (nextStatus === "failed") {
+              setPhase("failed");
+              setPollError("报告生成未完成，请联系心理老师处理。");
+              return;
+            }
+          } catch (error) {
+            if (!cancelled) setPollError("暂时无法获取生成进度，正在自动重试…");
+          }
+          if (!cancelled) timer = window.setTimeout(check, 4000);
+        };
+        check();
+        return () => {
+          cancelled = true;
+          if (timer) window.clearTimeout(timer);
+        };
+      }, [assessmentId, onToast, phase]);
+
+      useEffect(() => {
+        if (phase !== "ready" || brief || !assessmentId) return undefined;
+        let cancelled = false;
+        (async () => {
+          try {
+            const authToken = window.SandplayAuth && window.SandplayAuth.getToken ? window.SandplayAuth.getToken() : "";
+            const response = await fetch(`${REPORT_API_BASE}/assessments/${encodeURIComponent(assessmentId)}/status`, {
+              method: "GET",
+              headers: authToken
+                ? { "Authorization": `Bearer ${authToken}`, "Accept": "application/json" }
+                : { "Accept": "application/json" },
+              cache: "no-store"
+            });
+            const body = await response.json().catch(() => ({}));
+            if (cancelled) return;
+            if (!response.ok || body.code !== "OK" || !body.data || !body.data.brief) {
+              if (!cancelled) setPollError("报告已生成，但简略结果暂时无法读取。请联系心理老师查看完整报告。");
+              return;
+            }
+            if (!cancelled) {
+              setBrief(body.data.brief);
+              setPollError("");
+            }
+          } catch (error) {
+            if (!cancelled) setPollError("简略结果暂时无法读取，请稍后重试或联系心理老师。");
+          }
+        })();
+        return () => { cancelled = true; };
+      }, [assessmentId, brief, phase]);
+
       const summary = payload.grid_distribution && payload.grid_distribution.summary ? payload.grid_distribution.summary : {};
       const sampleCount = summary.total_items || 0;
       const sampleOccupied = summary.occupied_cells || 0;
       const sampleCenter = summary.center_count || 0;
-      const submitted = payload.report_status === "completed";
-      const failed = Boolean(payload.server_error);
-      const assessmentId = payload.report_id || "";
       const submittedAt = payload.report_created_at ? new Date(payload.report_created_at).toLocaleString("zh-CN", {
         year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"
       }) : "";
+      const studentName = payload.student && payload.student.name ? payload.student.name : "";
+      const reportFailed = phase === "failed" && !submitFailed;
+      const waiting = phase === "waiting";
+      const ready = phase === "ready";
+
+      const badgeText = submitFailed ? "未提交"
+        : (ready ? "已生成" : (reportFailed ? "生成失败" : (waiting ? "生成中" : "已提交")));
+      const badgeClass = `submit-badge${waiting ? " waiting" : ""}${(submitFailed || reportFailed) ? " failed" : ""}`;
+      const title = submitFailed ? "本次作品尚未提交"
+        : (ready ? "你的沙盘结果已经生成"
+          : (reportFailed ? "报告生成遇到问题"
+            : (waiting ? "正在生成沙盘结果" : "作品已提交")));
+      const subtitle = submitFailed
+        ? "作品图仍可保存。请先保存图片，再联系心理老师处理提交问题。"
+        : (ready
+          ? "下面是你可查看的简略版结果；完整报告由心理老师查看。"
+          : (reportFailed
+            ? "作品已经送达后台，但报告暂未生成。请联系心理老师处理。"
+            : (waiting
+              ? "数据已送达后台，正在等待沙盘结果。"
+              : "数据已成功送达后台，心理老师会在后台查看本次作品。")));
+      const message = submitFailed
+        ? `提交失败：${payload.server_error}。请先保存作品图，再联系心理老师，不要重复提交。`
+        : (reportFailed
+          ? "报告生成未完成。作品已经提交成功，请不要重复提交；心理老师可以在后台重新生成。"
+          : (ready
+            ? "报告已经生成。你可以先看下面的简略版，完整报告和心理建议由老师与你沟通。"
+            : (waiting
+              ? "可以保持当前页面打开。后台生成完成后会自动显示你的简略版结果；也可以退出登录，结果仍会保留在老师后台。"
+              : "你可以选择继续等待简略版结果，或先退出登录。退出后本次作品仍会保留在心理老师后台。")));
+
+      const leaveToLogin = () => {
+        if (leaving) return;
+        setLeaving(true);
+        try {
+          if (window.SandplayAuth && window.SandplayAuth.logout) {
+            window.SandplayAuth.logout();
+            return;
+          }
+        } catch (error) {}
+        onClose();
+        window.location.reload();
+      };
+
+      const startWaiting = () => {
+        if (!assessmentId) return;
+        setPollError("");
+        setPhase("waiting");
+      };
+
       return h("div", { className: "export-overlay" },
-        h("div", { className: "export-panel" },
+        h("div", { className: `export-panel submit-dialog${brief ? " submit-report" : ""}`, role: "dialog", "aria-modal": "true", "aria-label": "作品提交结果" },
           h("div", { className: "export-head" },
             h("div", null,
               h("div", { className: "panel-kicker" }, "SUBMISSION / 作品提交"),
-              h("h2", { className: "export-title" }, failed ? "本次作品尚未提交" : (submitted ? "作品已提交" : "本次沙盘作品")),
-              h("p", { className: "export-sub" }, failed
-                ? "作品图仍可保存。请先保存图片，再联系心理老师处理提交问题。"
-                : "心理老师会在后台查看本次作品。你不需要在这里等待报告。")
-            ),
-            h("button", { type: "button", onClick: onClose, className: "export-close" }, "关闭")
+              h("h2", { className: "export-title" }, title),
+              h("p", { className: "export-sub" }, subtitle)
+            )
           ),
           h("div", { className: "export-body" },
-            h("div", { className: "space-y-3" },
-              failed ? h("div", { className: "finish-error" }, `提交失败：${payload.server_error}。请先保存作品图，再联系心理老师。`) : null,
-              h("img", { src: payload.canvas_image_base64, alt: "我的沙盘作品", className: "export-image" }),
-              h("div", { className: "stat-grid" },
-                h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleCount), h("div", { className: "stat-label" }, "沙具数")),
-                h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleOccupied), h("div", { className: "stat-label" }, "占用区域")),
-                h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleCenter), h("div", { className: "stat-label" }, "中心区域沙具"))
-              ),
-              h("div", { className: "report-card" },
-                h("div", { className: "report-card-head" },
-                  h("strong", null, submitted ? "提交完成" : "作品仍在当前页面"),
-                  h("span", null, submitted ? "已交给老师" : "未提交")
-                ),
-                h("p", null, submitted
-                  ? `本次作品已提交${submittedAt ? "，时间 " + submittedAt : ""}${assessmentId ? "，提交编号 " + assessmentId.slice(0, 8).toUpperCase() : ""}。`
-                  : "刷新或关闭页面后，本次作品可能丢失。请先保存高清作品图。"),
-                submitted ? h("p", { style: { fontSize: 10.5, color: "#5c6a60", margin: "6px 0 0", lineHeight: 1.8 } },
-                  "工作台不向学生展示风险判断或临床结论。需要进一步沟通时，心理老师会另行联系你。") : null
-              ),
-              h("div", { className: "export-actions" },
-                h("button", { type: "button", onClick: () => downloadDataUrl("我的沙盘作品.png", payload.canvas_image_base64), className: "export-action primary" }, h("span", null, "保存高清作品图"), h("span", null, "↓"))
-              )
-            ),
-            h("div", { className: "report-overview" },
-              h("div", { className: "report-overview-head" },
-                h("div", null,
-                  h("div", { className: "report-overview-kicker" }, "接下来"),
-                  h("h3", null, "把作品交给老师就好"),
-                  h("p", { className: "report-overview-meta" }, "不需要自己解读，也不需要等待结果")
-                ),
-                h("span", { className: "report-overview-state" }, submitted ? "已提交" : "待提交")
-              ),
-              h("div", { className: "report-section" },
-                h("div", { className: "report-section-head" }, h("h4", null, "老师会看到什么"), h("span", null, "仅用于本次辅导")),
-                h("div", { className: "report-highlight" }, h("p", null, "沙盘整体画面、你选择的代表沙具、沙盘描述，以及你愿意补充的话。")),
-                h("ul", { className: "report-advice-list" },
-                  h("li", null, "作品只提交给学校心理老师，不进入公开分享页。"),
-                  h("li", null, "报告用于辅导参考，不用于分班、评优或临床诊断。"),
-                  h("li", null, "如果老师需要进一步了解，会另行和你约时间沟通。")
+            h("div", { className: "submit-receipt" },
+              h("div", null,
+                payload.canvas_image_base64
+                  ? h("img", { src: payload.canvas_image_base64, alt: "我的沙盘作品", className: "submit-thumb" })
+                  : null,
+                payload.canvas_image_base64
+                  ? h("button", {
+                    type: "button",
+                    className: "submit-save",
+                    onClick: () => downloadDataUrl("我的沙盘作品.png", payload.canvas_image_base64)
+                  }, "保存高清作品图 ↓")
+                  : null,
+                h("div", { className: "stat-grid", style: { marginTop: 10 } },
+                  h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleCount), h("div", { className: "stat-label" }, "沙具数")),
+                  h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleOccupied), h("div", { className: "stat-label" }, "占用区域")),
+                  h("div", { className: "stat-card" }, h("div", { className: "stat-value" }, sampleCenter), h("div", { className: "stat-label" }, "中心区域"))
                 )
               ),
-              h("div", { className: "export-actions" },
-                h("button", { type: "button", onClick: onClose, className: "export-action" }, h("span", null, "返回工作台"), h("span", null, "→"))
+              h("div", { className: "submit-main" },
+                h("div", { className: badgeClass, role: "status", "aria-live": "polite" }, h("span", { className: "dot" }), badgeText),
+                h("p", { className: "submit-message" }, message),
+                h("div", { className: "submit-meta" },
+                  h("div", { className: "submit-meta-item" },
+                    h("div", { className: "submit-meta-label" }, "提交编号"),
+                    h("div", { className: "submit-meta-value" }, assessmentId ? assessmentId.slice(0, 8).toUpperCase() : "—")
+                  ),
+                  h("div", { className: "submit-meta-item" },
+                    h("div", { className: "submit-meta-label" }, "当前状态"),
+                    h("div", { className: "submit-meta-value" }, badgeText)
+                  ),
+                  h("div", { className: "submit-meta-item" },
+                    h("div", { className: "submit-meta-label" }, "提交时间"),
+                    h("div", { className: "submit-meta-value" }, submittedAt || "—")
+                  ),
+                  h("div", { className: "submit-meta-item" },
+                    h("div", { className: "submit-meta-label" }, "学生"),
+                    h("div", { className: "submit-meta-value" }, studentName || "—")
+                  )
+                ),
+                pollError ? h("div", { className: "submit-note warn" }, pollError) : null
               )
+            ),
+            ready ? h("div", { className: "student-report-wrap" },
+              brief
+                ? h(StudentReportBrief, { brief })
+                : h("div", { className: `submit-note${pollError ? " warn" : ""}` }, pollError || "正在读取你的简略版结果…")
+            ) : null,
+            h("div", { className: `submit-dialog-actions${(ready || reportFailed) && !submitFailed ? " single" : ""}` },
+              submitFailed
+                ? h("button", { type: "button", onClick: onClose, className: "export-action primary" }, h("span", null, "返回修改"), h("span", null, "←"))
+                : (reportFailed
+                  ? h("button", { type: "button", onClick: leaveToLogin, disabled: leaving, className: "export-action primary" }, h("span", null, leaving ? "正在退出…" : "退出登录 · 返回登录页"), h("span", null, "→"))
+                  : (ready
+                    ? h("button", { type: "button", onClick: leaveToLogin, disabled: leaving, className: "export-action primary" }, h("span", null, leaving ? "正在退出…" : "退出登录 · 返回登录页"), h("span", null, "→"))
+                    : h("button", {
+                      type: "button",
+                      onClick: waiting ? undefined : startWaiting,
+                      disabled: waiting,
+                      className: "export-action primary"
+                    }, h("span", null, waiting ? h("span", { className: "submit-spinner" }) : null, waiting ? "等待中…" : "继续等待"), h("span", null, waiting ? "" : "→")))
+              ),
+              submitFailed
+                ? h("button", { type: "button", onClick: leaveToLogin, disabled: leaving, className: "export-action" }, h("span", null, "退出"), h("span", null, "→"))
+                : ((ready || reportFailed)
+                  ? null
+                  : h("button", { type: "button", onClick: leaveToLogin, disabled: leaving, className: "export-action" }, h("span", null, leaving ? "正在退出…" : "退出登录"), h("span", null, "→")))
+            ),
+            h("div", { className: "submit-footnote" },
+              submitFailed
+                ? "退出前请确认已经保存作品图。"
+                : (ready || reportFailed
+                  ? "结果仅用于本次心理辅导，不用于分班、评优或临床诊断。"
+                  : "退出会返回登录页；后台生成不会中断。")
             )
           )
         )
@@ -5091,9 +5559,11 @@
           representative_item_id: completionData.representativeId || null,
           representative_item_name: completionData.representativeName || null,
           representative_item_category: completionData.representativeCategory || null,
+          sand_name: completionData.sandName || "",
           self_image: completionData.selfImage || "",
           sandplay_description: completionData.description || "",
           self_narrative: completionData.selfNarrative || baseProfile.self_narrative || "",
+          transcript_file_name: completionData.transcriptFile ? completionData.transcriptFile.name : (baseProfile.transcript_name || null),
           student,
           consent: Boolean(completionData.consent),
           process_telemetry: processTelemetry,
@@ -5145,7 +5615,9 @@
             ...((completion.student || {}).academic_scores || {})
           },
           self_narrative: completion.selfNarrative || current.self_narrative,
-          self_image: completion.selfImage || current.self_image
+          sand_name: completion.sandName || current.sand_name || "",
+          self_image: completion.selfImage || current.self_image,
+          transcript_name: completion.transcriptFile ? completion.transcriptFile.name : current.transcript_name
         }));
         let basePayload = null;
         try {
@@ -5160,6 +5632,9 @@
           form.append("payload", JSON.stringify(serverPayload));
           const sandBlob = await dataUrlToBlob(basePayload.canvas_image_base64);
           form.append("sandplay_image", sandBlob, "sandplay.png");
+          if (completion.transcriptFile) {
+            form.append("transcript_image", completion.transcriptFile, completion.transcriptFile.name || "transcript.png");
+          }
           const authToken = window.SandplayAuth ? window.SandplayAuth.getToken() : "";
           const response = await fetch(`${REPORT_API_BASE}/assessments`, {
             method: "POST",
@@ -5173,7 +5648,8 @@
           const enriched = {
             ...basePayload,
             report_id: server.assessment_id,
-            report_status: "completed",
+            report_status: server.status || "analyzing",
+            report_ready: Boolean(server.report_ready),
             report_created_at: server.created_at,
             sandplay_image_url: server.sandplay_image_url
           };
