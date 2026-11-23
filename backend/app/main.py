@@ -884,12 +884,11 @@ async def get_shared_report(
     full = json.loads(row.report_json)
     return ok(request, {
         "share": {
-            "token": link.token,
             "created_at": iso_utc(link.created_at),
             "expires_at": iso_utc(link.expires_at),
             "long_term": link.expires_at is None,
             "visibility": "student_guardian",
-            "redacted_chapters": ["chapter_5_risk"],
+            "redacted_chapters": ["chapter_5_risk", "priority_banner"],
         },
         "report": sign_report_media(public_copy(full), row.id),
     })

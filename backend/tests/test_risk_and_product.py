@@ -180,6 +180,13 @@ class SummaryAndComparisonTests(unittest.TestCase):
             "public": {"headline": "家长标题", "signals": [], "next_step": "下一步"},
         }
         report["chapter_5_risk"]["dimensions"][0]["level"] = "L3"
+        report["chapter_1_overview"]["process_analysis"] = {"pace": "总耗时 453 秒"}
+        report["chapter_1_overview"]["terrain_observation"] = {"heightmap": "内部高度图"}
+        report["chapter_1_overview"]["teacher_observation"] = "教师内部观察"
+        report["chapter_3_six_dimensions"] = {
+            "process_integration": {"summary": "制作过程内部数据"},
+            "dimensions": [{"key": "cognitive", "name": "认知", "confidence": "中"}],
+        }
         report["meta"]["quality_flags"] = ["VISUAL_RISK_OBJECT", "HOLISTIC_SCREEN_MISSING", "KEEP_FLAG"]
         report["meta"]["quality_warnings"] = [
             {"code": "VISUAL_RISK_OBJECT", "message": "视觉高危物体"},
@@ -199,6 +206,11 @@ class SummaryAndComparisonTests(unittest.TestCase):
         self.assertNotIn("student_no", public["meta"])
         self.assertNotIn("process_metrics", public["meta"])
         self.assertNotIn("generation_usage", public["meta"])
+        self.assertNotIn("process_analysis", public["chapter_1_overview"])
+        self.assertNotIn("terrain_observation", public["chapter_1_overview"])
+        self.assertNotIn("teacher_observation", public["chapter_1_overview"])
+        self.assertNotIn("process_integration", public["chapter_3_six_dimensions"])
+        self.assertNotIn("heightmap", public["chapter_1_overview"])
 
 
 if __name__ == "__main__":

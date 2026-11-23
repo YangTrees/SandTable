@@ -96,6 +96,16 @@ def report_chapter_count(report: dict[str, Any]) -> int:
     return sum(1 for key in report if re.fullmatch(r"chapter_[1-9]_[a-z_]+", key))
 
 
+_PUBLIC_INTERNAL_PREFIXES = (
+    "process_", "terrain_", "heightmap_", "quality_", "sample_",
+    "generation_", "review_", "counselor_", "risk_",
+)
+_PUBLIC_INTERNAL_KEYS = {
+    "teacher_observation", "teacher_note", "teacher_notes",
+    "internal_note", "internal_notes", "process", "quality", "heightmap",
+}
+
+
 def _public_scrub(value: Any) -> Any:
     """Recursively remove counselor-only payloads and algorithm-facing wording."""
     if isinstance(value, dict):
@@ -103,6 +113,8 @@ def _public_scrub(value: Any) -> Any:
         for key, item in value.items():
             lowered = str(key).lower()
             if lowered in {"nine_grid_distribution", "grid_distribution", "heightmap"}:
+                continue
+            if lowered in _PUBLIC_INTERNAL_KEYS or lowered.startswith(_PUBLIC_INTERNAL_PREFIXES):
                 continue
             if lowered.startswith("counselor") or lowered in {"risk_level", "risk_summary", "risk_overview"}:
                 continue
